@@ -112,14 +112,19 @@
   .dd-item:last-child{border-bottom:none}
   .dd-dot{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
   .dd-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .rav-mutabaah{background:#eef1f7;color:#7f95c4} .rav-muhib{background:var(--blue-s);color:var(--blue)} .rav-muayyid{background:#fff3c9;color:var(--amber)}
+  .rav{font-size:12px;font-weight:800;letter-spacing:.02em}
+  .cev.pes-akhawat{background:var(--blue-s);color:var(--blueb)} .cev.pes-campur{background:#e3f5f1;color:#1f8f80}
+  .rj{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:#fff;box-shadow:var(--shadow)}
+  .rj-h{font-weight:800;color:var(--blue);margin-bottom:6px} .rj-b{font-size:13.5px;line-height:1.55}
   .iptblk{width:6px;border-radius:4px;flex:0 0 auto;align-self:stretch;min-height:34px}
   .row.sel{outline:2px solid var(--blue);outline-offset:-1px}
   .iptdot{width:11px;height:11px;border-radius:3px;flex:0 0 auto;margin-right:2px}
   .ipt-pill{text-align:left}
   .ipt-pill .lbl{flex:1;text-align:left;line-height:1.25}
-  .drawer-back{position:fixed;inset:0;background:rgba(9,30,66,.34);z-index:50;animation:fadein .15s ease}
+  .drawer-back{position:fixed;inset:0;background:rgba(9,30,66,.34);z-index:50;}
   @keyframes fadein{from{opacity:0}to{opacity:1}}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:480px;max-width:100%;background:var(--paper);z-index:51;box-shadow:-10px 0 34px rgba(9,30,66,.2);display:flex;flex-direction:column;animation:slidein .2s ease}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:480px;max-width:100%;background:var(--paper);z-index:51;box-shadow:-10px 0 34px rgba(9,30,66,.2);display:flex;flex-direction:column;}
   @keyframes slidein{from{transform:translateX(28px);opacity:.5}to{transform:none;opacity:1}}
   .drawer-head{display:flex;align-items:center;gap:10px;padding:13px 15px;background:#fff;border-bottom:1px solid var(--line)}
   .drawer-head .dname{font-weight:800;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -234,6 +239,7 @@
   <button class="navtab" data-view="minit">Minit &amp; Tindakan</button>
   <button class="navtab" data-view="wasilah">Wasilah</button>
   <button class="navtab" data-view="tuntutan">Tuntutan</button>
+  <button class="navtab" data-view="rujukan">Rujukan</button>
 </div></nav>
 
 <main class="app" id="app"></main>
@@ -320,27 +326,35 @@ function getC(id){return S.claims.find(c=>c.id===id);}
 function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],minatUsrah:"Belum",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",_open:true,_etab:1,_upd:Date.now()};}
 function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_open:true,_upd:Date.now()};}
 function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"Belum"};}
-function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",dapMUH:"",dapMUT:"",catatan:"",_open:true,_upd:Date.now()};}
+function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_open:true,_upd:Date.now()};}
 function newClaim(){return{id:uid("cl_"),reportName:"",jenis:"Bajet Muayyasah",tarikh:today(),desc:"",amount:"",cukai:"0.00",resit:"",lampiran:"",files:[],status:"Draf",namaPemohon:"",namaAgensi:"PEMBINA",tarikhAktiviti:"",perincianAktiviti:"",jumlahMadu:"",perincianBelanja:"",gambarLink:"",jumlahDipohon:"",penama:"",bank:"",akaun:"",_open:true,_upd:Date.now()};}
 
 /* ---- MUT status ---- */
 function sesCount(p){return(p.sessions||[]).length;}
-function mutStatus(p){const n=sesCount(p);if(n>=3&&p.minatUsrah==="Ya")return{k:"g",t:"Layak Tarsyih"};if(n>=3)return{k:"a",t:"Tunggu minat usrah"};if(n>0)return{k:"b",t:"Mutabaah aktif"};return{k:"n",t:"Belum mula"};}
+function mutStatus(p){const n=sesCount(p);if(n>=3&&p.minatUsrah==="Ya")return{k:"g",t:"Layak Tarsyih"};if(n>=3)return{k:"a",t:"Tunggu minat usrah"};if(n>0)return{k:"",t:""};return{k:"n",t:"Belum mula"};}
 /* ---- BPMy ---- */
 function bpmy(p){const sc=p.bpmy||{};let total=0;const cats=BPMY.map(c=>{let s=0,max=0;c.items.forEach(it=>{s+=(sc[it.id]||0)*it.w;max+=5*it.w;});total+=s;return{id:c.id,name:c.name,score:s,max:max};});
   return{cats,total,pct:total/BPMY_MAX,pass:(total/BPMY_MAX)>=0.5};}
 function muhStatus(p){const b=bpmy(p);const pc=Math.round(b.pct*100);if(b.pass)return{k:"g",t:"Layak MAY · "+pc+"%"};if(b.total>0)return{k:"b",t:"BPMy "+pc+"%"};return{k:"n",t:"Baru muhib"};}
 function statusOf(p){if(p.stage==="mutabaah")return mutStatus(p);if(p.stage==="muhib")return muhStatus(p);if(p.stage==="muayyid")return{k:"g",t:"Muayyid"};return{k:"n",t:"Baru"};}
 function eligible(p){if(p.stage==="mutabaah")return sesCount(p)>=3&&p.minatUsrah==="Ya";if(p.stage==="muhib")return bpmy(p).pass;return false;}
+function stageCode(s){return {mutabaah:"MUT",muhib:"MUH",muayyid:"MY"}[s]||"—";}
 function stageLabel(s){return(STAGES.find(x=>x.id===s)||{}).label||s;}
 
 /* =============== RENDER =============== */
+function viewRujukan(){return `
+  <div class="grp"><h3>Kriteria Kemenjadian</h3>
+   <div class="rj"><div class="rj-h">Mutabaah → Muhib</div><div class="rj-b"><b>Tempoh:</b> ± 1 bulan (sasaran tarsyih Oktober 2026).<br><b>Syarat tarsyih:</b> hadir usrah sekurang-kurangnya <b>3 kali</b> DAN menunjukkan <b>minat untuk menyertai usrah</b>.</div></div>
+   <div class="rj"><div class="rj-h">Muhib → Muayyid</div><div class="rj-b"><b>Tempoh:</b> ± 6 bulan (Nov 2026 – Mei 2027, tarsyih Jun 2027).<br><b>Syarat tarsyih — BPMy ≥ 50%:</b> dinilai atas 5 ciri — Muayyasyah, Komitmen, Kerja Berpasukan, Ciri Kesolehan (item 4.8/4.9 wajib), dan Kefahaman Dakwah (item 5.1a wajib). Isi borang BPMy dalam tab <b>Pencalonan Muayyid</b> bagi setiap muhib.</div></div>
+  </div>
+  <div class="grp"><h3>Silibus Usrah (MUT / MUH)</h3><div class="hint">Akan dikemas kini selepas pengesahan. Kongsikan silibus apabila sedia dan ia akan dimasukkan di sini.</div></div>`;}
 function setView(v){view=v;document.querySelectorAll(".navtab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render();}
 function render(){const a=$("#app");
   if(view==="keahlian")a.innerHTML=viewKeahlian();
   else if(view==="minit")a.innerHTML=viewMinit();
   else if(view==="wasilah")a.innerHTML=viewWasilah();
   else if(view==="tuntutan")a.innerHTML=viewTuntutan();
+  else if(view==="rujukan")a.innerHTML=viewRujukan();
 }
 
 /* helpers for fields */
@@ -390,10 +404,14 @@ function viewKeahlian(){
     </div>${detailDrawer()}`;
 }
 
-function statsPD(){const map={};
-  S.people.forEach(p=>{(p.sessions||[]).forEach(s=>{if(s.jenis!=="Usrah"&&s.jenis!=="DF")return;[s.oleh||p.pd1,s.oleh2].forEach(who=>{if(!who)return;map[who]=map[who]||{Usrah:0,DF:0};map[who][s.jenis]=(map[who][s.jenis]||0)+1;});});});
+function statsPD(){const map={};const MM=["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogos","Sep","Okt","Nov","Dis"];
+  S.people.forEach(p=>{(p.sessions||[]).forEach(s=>{if(s.jenis!=="Usrah"&&s.jenis!=="DF")return;const mk=(s.tarikh||"").slice(0,7);[s.oleh||p.pd1,s.oleh2].forEach(who=>{if(!who)return;map[who]=map[who]||{};map[who][mk]=map[who][mk]||{U:0,D:0};if(s.jenis==="Usrah")map[who][mk].U++;else map[who][mk].D++;});});});
   const keys=Object.keys(map).sort();if(!keys.length)return "";
-  return `<details class="stats" open><summary style="cursor:pointer;font-weight:800;color:var(--blue)">Frekuensi usrah / DF ikut PD</summary><div style="margin-top:8px">`+keys.map(k=>`<div class="stat-row"><span>${esc(k)}</span><b>${map[k].Usrah||0} usrah · ${map[k].DF||0} DF</b></div>`).join("")+`</div></details>`;
+  const body=keys.map(k=>{const months=Object.keys(map[k]).filter(x=>x).sort();
+    const lines=months.map(m=>{const pr=m.split("-");const lbl=(MM[(+pr[1])-1]||pr[1])+" "+pr[0];return `<div class="stat-row" style="padding-left:12px"><span style="color:var(--muted)">${lbl}</span><b>${map[k][m].U} usrah · ${map[k][m].D} DF</b></div>`;}).join("");
+    const tU=months.reduce((a,m)=>a+map[k][m].U,0),tD=months.reduce((a,m)=>a+map[k][m].D,0);
+    return `<div style="margin-bottom:8px"><div class="stat-row" style="font-weight:800;color:var(--ink)"><span>${esc(k)}</span><b>${tU} usrah · ${tD} DF</b></div>${lines}</div>`;}).join("");
+  return `<details class="stats"><summary style="cursor:pointer;font-weight:800;color:var(--blue)">Kekerapan usrah / DF ikut PD</summary><div style="margin-top:8px">${body}</div></details>`;
 }
 
 function iptPills(){let base=S.people.slice();if(stage!=="all")base=base.filter(p=>p.stage===stage);
@@ -415,9 +433,9 @@ function rowKeahlian(p){
   if(!p.pd1&&!p.pd2)tags.push(`<span class="tag red">Tiada PD</span>`);
   if(p.stage==="mutabaah")tags.push(`<span class="tag ses">${sesCount(p)} sesi</span>`);
   return `<div class="row${selId===p.id?" sel":""}">
-    <div class="rhead" data-sel="${p.id}"><span class="iptblk" style="background:${iptColor(p.universiti)}" title="${esc(p.universiti||"Tiada IPT")}"></span><div class="rav">${initials(p.nama)}</div>
+    <div class="rhead" data-sel="${p.id}"><span class="iptblk" style="background:${iptColor(p.universiti)}" title="${esc(p.universiti||"Tiada IPT")}"></span><div class="rav rav-${p.stage}" title="${esc(stageLabel(p.stage))}">${stageCode(p.stage)}</div>
       <div class="rname${p.nama?"":" empty"}">${p.nama?esc(p.nama):"(nama baharu)"}</div>
-      <div class="rtags"><span class="tag st">${stageLabel(p.stage)}</span>${tags.join("")}<span class="badge b-${st.k}">${st.t}</span></div>
+      <div class="rtags">${tags.join("")}${st.t?`<span class="badge b-${st.k}">${st.t}</span>`:""}</div>
       <span class="chev">›</span></div>
   </div>`;
 }
@@ -431,7 +449,6 @@ function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
     ${fld("Institut Pengajian Tinggi (IPT)",selManaged(p.id,"universiti",p.universiti,"universities"))}
     <div class="g2">${fld("Bidang pengajian",T(p.id,"bidang",p.bidang,"cth. Perubatan"))}${fld("Tahap pengajian",T(p.id,"tahap",p.tahap,"cth. Sarjana Muda"))}</div>
     <div class="g2">${fld("Tahun kemasukan IPT",T(p.id,"tahunMasuk",p.tahunMasuk,"cth. 2024"))}${fld("Status",SELf(p.id,"kerja",p.kerja,KERJA))}</div>
-    ${fld("Tarikh tamat pengajian",T(p.id,"tamatP",p.tamatP,"","date"))}
     ${p.stage==="muayyid"?fld("Tarikh kenaikan MAY",T(p.id,"tarikhMuayyid",p.tarikhMuayyid,"","date")):""}
     ${fld("Kolej kediaman (jika ada)",selManaged(p.id,"kolej",p.kolej,"kolej"))}
     ${fld("Alamat di cawangan",TA(p.id,"alamatCaw",p.alamatCaw,"Alamat sewa / luar kampus"))}
@@ -441,9 +458,8 @@ function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
       <div class="g2">${fld("Poskod",T(p.id,"poskod",p.poskod,"40000"))}${fld("Negeri",SELf(p.id,"negeri",p.negeri,NEGERI))}</div>
     </div></div>`;}
 
-function secPD(p){return `<div class="grp"><h3>Penggerak Dakwah & tajmik</h3>
+function secPD(p){return `<div class="grp"><h3>Penggerak Dakwah</h3>
     <div class="g2">${fld("PD 1",selManaged(p.id,"pd1",p.pd1,"pds"))}${fld("PD 2",selManaged(p.id,"pd2",p.pd2,"pds"))}</div>
-    ${fld("Di-tajmik / didekati oleh",T(p.id,"tajmik",p.tajmik,"Siapa approach"))}
     <div class="g2">${fld("Peringkat",stageSelect(p.id,p.stage))}${fld("Tahun PSPB",`<select data-ed="${p.id}" data-f="tahunPSPB"><option value=""${!p.tahunPSPB?" selected":""}>— Tahun PSPB —</option>${PSPB_YEARS.map(y=>`<option${String(p.tahunPSPB)===y?" selected":""}>${y}</option>`).join("")}</select>`)}</div>
   </div>`;}
 
@@ -453,11 +469,11 @@ function secPassing(p){return `<div class="grp"><h3>Passing ke cawangan lain</h3
   </div>`;}
 function secCatatan(p){return `<div class="grp"><h3>Catatan</h3>${fld("Nota",TA(p.id,"catatan",p.catatan,"Nota…"))}</div>`+attList("person",p.id,p.lampiran);}
 function editorKeahlian(p){
-  const info=secMaklumat(p)+secPD(p);
-  let tabs=[["Maklumat asas & PD",info],["Kehadiran",mutSection(p)]];
+  const info=secPD(p)+secMaklumat(p);
+  const pc=secPassing(p)+secCatatan(p);
+  let tabs=[["Kehadiran",mutSection(p)],["Maklumat & PD",info]];
   if(p.stage==="muhib")tabs.push(["Pencalonan Muayyid",muhSection(p)]);
-  tabs.push(["Passing",secPassing(p)]); tabs.push(["Catatan",secCatatan(p)]);
-  if(p.stage==="muayyid")tabs=[["Maklumat asas & PD",info],["Passing",secPassing(p)],["Catatan",secCatatan(p)]];
+  tabs.push(["Passing & Catatan",pc]);
   const t=Math.min(p._etab||1,tabs.length);
   const nav=`<div class="etabs">`+tabs.map((tb,i)=>`<button class="etab${(t===i+1)?" on":""}" data-etab="${p.id}|${i+1}">${tb[0]}</button>`).join("")+`</div>`;
   let lab="";if(p.stage==="mutabaah")lab="Naik ke Muhib →";else if(p.stage==="muhib")lab="Naik ke Muayyid →";
@@ -529,12 +545,12 @@ function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").lengt
 /* ---------- WASILAH ---------- */
 let wasMode="list";
 function viewWasilah(){
-  const toggle=`<div class="bar"><div class="toggle"><button class="${wasMode==="list"?"on":""}" data-wmode="list">Senarai</button><button class="${wasMode==="cal"?"on":""}" data-wmode="cal">Kalendar</button></div><button class="add" id="addWasBtn" style="margin-left:auto">＋ Wasilah</button><button class="btn2" id="addHolBtn">＋ Tarikh penting</button></div>`;
+  const toggle=`<div class="bar"><div class="toggle"><button class="${wasMode==="list"?"on":""}" data-wmode="list">Senarai</button><button class="${wasMode==="cal"?"on":""}" data-wmode="cal">Kalendar</button></div><button class="add" id="addWasBtn" style="margin-left:auto">＋ Program</button><button class="btn2" id="addHolBtn">＋ Tarikh penting</button></div>`;
   if(wasMode==="cal")return toggle+calLegend()+calendarHTML()+calDayDetail()+holSection();
-  const list=S.wasilah.length?S.wasilah.slice().sort((a,b)=>(a.tarikh||"").localeCompare(b.tarikh||"")).map(wasCard).join(""):`<div class="empty"><b>Belum ada wasilah</b></div>`;
+  const anyOpen=S.wasilah.some(w=>w._open);const sorted=anyOpen?S.wasilah.slice():S.wasilah.slice().sort((a,b)=>(a.tarikh||"").localeCompare(b.tarikh||""));const list=S.wasilah.length?sorted.map(wasCard).join(""):`<div class="empty"><b>Belum ada program</b></div>`;
   return toggle+`<div class="rows">${list}</div>`+holSection();
 }
-function calLegend(){const L=(c,t)=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:${c};display:inline-block"></span>${t}</span>`;return `<div class="hint" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:8px">${L("var(--blueb)","Wasilah")}${L("var(--red)","Cuti umum")}${L("var(--purple)","Cuti semester")}${L("var(--amber)","Study week")}<span>\uD83C\uDF82 Hari lahir</span></div>`;}
+function calLegend(){const L=(c,t)=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:${c};display:inline-block"></span>${t}</span>`;return `<div class="hint" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:8px">${L("var(--blueb)","Akhawat")}${L("#1f8f80","Campur")}${L("var(--red)","Cuti umum")}${L("var(--purple)","Cuti semester")}${L("var(--amber)","Study week")}<span>\uD83C\uDF82 Hari lahir</span></div>`;}
 function holSection(){const list=(S.holidays||[]).slice().sort((a,b)=>(a.start||"").localeCompare(b.start||""));
   return `<div class="stats" style="margin-top:12px"><div data-holtoggle="1" style="cursor:pointer;font-weight:800;color:var(--blue);display:flex;align-items:center;justify-content:space-between">Tarikh Penting & Cuti (${list.length})<span style="font-size:12px;color:var(--muted)">${holOpen?"Sembunyi ▲":"Papar ▼"}</span></div>${holOpen?`<div class="hint" style="margin-top:8px">Cuti umum Selangor (tarikh tetap) telah diisi. Tambah cuti semester UiTM/MSU, study week, atau cuti bergerak (Raya/CNY) di sini — sahkan tarikh rasmi.</div><div class="rows" style="margin-top:8px">${list.map(holCard).join("")}</div>`:""}</div>`;}
 
@@ -546,7 +562,9 @@ function wasCard(w){const sb={"Sudah":"b-g","Belum":"b-n","Tangguh":"b-a"}[w.sta
     <div class="rbody">
       <div class="g2">${fld("Nama program",`<input data-wed="${w.id}" data-f="nama" value="${esc(w.nama)}">`)}${fld("Bahan",`<input data-wed="${w.id}" data-f="bahan" value="${esc(w.bahan)}" placeholder="cth. OBI">`)}</div>
       <div class="g2">${fld("Tarikh mula",`<input data-wed="${w.id}" data-f="tarikh" type="date" value="${esc(w.tarikh)}">`)}${fld("Tarikh tamat (jika program >1 hari)",`<input data-wed="${w.id}" data-f="tarikhTamat" type="date" value="${esc(w.tarikhTamat)}">`)}</div>
-      <div class="g2">${fld("Medium",SELw(w.id,"medium",w.medium,W_MEDIUM))}${fld("Status pelaksanaan",SELw(w.id,"status",w.status,W_STATUS))}</div>
+      <div class="g2">${fld("Medium",SELw(w.id,"medium",w.medium,W_MEDIUM))}${fld("Status pelaksanaan",wtgl(w.id,"status",w.status,W_STATUS))}</div>
+      <div class="g2">${fld("Jenis peserta",wtgl(w.id,"peserta",w.peserta||"Akhawat",["Akhawat","Campur"]))}${fld("Program kolaborasi?",`<div class="toggle"><button data-wtgl="${w.id}|kolab|true" class="${w.kolab?"on":""}">Ya</button><button data-wtgl="${w.id}|kolab|false" class="${!w.kolab?"on":""}">Tidak</button></div>`)}</div>
+      ${w.kolab?fld("Nama pihak kolaborasi",`<input data-wed="${w.id}" data-f="kolabNama" value="${esc(w.kolabNama||"")}" placeholder="cth. Sekretariat X">`):""}
       <div class="g3">${fld("Target peserta",`<input data-wed="${w.id}" data-f="target" type="number" min="0" value="${esc(w.target)}" placeholder="cth. 30">`)}${fld("Venue",`<input data-wed="${w.id}" data-f="venue" value="${esc(w.venue)}">`)}${fld("Anggaran budget (RM)",`<input data-wed="${w.id}" data-f="budget" type="number" min="0" step="0.01" value="${esc(w.budget)}" placeholder="0.00">`)}</div>
       ${fld("PIC",`<input data-wed="${w.id}" data-f="pic" value="${esc(w.pic)}">`)}
       <div class="g2">${fld("Dapatan — MUH hadir",`<input data-wed="${w.id}" data-f="dapMUH" type="number" min="0" value="${esc(w.dapMUH)}" placeholder="bil.">`)}${fld("Dapatan — MUT hadir",`<input data-wed="${w.id}" data-f="dapMUT" type="number" min="0" value="${esc(w.dapMUT)}" placeholder="bil.">`)}</div>
@@ -555,6 +573,7 @@ function wasCard(w){const sb={"Sudah":"b-g","Belum":"b-n","Tangguh":"b-a"}[w.sta
     </div></div>`;
 }
 function SELw(id,f,v,opts){return `<select data-wed="${id}" data-f="${f}">`+opts.map(o=>`<option${o===v?" selected":""}>${esc(o)}</option>`).join("")+`</select>`;}
+function wtgl(id,f,v,opts){return `<div class="toggle${opts.length>2?" g":""}">`+opts.map(o=>`<button data-wtgl="${id}|${f}|${esc(o)}" class="${v===o?"on":""}">${esc(o)}</button>`).join("")+`</div>`;}
 function holClass(j){return j==="Cuti Umum"?"hol-umum":j==="Cuti Semester"?"hol-sem":j==="Study Week"?"hol-study":"hol-lain";}
 function icBirthday(ic){const d=(ic||"").replace(/\D/g,"");if(d.length<6)return null;const mm=+d.slice(2,4),dd=+d.slice(4,6);if(mm<1||mm>12||dd<1||dd>31)return null;return{mm:mm,dd:dd};}
 function calendarHTML(){
@@ -567,7 +586,7 @@ function calendarHTML(){
     const hs=(S.holidays||[]).filter(x=>x.start&&iso>=x.start&&iso<=(x.end||x.start));
     const evs=S.wasilah.filter(w=>w.tarikh&&iso>=w.tarikh&&iso<=(w.tarikhTamat||w.tarikh));
     const bd=bdays.filter(x=>x.b.mm===cm&&x.b.dd===cd);
-    cells+=`<div class="cald${out?" out":""}${selDate===iso?" sel":""}" data-calday="${iso}"><div class="dn">${d.getDate()}</div>`+hs.map(x=>`<div class="cev ${holClass(x.jenis)}">${esc(x.nama||"cuti")}</div>`).join("")+bd.map(x=>`<div class="cev bday">\uD83C\uDF82 ${esc(x.n)}</div>`).join("")+evs.map(w=>`<div class="cev ${w.status==="Sudah"?"done":(w.status==="Tangguh"?"tangguh":"")}">${esc(w.nama||"program")}</div>`).join("")+`</div>`;}
+    cells+=`<div class="cald${out?" out":""}${selDate===iso?" sel":""}" data-calday="${iso}"><div class="dn">${d.getDate()}</div>`+hs.map(x=>`<div class="cev ${holClass(x.jenis)}">${esc(x.nama||"cuti")}</div>`).join("")+bd.map(x=>`<div class="cev bday">\uD83C\uDF82 ${esc(x.n)}</div>`).join("")+evs.map(w=>`<div class="cev pes-${(w.peserta==="Campur")?"campur":"akhawat"}" title="${esc(w.nama)} · ${esc(w.status)}${w.kolab?" · kolab":""}">${esc(w.nama||"program")}</div>`).join("")+`</div>`;}
   return `<div class="caltop"><button class="btn2" data-calnav="-1">‹</button><h3>${months[mo]} ${y}</h3><button class="btn2" data-calnav="1">›</button></div>
     <div class="cal">${dows.map(d=>`<div class="calh">${d}</div>`).join("")}${cells}</div>`;
 }
@@ -582,7 +601,7 @@ function calDayDetail(){
   const bd=(S.people||[]).map(x=>({b:icBirthday(x.ic),n:x.nama})).filter(x=>x.b&&x.b.mm===cm&&x.b.dd===cd);
   let items="";
   hs.forEach(x=>{const c=x.jenis==="Cuti Umum"?"var(--red)":x.jenis==="Cuti Semester"?"var(--purple)":x.jenis==="Study Week"?"var(--amber)":"var(--muted)";items+=`<div class="dd-item"><span class="dd-dot" style="background:${c}"></span><div><b>${esc(x.nama||"Cuti")}</b><div class="dd-sub">${esc(x.jenis)}</div></div></div>`;});
-  ws.forEach(w=>items+=`<div class="dd-item" data-wopen="${w.id}" style="cursor:pointer"><span class="dd-dot" style="background:var(--blueb)"></span><div style="flex:1"><b>${esc(w.nama||"(program)")}</b><div class="dd-sub">Wasilah${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · "+esc(w.tarikh)+" → "+esc(w.tarikhTamat):""} · ${esc(w.status)}</div></div><span class="chev">›</span></div>`);
+  ws.forEach(w=>items+=`<div class="dd-item" data-wopen="${w.id}" style="cursor:pointer"><span class="dd-dot" style="background:${(w.peserta==="Campur")?"#1f8f80":"var(--blueb)"}"></span><div style="flex:1"><b>${esc(w.nama||"(program)")}</b><div class="dd-sub">${esc(w.peserta||"Akhawat")}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · "+esc(w.tarikh)+" → "+esc(w.tarikhTamat):""} · ${esc(w.status)}${w.kolab?" · kolab: "+esc(w.kolabNama||"ya"):""}</div></div><span class="chev">›</span></div>`);
   bd.forEach(x=>items+=`<div class="dd-item"><span class="dd-dot" style="background:#c2367a"></span><div><b>\uD83C\uDF82 ${esc(x.n)}</b><div class="dd-sub">Hari lahir</div></div></div>`);
   if(!items)items=`<div class="hint">Tiada program atau cuti pada tarikh ini.</div>`;
   return `<div class="dayd"><div style="font-weight:800;margin-bottom:8px;color:var(--blue)">Butiran · ${hdr}</div>${items}</div>`;
@@ -662,6 +681,7 @@ document.addEventListener("click",e=>{
   const cday=e.target.closest("[data-calday]");if(cday){selDate=cday.dataset.calday;render();return;}
   const wop=e.target.closest("[data-wopen]");if(wop){const w=getW(wop.dataset.wopen);if(w){wasMode="list";w._open=true;render();}return;}
   const holt=e.target.closest("[data-holtoggle]");if(holt){holOpen=!holOpen;render();return;}
+  const wtg=e.target.closest("[data-wtgl]");if(wtg){const pr=wtg.dataset.wtgl.split("|");const w=getW(pr[0]);if(w){w[pr[1]]=(pr[2]==="true"?true:(pr[2]==="false"?false:pr[2]));stamp(w);save();render();}return;}
   const dhl=e.target.closest("[data-delhol]");if(dhl){const x=getH(dhl.dataset.delhol);if(x&&confirm("Buang tarikh ini?")){S._del[x.id]=Date.now();S.holidays=S.holidays.filter(y=>y.id!==x.id);save();render();}return;}
   // claims
   const ctog=e.target.closest("[data-ctog]");if(ctog){const c=getC(ctog.dataset.ctog);if(c){c._open=!c._open;render();}return;}
@@ -812,9 +832,10 @@ function stampActive(){try{const a=document.activeElement;if(a)stamp(recFromData
 function isEditing(){const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));}
 async function apiGet(code){const u=cfg.url+(cfg.url.indexOf("?")>-1?"&":"?")+"action=get&code="+encodeURIComponent(code);const r=await fetch(u);return await r.json();}
 async function apiSave(){const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})});return await r.json();}
-async function syncNow(){if(!SYNC.ok||!cfg.url||!SYNC.code||SYNC.busy)return;SYNC.busy=true;try{const r=await apiSave();if(r&&r.ok){dirty=false;if(r.data&&!isEditing()){try{S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();render();}catch(e){}}}}catch(e){}SYNC.busy=false;}
+function sig(x){try{const o=Object.assign({},x);delete o._localSavedAt;return JSON.stringify(o);}catch(e){return Math.random()+"";}}
+async function syncNow(){if(!SYNC.ok||!cfg.url||!SYNC.code||SYNC.busy)return;SYNC.busy=true;try{const r=await apiSave();if(r&&r.ok){dirty=false;if(r.data&&!isEditing()){try{const before=sig(S);S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();if(sig(S)!==before)render();}catch(e){}}}}catch(e){}SYNC.busy=false;}
 function pushSync(){syncNow();}
-async function pullMerge(){if(!SYNC.ok||dirty||SYNC.busy||isEditing())return;try{const r=await apiGet(SYNC.code);if(r&&r.ok&&r.data){S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();render();}}catch(e){}}
+async function pullMerge(){if(!SYNC.ok||dirty||SYNC.busy||isEditing())return;try{const r=await apiGet(SYNC.code);if(r&&r.ok&&r.data){const before=sig(S);S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();if(sig(S)!==before)render();}}catch(e){}}
 function startPolling(){if(pollT)clearInterval(pollT);pollT=setInterval(pullMerge,25000);}
 async function pullNow(){if(!SYNC.ok){toast("Log masuk dahulu");return;}try{const r=await apiGet(SYNC.code);if(r&&r.ok){if(r.data){S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();}render();toast("Data terkini ditarik");}else toast("Gagal menarik data");}catch(e){toast("Tidak dapat menyambung");}}
 function logout(){SYNC={ok:false,code:"",busy:false};dirty=false;if(pollT)clearInterval(pollT);try{localStorage.removeItem(KEY);}catch(e){}S={};normalizeS();render();gateShow();toast("Telah log keluar");}
