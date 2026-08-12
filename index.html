@@ -233,15 +233,11 @@
   <a class="hbtn" href="gagasan.html">Gagasan</a>
   <div class="menu"><button class="hbtn" id="menuBtn">⋮</button>
     <div class="menu-pop" id="menuPop">
-      <button data-act="login">Sync & Log Masuk</button>
       <button data-act="pull">Segerak (tarik terkini)</button>
       <button data-act="logout">Log keluar</button>
       <hr>
       <button data-act="importxl">⭱&nbsp; Muat senarai nama (Excel/CSV)</button>
       <button data-act="csv">⭳&nbsp; Export Keahlian (CSV)</button>
-      <button data-act="json">⭳&nbsp; Simpan JSON (backup)</button>
-      <button data-act="import">⭱&nbsp; Muat JSON</button>
-      <hr><button data-act="reset" class="danger">⟳&nbsp; Set semula data</button>
     </div></div>
   <input type="file" id="fileImport" accept="application/json">
   <input type="file" id="fileXl" accept=".xlsx,.xls,.csv">
@@ -274,7 +270,7 @@ const KEY="kitpd_psm_sa";
 const STAGES=[{id:"mutabaah",label:"Mutabaah"},{id:"muhib",label:"Muhib"},{id:"muayyid",label:"Muayyid"}];
 const SES_JENIS=["Usrah","DF","Program"];
 const NEGERI=["Johor","Kedah","Kelantan","Melaka","Negeri Sembilan","Pahang","Perak","Perlis","Pulau Pinang","Sabah","Sarawak","Selangor","Terengganu","Kuala Lumpur","Labuan","Putrajaya"];
-const JANTINA=["Lelaki","Perempuan"]; const KERJA=["Belajar","Bekerja"]; const PSPB_YEARS=["2025","2026","2027","2028"];
+const JANTINA=["Lelaki","Perempuan"]; const KERJA=["Belajar","Bekerja"]; const PSPB_YEARS=["2023","2024","2025","2026","2027","2028"];
 const MEET_STATUS=null;
 const W_STATUS=["Belum","Sudah","Tangguh"];
 const W_MEDIUM=["Online","Fizikal"];
@@ -373,12 +369,13 @@ function viewRujukan(){return `
   </div>
   <div class="grp"><h3>Silibus Usrah (MUT / MUH)</h3><div class="hint">Akan dikemas kini selepas pengesahan. Kongsikan silibus apabila sedia dan ia akan dimasukkan di sini.</div></div>`;}
 function setView(v){view=v;document.querySelectorAll(".navtab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render();}
-function render(){const a=$("#app");
+function render(){const _dsb=document.querySelector(".drawer-body");const _sc=_dsb?_dsb.scrollTop:0;const a=$("#app");
   if(view==="keahlian")a.innerHTML=viewKeahlian();
   else if(view==="minit")a.innerHTML=viewMinit();
   else if(view==="wasilah")a.innerHTML=viewWasilah();
   else if(view==="tuntutan")a.innerHTML=viewTuntutan();
   else if(view==="rujukan")a.innerHTML=viewRujukan();
+  const _nb=document.querySelector(".drawer-body");if(_nb&&_sc)_nb.scrollTop=_sc;
 }
 
 /* helpers for fields */
@@ -409,7 +406,7 @@ function filteredPeople(){let list=S.people.slice();
 
 function viewKeahlian(){
   const arsipN=S.people.filter(p=>p.arsip).length;
-  const pills=[{id:"all",label:"Semua"}].concat(STAGES).map(s=>{const n=(s.id==="all"?S.people:S.people.filter(p=>p.stage===s.id)).length;return `<button class="pill${stage===s.id?" active":""}" data-stage="${s.id}">${s.label}<span class="c">${n}</span></button>`;}).join("");
+  const pills=[{id:"all",label:"Semua"}].concat(STAGES).map(s=>{const n=(s.id==="all"?S.people.filter(p=>!p.arsip):S.people.filter(p=>p.stage===s.id&&!p.arsip)).length;return `<button class="pill${stage===s.id?" active":""}" data-stage="${s.id}">${s.label}<span class="c">${n}</span></button>`;}).join("");
   const pdOpt=`<option value="">Semua PD</option><option value="__none__"${F.pd==="__none__"?" selected":""}>(Tiada PD)</option>`+pdOptions().map(x=>`<option${F.pd===x?" selected":""}>${esc(x)}</option>`).join("");
   const filters=`<div class="filters">
     <select data-flt="pd">${pdOpt}</select>
@@ -422,7 +419,7 @@ function viewKeahlian(){
   return `<div class="bar">${pills}</div>
     ${(arsipN>0||showArsip)?`<div style="display:flex;justify-content:flex-end;margin:2px 0 6px"><button class="arsiplink" data-arsip="1">${showArsip?"← Senarai aktif":("Arkib ("+arsipN+")")}</button></div>`:""}
     <div class="khwrap">
-      <aside class="iptside"><div class="iptttl">Tapis ikut IPT</div>${iptPills()}</aside>
+      <aside class="iptside">${iptPills()}</aside>
       <div class="khmain">
         <div class="bar"><div class="search"><span class="ic">⌕</span><input id="search" value="${esc(q)}" placeholder="Cari nama…"></div><button class="add" id="addBtn">＋ Tambah</button></div>
         ${filters}${statsPD()}
@@ -441,7 +438,7 @@ function statsPD(){const map={};const MM=["Jan","Feb","Mac","Apr","Mei","Jun","J
   return `<details class="stats"><summary style="cursor:pointer;font-weight:800;color:var(--blue)">Kekerapan usrah / DF ikut PD</summary><div style="margin-top:8px">${body}</div></details>`;
 }
 
-function iptPills(){let base=S.people.slice();if(stage!=="all")base=base.filter(p=>p.stage===stage);
+function iptPills(){let base=S.people.filter(p=>!p.arsip);if(stage!=="all")base=base.filter(p=>p.stage===stage);
   const counts={};let blank=0;base.forEach(p=>{const u=(p.universiti||"").trim();if(!u)blank++;else counts[u]=(counts[u]||0)+1;});
   const names=Object.keys(counts).sort();const dot=c=>`<span class="iptdot" style="background:${c}"></span>`;
   let out=`<button class="ipt-pill${!F.ipt?" active":""}" data-iptp=""><span class="lbl">Semua IPT</span><span class="c">${base.length}</span></button>`;
@@ -457,7 +454,7 @@ function renderGrouped(list){
 function rowKeahlian(p){
   const st=statusOf(p);const tags=[];
   if(p.pd1)tags.push(`<span class="tag pd">${esc(p.pd1)}</span>`);if(p.pd2)tags.push(`<span class="tag pd">${esc(p.pd2)}</span>`);
-  if(!p.pd1&&!p.pd2)tags.push(`<span class="tag red">Tiada PD</span>`);
+  if(p.stage!=="muayyid"&&!p.pd1&&!p.pd2)tags.push(`<span class="tag red">Tiada PD</span>`);
   if(p.stage==="mutabaah")tags.push(`<span class="tag ses">${sesCount(p)} sesi</span>`);
   return `<div class="row${selId===p.id?" sel":""}">
     <div class="rhead" data-sel="${p.id}"><span class="iptblk" style="background:${iptColor(p.universiti)}" title="${esc(p.universiti||"Tiada IPT")}"></span><div class="rav rav-${p.stage}" title="${esc(stageLabel(p.stage))}">${stageCode(p.stage)}</div>
@@ -485,8 +482,8 @@ function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
       <div class="g2">${fld("Poskod",T(p.id,"poskod",p.poskod,"40000"))}${fld("Negeri",SELf(p.id,"negeri",p.negeri,NEGERI))}</div>
     </div></div>`;}
 
-function secPD(p){return `<div class="grp"><h3>Penggerak Dakwah</h3>
-    <div class="g2">${fld("PD 1",selManaged(p.id,"pd1",p.pd1,"pds"))}${fld("PD 2",selManaged(p.id,"pd2",p.pd2,"pds"))}</div>
+function secPD(p){const isMay=p.stage==="muayyid";return `<div class="grp"><h3>${isMay?"Peringkat & Tahun":"Penggerak Dakwah"}</h3>
+    ${isMay?"":`<div class="g2">${fld("PD 1",selManaged(p.id,"pd1",p.pd1,"pds"))}${fld("PD 2",selManaged(p.id,"pd2",p.pd2,"pds"))}</div>`}
     <div class="g2">${fld("Peringkat",stageSelect(p.id,p.stage))}${fld("Tahun PSPB",`<select data-ed="${p.id}" data-f="tahunPSPB"><option value=""${!p.tahunPSPB?" selected":""}>— Tahun PSPB —</option>${PSPB_YEARS.map(y=>`<option${String(p.tahunPSPB)===y?" selected":""}>${y}</option>`).join("")}</select>`)}</div>
   </div>`;}
 
@@ -498,9 +495,9 @@ function secCatatan(p){return `<div class="grp"><h3>Catatan</h3>${fld("Nota",TA(
 function editorKeahlian(p){
   const info=secPD(p)+secMaklumat(p);
   const pc=secPassing(p)+secCatatan(p);
-  let tabs=[["Kehadiran",mutSection(p)],["Maklumat & PD",info]];
-  if(p.stage==="muhib")tabs.push(["Pencalonan Muayyid",muhSection(p)]);
-  tabs.push(["Passing & Catatan",pc]);
+  let tabs;
+  if(p.stage==="muayyid"){tabs=[["Maklumat & PD",info],["Passing & Catatan",pc]];}
+  else{tabs=[["Kehadiran",mutSection(p)],["Maklumat & PD",info]];if(p.stage==="muhib")tabs.push(["Pencalonan Muayyid",muhSection(p)]);tabs.push(["Passing & Catatan",pc]);}
   const t=Math.min(p._etab||1,tabs.length);
   const nav=`<div class="etabs">`+tabs.map((tb,i)=>`<button class="etab${(t===i+1)?" on":""}" data-etab="${p.id}|${i+1}">${tb[0]}</button>`).join("")+`</div>`;
   let lab="";if(p.stage==="mutabaah")lab="Naik ke Muhib →";else if(p.stage==="muhib")lab="Naik ke Muayyid →";
@@ -657,7 +654,7 @@ function claimCard(c){const sb={"Draf":"b-n","Dihantar":"b-b","Lulus":"b-g","Tol
      ${fld("No. resit",CT(c.id,"resit",c.resit))}${fld("Keterangan",CTA(c.id,"desc",c.desc))}</div>`;
   return `<div class="row${c._open?" open":""}"><div class="rhead" data-ctog="${c.id}"><div class="rav">${initials(c.reportName)||"T"}</div>
     <div class="rname">${esc((c.namaPemohon?c.namaPemohon+" - ":"")+(c.reportName||"(nama laporan)"))}</div>
-    <div class="rtags"><span class="tag">${esc(c.jenis)}</span>${money?`<span class="tag ses">RM ${esc(money)}</span>`:``}<span class="badge ${sb}">${esc(c.status)}</span></div><span class="chev">▾</span></div>
+    <div class="rtags">${money?`<span class="tag ses">RM ${esc(money)}</span>`:``}<span class="badge ${sb}">${esc(c.status)}</span></div><span class="chev">▾</span></div>
     <div class="rbody">
       <div class="grp"><h3>Am</h3>
         ${fld("Nama laporan",CT(c.id,"reportName",c.reportName,"","Eg: Muayyasyah Usrah A"))}
@@ -749,11 +746,9 @@ function renderListOnly(){const l=document.querySelector(".rows");if(!l)return;l
 
 $("#menuBtn").addEventListener("click",e=>{e.stopPropagation();$("#menuPop").classList.toggle("show");});
 $("#menuPop").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;$("#menuPop").classList.remove("show");
-  if(a==="json")exportJSON();if(a==="csv")exportCSV();if(a==="import")$("#fileImport").click();if(a==="importxl")$("#fileXl").click();
-  if(a==="login")gateShow();
+  if(a==="csv")exportCSV();if(a==="importxl")$("#fileXl").click();
   if(a==="pull")pullNow();
-  if(a==="logout")logout();
-  if(a==="reset"){if(confirm("Set semula SEMUA data? Simpan JSON dahulu jika perlu.")){S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],holidays:[],_holSeeded:false};normalizeS();save();render();toast("Diset semula");}}});
+  if(a==="logout")logout();});
 $("#fileImport").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);S=Object.assign({people:[],meetings:[],wasilah:[],claims:[]},d);normalizeS();save();render();toast("Data dimuat");}catch(err){toast("Fail tidak sah");}};r.readAsText(f);e.target.value="";});
 $("#fileXl").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;importNames(f);e.target.value="";});
 
