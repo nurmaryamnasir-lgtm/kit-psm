@@ -130,6 +130,28 @@
   .kkt{font-weight:800;font-size:14.5px} .kkd{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5}
   .arsiplink{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:4px}
   .arch{background:var(--paper);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:0 14px;font-weight:700}
+  .wdate,.hdate{flex:0 0 auto;width:46px;border-radius:10px;text-align:center;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+  .wdate .wdd,.hdate .hdd{font-size:18px;font-weight:800} .wdate .wdm,.hdate .hdm{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .wdate.pa{background:var(--blue-s);color:var(--blueb)} .wdate.pc{background:#e3f5f1;color:#1f8f80} .hdate{background:var(--paper);color:var(--muted)}
+  .hsub{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+  .journey{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .jstage{flex:1 1 120px;border-radius:13px;padding:14px 12px;text-align:center;border:1px solid var(--line);min-width:110px}
+  .jstage .s{font-size:15px;letter-spacing:3px;color:var(--yellow)} .jstage .nm{font-weight:800;font-size:16px;margin-top:5px} .jstage .nt{font-size:11px;margin-top:3px}
+  .js1{background:var(--paper)} .js1 .nt{color:var(--muted)} .js2{background:linear-gradient(160deg,var(--blue),var(--blue-2));border-color:transparent;color:#fff} .js2 .nt{color:#cfe0ff} .js3{background:linear-gradient(160deg,#fff7e0,#ffeab4);border-color:#f2dda6} .js3 .nt{color:var(--amber)}
+  .jar{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:96px} .jd{background:var(--blue);color:#fff;font-weight:800;font-size:12px;padding:5px 13px;border-radius:20px;white-space:nowrap} .jar .jw{font-size:10px;color:var(--muted);text-align:center}
+  .tl{position:relative;margin-left:6px} .tl::before{content:"";position:absolute;left:19px;top:8px;bottom:8px;width:2px;background:var(--line)}
+  .phase{position:relative;padding:0 0 22px 56px} .phase:last-child{padding-bottom:0}
+  .pnode{position:absolute;left:6px;top:2px;width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--muted);z-index:1}
+  .phase.now .pnode{background:var(--yellow);border-color:var(--yellow);color:var(--blue-ink);box-shadow:0 0 0 5px #fff3c9} .phase.done .pnode{background:var(--blue);border-color:var(--blue);color:#fff}
+  .pcard{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 16px;box-shadow:var(--shadow)} .phase.now .pcard{border-color:var(--yellow);box-shadow:0 0 0 2px #fff3c9,var(--shadow)}
+  .ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap} .pwhen{font-size:11.5px;font-weight:800;letter-spacing:.04em;color:var(--blue-2)}
+  .pfase{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;background:var(--paper);color:var(--muted);padding:3px 9px;border-radius:20px} .phase.now .pfase{background:#fff3c9;color:var(--amber)}
+  .pnow-badge{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;background:var(--yellow);color:var(--blue-ink);padding:3px 9px;border-radius:20px}
+  .ptitle{font-size:16px;font-weight:800;margin:6px 0 3px;letter-spacing:-.01em} .pfocus{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+  .pfocus .fh{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:6px} .pfocus ul{margin:0;padding-left:18px} .pfocus li{font-size:13px;margin-bottom:4px}
+  .bpmy-badge{display:inline-block;background:var(--green);color:#fff;font-weight:800;font-size:13px;padding:7px 14px;border-radius:20px;margin-bottom:12px}
+  .ciri{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px} .ci{display:flex;align-items:center;gap:8px;border-radius:12px;padding:11px 13px;font-weight:800;font-size:13.5px;color:#fff} .ci .cin{opacity:.85}
+  .ci-c1{background:#147FB3} .ci-c2{background:var(--blueb)} .ci-c3{background:#2a9d8f} .ci-c4{background:var(--purple)} .ci-c5{background:var(--amber)}
   .iptblk{width:6px;border-radius:4px;flex:0 0 auto;align-self:stretch;min-height:34px}
   .row.sel{outline:2px solid var(--blue);outline-offset:-1px}
   .iptdot{width:11px;height:11px;border-radius:3px;flex:0 0 auto;margin-right:2px}
@@ -274,7 +296,7 @@ const JANTINA=["Lelaki","Perempuan"]; const KERJA=["Belajar","Bekerja"]; const P
 const MEET_STATUS=null;
 const W_STATUS=["Belum","Sudah","Tangguh"];
 const W_MEDIUM=["Online","Fizikal"];
-const H_TYPES=["Cuti Umum","Cuti Semester","Study Week","Lain-lain"];
+const H_TYPES=["Minggu Orientasi","Mid Semester Break","Study Week","Exam Week","Semester Break","Cuti Umum","Lain-lain"];
 const CLAIM_TYPES=["Bajet Muayyasyah"];
 const CLAIM_STATUS=["Draf","Dihantar","Lulus","Tolak"];
 const BPMY=[
@@ -346,28 +368,30 @@ function stageCode(s){return {mutabaah:"MUT",muhib:"MUH",muayyid:"MY"}[s]||"—"
 function stageLabel(s){return(STAGES.find(x=>x.id===s)||{}).label||s;}
 
 /* =============== RENDER =============== */
-function viewRujukan(){return `
-  <div class="grp"><h3>Perjalanan Kemenjadian</h3>
-    <div class="jrny">
-      <div class="jst js1"><div class="jstar">★</div><div class="jname">Mutabaah</div></div>
-      <div class="jarrow"><span class="jdur">1 bulan</span></div>
-      <div class="jst js2"><div class="jstar">★★</div><div class="jname">Muhib</div></div>
-      <div class="jarrow"><span class="jdur">6 bulan</span></div>
-      <div class="jst js3"><div class="jstar">★★★</div><div class="jname">Muayyid</div></div>
-    </div>
-  </div>
-  <div class="grp"><h3>Kriteria Mutabaah → Muhib</h3>
-    <div class="hint" style="margin-bottom:10px">Tarsyih ± Oktober 2026. Perlu penuhi ketiga-tiga kriteria:</div>
-    <div class="kk">
-      <div class="kkc kkc-g"><div class="kkn">1</div><div><div class="kkt">Bukan musuh</div><div class="kkd">Tidak memegang prinsip yang jelas bercanggah dengan Islam (cth. ateisme, pro-LGBT).</div></div></div>
-      <div class="kkc kkc-b"><div class="kkn">2</div><div><div class="kkt">Minimum 3× kehadiran</div><div class="kkd">Hadir sekurang-kurangnya 3 kali ke program ISMA / Biro.</div></div></div>
-      <div class="kkc kkc-a"><div class="kkn">3</div><div><div class="kkt">Kecenderungan berubah</div><div class="kkd">Menunjukkan minat / kecenderungan untuk berubah & memperbaiki diri.</div></div></div>
-    </div>
-  </div>
-  <div class="grp"><h3>Kriteria Muhib → Muayyid</h3>
-    <div class="rj"><div class="rj-h">Tempoh ± 6 bulan · tarsyih Jun 2027</div><div class="rj-b">Dinilai melalui borang <b>BPMy</b> — <b>lulus jika skor ≥ 50%</b>. 5 ciri: <b>Muayyasyah, Komitmen, Kerja Berpasukan, Ciri Kesolehan</b> (item 4.8/4.9 wajib) & <b>Kefahaman Dakwah</b> (item 5.1a wajib). Isi BPMy dalam tab <b>Pencalonan Muayyid</b> setiap muhib.</div></div>
-  </div>
-  <div class="grp"><h3>Silibus Usrah (MUT / MUH)</h3><div class="hint">Akan dikemas kini selepas pengesahan. Kongsikan silibus apabila sedia dan ia akan dimasukkan di sini.</div></div>`;}
+const PHASES=[
+  {start:[2026,7],end:[2026,7],when:"Julai 2026",dur:"1 hari",fase:"Pra-PSPB",title:"Penurunan Kit PSPB 2026",focus:["Terima & hadam Kit PSPB 2026 sebagai panduan gerak kerja tajmik","Kemas kini senarai penuh PD sedia ada & mas'ul usrah"]},
+  {start:[2026,8],end:[2026,9],when:"Ogos – September 2026",dur:"3 bulan",fase:"Pra-PSPB",title:"Persiapan PSPB & Pemantapan Penggerak Dakwah",focus:["Nilai kesediaan SETIAP PD","Jalankan Daurah/Jaulah untuk PD berskor rendah (<8)","Susun tenaga & sasaran tajmik ikut lokaliti / fakulti","Retreat perancangan gerak kerja cawangan"]},
+  {start:[2026,10],end:[2026,10],when:"Oktober 2026",dur:"1 bulan",fase:"Puncak PSPB",title:"Kempen PSPB & Tarsyih MUT → MHB",focus:["Taklif mad'u baru kepada PD ikut kapasiti & kesediaan","Buka usrah mutabaah; jalankan LMM mingguan","Tarsyih MUT→MHB: 3× kehadiran + minat kepada usrah"]},
+  {start:[2026,11],end:[2027,5],when:"Nov 2026 – Mei 2027",dur:"6 bulan",fase:"Pasca PSPB",title:"Kemenjadian MHB → MAY",focus:["Pelaksanaan usrah, wasilah khusus & coaching AB","Pantau kadar kehadiran & komitmen setiap muhib","Sasar 4 syarat tarsyih MHB→MAY sepanjang tempoh"]},
+  {start:[2027,6],end:[2027,6],when:"Jun 2027",dur:"1 bulan",fase:"Pasca PSPB",title:"Urusan Tarsyih & Kenaikan MHB → MAY",focus:["Nilai 4 syarat: komitmen, kerja berpasukan, ciri kesolehan, minat tarbiah khusus","Muktamad senarai kenaikan muhib → muayyid"]}
+];
+function phaseState(x){const now=new Date(),cur=now.getFullYear()*12+(now.getMonth()+1),s=x.start[0]*12+x.start[1],e=x.end[0]*12+x.end[1];if(cur>e)return"done";if(cur>=s&&cur<=e)return"now";return"future";}
+function viewRujukan(){
+  const journey=`<div class="grp"><h3>Perjalanan Kemenjadian · Mutabaah → Muhib → Muayyid</h3><div class="journey">
+    <div class="jstage js1"><div class="s">★</div><div class="nm">Mutabaah</div><div class="nt">Mad'u dalam usrah followup</div></div>
+    <div class="jar"><div class="jd">1 bulan</div><div class="jw">Oktober 2026<br>Tarsyih MUT→MHB</div></div>
+    <div class="jstage js2"><div class="s">★★</div><div class="nm">Muhib</div><div class="nt">Modul MHB · usrah & coaching</div></div>
+    <div class="jar"><div class="jd">6 bulan</div><div class="jw">Nov 2026 – Mei 2027</div></div>
+    <div class="jstage js3"><div class="s">★★★</div><div class="nm">Muayyid</div><div class="nt">Kenaikan · Jun 2027</div></div>
+  </div></div>`;
+  const tl=PHASES.map((x,i)=>{const st=phaseState(x);const badge=st==="now"?`<span class="pnow-badge">Anda di sini</span>`:`<span class="pfase">${esc(x.fase)}</span>`;
+    return `<div class="phase ${st}"><div class="pnode">${st==="done"?"✓":(i+1)}</div><div class="pcard"><div class="ptop"><span class="pwhen">${esc(x.when)} · ${esc(x.dur)}</span>${badge}</div><div class="ptitle">${esc(x.title)}</div><div class="pfocus"><div class="fh">Fokus PSM</div><ul>${x.focus.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></div></div></div>`;}).join("");
+  const timeline=`<div class="grp"><h3>Garis Masa PSPB 2026 · Peranan PSM</h3><div class="tl">${tl}</div></div>`;
+  const ciri=[["Muayyasyah","c1"],["Komitmen","c2"],["Kerja Berpasukan","c3"],["Ciri Kesolehan","c4"],["Kefahaman Dakwah","c5"]];
+  const kritMAY=`<div class="grp"><h3>Kriteria Muhib → Muayyid</h3><div class="bpmy-badge">⭐ Lulus jika skor BPMy ≥ 50%</div><div class="ciri">${ciri.map(c=>`<div class="ci ci-${c[1]}"><span class="cin">★</span>${c[0]}</div>`).join("")}</div><div class="hint" style="margin-top:8px">Nilai 5 ciri ini bagi setiap muhib melalui borang BPMy dalam tab <b>Pencalonan Muayyid</b>.</div></div>`;
+  return journey+timeline+`<div class="grp"><h3>Kriteria Mutabaah → Muhib</h3><div class="hint" style="margin-bottom:10px">Tarsyih ± Oktober 2026. Perlu penuhi ketiga-tiga:</div><div class="kk"><div class="kkc kkc-g"><div class="kkn">1</div><div><div class="kkt">Bukan musuh</div><div class="kkd">Tidak memegang prinsip yang jelas bercanggah dengan Islam (cth. ateisme, pro-LGBT).</div></div></div><div class="kkc kkc-b"><div class="kkn">2</div><div><div class="kkt">Minimum 3× kehadiran</div><div class="kkd">Hadir sekurang-kurangnya 3 kali ke program ISMA / Biro.</div></div></div><div class="kkc kkc-a"><div class="kkn">3</div><div><div class="kkt">Kecenderungan berubah</div><div class="kkd">Menunjukkan minat / kecenderungan untuk berubah & memperbaiki diri.</div></div></div></div></div>`+kritMAY+`<div class="grp"><h3>Silibus Usrah (MUT / MUH)</h3><div class="hint">Akan dikemas kini selepas pengesahan. Kongsikan silibus apabila sedia dan ia akan dimasukkan di sini.</div></div>`;
+}
+
 function setView(v){view=v;document.querySelectorAll(".navtab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render();}
 function render(){const _dsb=document.querySelector(".drawer-body");const _sc=_dsb?_dsb.scrollTop:0;const a=$("#app");
   if(view==="keahlian")a.innerHTML=viewKeahlian();
@@ -497,7 +521,8 @@ function editorKeahlian(p){
   const pc=secPassing(p)+secCatatan(p);
   let tabs;
   if(p.stage==="muayyid"){tabs=[["Maklumat & PD",info],["Passing & Catatan",pc]];}
-  else{tabs=[["Kehadiran",mutSection(p)],["Maklumat & PD",info]];if(p.stage==="muhib")tabs.push(["Pencalonan Muayyid",muhSection(p)]);tabs.push(["Passing & Catatan",pc]);}
+  else if(p.stage==="muhib"){tabs=[["Pencalonan Muayyid",muhSection(p)],["Kehadiran",mutSection(p)],["Maklumat & PD",info],["Passing & Catatan",pc]];}
+  else{tabs=[["Kehadiran",mutSection(p)],["Maklumat & PD",info],["Passing & Catatan",pc]];}
   const t=Math.min(p._etab||1,tabs.length);
   const nav=`<div class="etabs">`+tabs.map((tb,i)=>`<button class="etab${(t===i+1)?" on":""}" data-etab="${p.id}|${i+1}">${tb[0]}</button>`).join("")+`</div>`;
   let lab="";if(p.stage==="mutabaah")lab="Naik ke Muhib →";else if(p.stage==="muhib")lab="Naik ke Muayyid →";
@@ -515,7 +540,7 @@ function mutSection(p){
     ${ses||`<div class="hint">Belum ada sesi direkod.</div>`}
     <button class="addsub" data-addses="${p.id}">＋ Tambah sesi</button>
     <div class="g2" style="margin-top:11px">
-      ${fld("Berminat sertai usrah? (syarat tarsyih)",`<div class="toggle g"><button data-tgl="${p.id}|minatUsrah|Ya" class="${p.minatUsrah==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|minatUsrah|Belum" class="${p.minatUsrah!=="Ya"?"on":""}">Belum</button></div>`)}
+      ${p.stage!=="muhib"?fld("Berminat sertai usrah? (syarat tarsyih)",`<div class="toggle g"><button data-tgl="${p.id}|minatUsrah|Ya" class="${p.minatUsrah==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|minatUsrah|Belum" class="${p.minatUsrah!=="Ya"?"on":""}">Belum</button></div>`):""}
       ${fld("Berminat jadi AJK?",`<div class="toggle"><button data-tgl="${p.id}|minatAJK|Ya" class="${p.minatAJK==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|minatAJK|Tidak" class="${p.minatAJK!=="Ya"?"on":""}">Tidak</button></div>`)}
     </div></div>`;
 }
@@ -570,19 +595,24 @@ function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").lengt
 let wasMode="list";
 function viewWasilah(){
   const toggle=`<div class="bar"><div class="toggle"><button class="${wasMode==="list"?"on":""}" data-wmode="list">Senarai</button><button class="${wasMode==="cal"?"on":""}" data-wmode="cal">Kalendar</button></div><button class="add" id="addWasBtn" style="margin-left:auto">＋ Program</button><button class="btn2" id="addHolBtn">＋ Tarikh penting</button></div>`;
-  if(wasMode==="cal")return toggle+calLegend()+calendarHTML()+calDayDetail()+holSection();
-  const anyOpen=S.wasilah.some(w=>w._open);const sorted=anyOpen?S.wasilah.slice():S.wasilah.slice().sort((a,b)=>(a.tarikh||"").localeCompare(b.tarikh||""));const list=S.wasilah.length?sorted.map(wasCard).join(""):`<div class="empty"><b>Belum ada program</b></div>`;
-  return toggle+`<div class="rows">${list}</div>`+holSection();
+  if(wasMode==="cal")return toggle+calLegend()+calendarHTML()+calDayDetail();
+  const MM=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+  const entries=[];S.wasilah.forEach(w=>entries.push({t:"w",d:w.tarikh||"",o:w}));(S.holidays||[]).forEach(x=>entries.push({t:"h",d:x.start||"",o:x}));
+  if(!entries.length)return toggle+`<div class="rows"><div class="empty"><b>Belum ada program</b></div></div>`;
+  const groups={};entries.forEach(e=>{const mk=(e.d||"").slice(0,7)||"zzzz";(groups[mk]=groups[mk]||[]).push(e);});
+  const body=Object.keys(groups).sort().map(mk=>{const items=groups[mk].slice().sort((a,b)=>(a.d||"~").localeCompare(b.d||"~"));const lbl=mk==="zzzz"?"Tiada tarikh":(MM[(+mk.slice(5,7))-1]+" "+mk.slice(0,4));return `<div class="grouphdr">${lbl}<span class="gc">${items.length}</span></div>`+items.map(e=>e.t==="w"?wasCard(e.o):holCard(e.o)).join("");}).join("");
+  return toggle+`<div class="rows">${body}</div>`;
 }
 function calLegend(){const L=(c,t)=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:${c};display:inline-block"></span>${t}</span>`;return `<div class="hint" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:8px">${L("var(--blueb)","Akhawat")}${L("#1f8f80","Campur")}${L("var(--red)","Cuti umum")}${L("var(--purple)","Cuti semester")}${L("var(--amber)","Study week")}<span>\uD83C\uDF82 Hari lahir</span></div>`;}
 function holSection(){const list=(S.holidays||[]).slice().sort((a,b)=>(a.start||"").localeCompare(b.start||""));
   return `<div class="stats" style="margin-top:12px"><div data-holtoggle="1" style="cursor:pointer;font-weight:800;color:var(--blue);display:flex;align-items:center;justify-content:space-between">Tarikh Penting & Cuti (${list.length})<span style="font-size:12px;color:var(--muted)">${holOpen?"Sembunyi ▲":"Papar ▼"}</span></div>${holOpen?`<div class="hint" style="margin-top:8px">Cuti umum Selangor (tarikh tetap) telah diisi. Tambah cuti semester UiTM/MSU, study week, atau cuti bergerak (Raya/CNY) di sini — sahkan tarikh rasmi.</div><div class="rows" style="margin-top:8px">${list.map(holCard).join("")}</div>`:""}</div>`;}
 
-function holCard(h){return `<div class="row${h._open?" open":""}"><div class="rhead" data-htog="${h.id}"><div class="rav" style="background:var(--paper);color:var(--muted)">C</div><div class="rname${h.nama?"":" empty"}">${h.nama?esc(h.nama):"(tarikh penting)"}</div><div class="rtags"><span class="tag">${esc(h.jenis)}</span><span class="tag st">${esc(h.start||"—")}${h.end?" → "+esc(h.end):""}</span></div><span class="chev">▾</span></div><div class="rbody"><div class="g2">${fld("Nama",`<input data-hed="${h.id}" data-f="nama" value="${esc(h.nama)}">`)}${fld("Jenis",`<select data-hed="${h.id}" data-f="jenis">${H_TYPES.map(o=>`<option${o===h.jenis?" selected":""}>${o}</option>`).join("")}</select>`)}</div><div class="g2">${fld("Tarikh mula",`<input data-hed="${h.id}" data-f="start" type="date" value="${esc(h.start)}">`)}${fld("Tarikh tamat (pilihan)",`<input data-hed="${h.id}" data-f="end" type="date" value="${esc(h.end)}">`)}</div><div class="actions"><button class="del" data-delhol="${h.id}" style="flex:1">Buang</button></div></div></div>`;}
+function holCard(h){const c=holColor(h.jenis);return `<div class="row hrow${h._open?" open":""}" style="border-left:5px solid ${c}"><div class="rhead" data-htog="${h.id}"><div class="hdate"><div class="hdd">${(h.start||"").slice(8,10)||"—"}</div><div class="hdm">${monShort(h.start)}</div></div><div class="rname${h.nama?"":" empty"}">${h.nama?esc(h.nama):"(tarikh penting)"}<div class="hsub" style="color:${c}">${esc(h.jenis)}${h.end&&h.end!==h.start?" · s/d "+esc(h.end):""}</div></div><span class="chev">▾</span></div><div class="rbody"><div class="g2">${fld("Nama",`<input data-hed="${h.id}" data-f="nama" value="${esc(h.nama)}">`)}${fld("Jenis",`<select data-hed="${h.id}" data-f="jenis">${H_TYPES.map(o=>`<option${o===h.jenis?" selected":""}>${o}</option>`).join("")}</select>`)}</div><div class="g2">${fld("Tarikh mula",`<input data-hed="${h.id}" data-f="start" type="date" value="${esc(h.start)}">`)}${fld("Tarikh tamat (pilihan)",`<input data-hed="${h.id}" data-f="end" type="date" value="${esc(h.end)}">`)}</div><div class="actions"><button class="del" data-delhol="${h.id}" style="flex:1">Buang</button></div></div></div>`;}
+function monShort(iso){const MS=["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogos","Sep","Okt","Nov","Dis"];const m=+((iso||"").slice(5,7));return m?MS[m-1]:"";}
+function holColor(j){return j==="Study Week"?"var(--amber)":j==="Exam Week"?"var(--red)":j==="Semester Break"?"var(--purple)":j==="Mid Semester Break"?"var(--blueb)":j==="Minggu Orientasi"?"var(--green)":j==="Cuti Umum"?"var(--red)":"var(--muted)";}
 function wasCard(w){const sb={"Sudah":"b-g","Belum":"b-n","Tangguh":"b-a"}[w.status]||"b-n";
-  return `<div class="row${w._open?" open":""}"><div class="rhead" data-wtog="${w.id}"><div class="rav">${initials(w.nama)||"W"}</div>
-    <div class="rname">${esc(w.nama||"(nama program)")}</div>
-    <div class="rtags"><span class="tag st">${esc(w.tarikh||"—")}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" → "+esc(w.tarikhTamat):""}</span><span class="tag">${esc(w.medium)}</span><span class="badge ${sb}">${esc(w.status)}</span></div><span class="chev">▾</span></div>
+  return `<div class="row${w._open?" open":""}"><div class="rhead" data-wtog="${w.id}"><div class="wdate ${(w.peserta==="Campur")?"pc":"pa"}"><div class="wdd">${(w.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(w.tarikh)}</div></div>
+    <div class="rname">${esc(w.nama||"(nama program)")}<div class="hsub">${esc(w.peserta||"Akhawat")} · ${esc(w.status)}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · s/d "+esc(w.tarikhTamat):""}</div></div><span class="chev">▾</span></div>
     <div class="rbody">
       <div class="g2">${fld("Nama program",`<input data-wed="${w.id}" data-f="nama" value="${esc(w.nama)}">`)}${fld("Bahan",`<input data-wed="${w.id}" data-f="bahan" value="${esc(w.bahan)}" placeholder="cth. OBI">`)}</div>
       <div class="g2">${fld("Tarikh",`<input data-wed="${w.id}" data-f="tarikh" type="date" value="${esc(w.tarikh)}">`)}${fld("Program lebih 1 hari?",`<div class="toggle"><button data-wtgl="${w.id}|multi|true" class="${w.multi?"on":""}">Ya</button><button data-wtgl="${w.id}|multi|false" class="${!w.multi?"on":""}">Tidak</button></div>`)}</div>
@@ -723,7 +753,7 @@ document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(!(t.ta
   if(d.ses&&d.f){const[pid,sid]=d.ses.split("|");const p=get(pid);const s=p&&p.sessions.find(x=>x.id===sid);if(s){s[d.f]=t.value;save();}return;}
   if(d.med&&d.f){const m=getM(d.med);if(m){m[d.f]=t.value;save();}return;}
   if(d.mit&&d.f){const[mid,iid]=d.mit.split("|");const m=getM(mid);const it=m&&m.items.find(x=>x.id===iid);if(it){it[d.f]=t.value;save();}return;}
-  if(d.wed&&d.f){const w=getW(d.wed);if(w){w[d.f]=t.value;save();}return;}
+  if(d.wed&&d.f){const w=getW(d.wed);if(w){w[d.f]=t.value;stamp(w);save();}return;}
   if(d.hed&&d.f){const x=getH(d.hed);if(x){x[d.f]=t.value;save();}return;}
   if(d.ced&&d.f){const c=getC(d.ced);if(c){c[d.f]=t.value;save();}return;}
 });
@@ -736,8 +766,8 @@ document.addEventListener("change",e=>{const t=e.target,d=t.dataset||{};
   if(d.ses&&d.f&&t.tagName==="SELECT"){const[pid,sid]=d.ses.split("|");const p=get(pid);const s=p&&p.sessions.find(x=>x.id===sid);if(s){s[d.f]=t.value;save();render();}return;}
   if(d.med&&d.f&&(t.tagName==="SELECT"||t.type==="date")){const m=getM(d.med);if(m){m[d.f]=t.value;save();render();}return;}
   if(d.mit&&d.f&&t.tagName==="SELECT"){const[mid,iid]=d.mit.split("|");const m=getM(mid);const it=m&&m.items.find(x=>x.id===iid);if(it){it[d.f]=t.value;save();render();}return;}
-  if(d.wed&&d.f&&(t.tagName==="SELECT"||t.type==="date")){const w=getW(d.wed);if(w){w[d.f]=t.value;save();render();}return;}
-  if(d.hed&&d.f){const x=getH(d.hed);if(x){x[d.f]=(d.f==="nama"?titleCase(t.value):t.value);t.value=x[d.f];save();render();}return;}
+  if(d.wed&&d.f&&(t.tagName==="SELECT"||t.type==="date")){const w=getW(d.wed);if(w){w[d.f]=t.value;stamp(w);save();if(t.type!=="date")render();}return;}
+  if(d.hed&&d.f){const x=getH(d.hed);if(x){x[d.f]=(d.f==="nama"?titleCase(t.value):t.value);t.value=x[d.f];stamp(x);save();if(t.type!=="date")render();}return;}
   if(d.ced&&d.f&&(t.tagName==="SELECT"||t.type==="date")){const c=getC(d.ced);if(c){c[d.f]=t.value;save();render();}return;}
   const flt=t.closest?t.closest("[data-flt]"):null;if(flt){F[flt.dataset.flt]=t.value;render();return;}
 });
