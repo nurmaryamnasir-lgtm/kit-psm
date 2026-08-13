@@ -13,7 +13,7 @@
     --shadow:0 1px 2px rgba(9,30,66,.06),0 6px 18px rgba(9,30,66,.07);
     --font:ui-sans-serif,system-ui,"Segoe UI",-apple-system,"Helvetica Neue",Arial,sans-serif;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0}
+  html,body{margin:0;overflow-x:hidden}
   body{font-family:var(--font);color:var(--ink);background:var(--paper);line-height:1.4;-webkit-font-smoothing:antialiased}
   button{font-family:inherit;cursor:pointer} input,select,textarea{font-family:inherit;font-size:15px}
   h1,h2,h3{margin:0}
@@ -152,6 +152,20 @@
   .bpmy-badge{display:inline-block;background:var(--green);color:#fff;font-weight:800;font-size:13px;padding:7px 14px;border-radius:20px;margin-bottom:12px}
   .ciri{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px} .ci{display:flex;align-items:center;gap:8px;border-radius:12px;padding:11px 13px;font-weight:800;font-size:13.5px;color:#fff} .ci .cin{opacity:.85}
   .ci-c1{background:#147FB3} .ci-c2{background:var(--blueb)} .ci-c3{background:#2a9d8f} .ci-c4{background:var(--purple)} .ci-c5{background:var(--amber)}
+  .rjbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+  .rjh{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+  .rjh::before{content:"";width:20px;height:3px;background:var(--yellow);border-radius:2px}
+  .tind{display:flex;gap:10px;align-items:flex-start;padding:9px 4px;border-bottom:1px solid var(--paper)} .tind:last-child{border-bottom:none}
+  .tind-l{flex:1;min-width:0} .tind-pic{font-weight:800;font-size:13px} .tind-task{font-size:13px;margin-top:1px} .tind-from{font-size:11px;color:var(--muted);margin-top:2px}
+  .tind-r{flex:0 0 auto;display:flex;flex-direction:column;gap:5px;align-items:flex-end} .tind-due{font-size:11.5px;color:var(--muted);font-weight:700} .tind-sel{border:1px solid var(--line);border-radius:9px;padding:5px 8px;font-size:12px}
+  @media(max-width:720px){
+    .rhead{padding:10px 12px;gap:9px}
+    .rav{width:30px;height:30px;font-size:11px;border-radius:8px}
+    .rname{white-space:normal;font-size:15px;line-height:1.3}
+    .rtags{gap:5px} .tag{font-size:10px;padding:2px 7px} .badge{font-size:10px;padding:4px 8px}
+    .iptblk{min-height:26px;width:5px} .rows{gap:6px} .row{max-width:100%}
+    .wdate,.hdate{width:42px}
+  }
   .iptblk{width:6px;border-radius:4px;flex:0 0 auto;align-self:stretch;min-height:34px}
   .row.sel{outline:2px solid var(--blue);outline-offset:-1px}
   .iptdot{width:11px;height:11px;border-radius:3px;flex:0 0 auto;margin-right:2px}
@@ -351,7 +365,7 @@ function getC(id){return S.claims.find(c=>c.id===id);}
 
 function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],minatUsrah:"Belum",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",_open:true,_etab:1,arsip:false,_upd:Date.now()};}
 function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_open:true,_upd:Date.now()};}
-function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"Belum"};}
+function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"To do"};}
 function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_open:true,_upd:Date.now()};}
 function newClaim(){return{id:uid("cl_"),reportName:"",jenis:"Bajet Muayyasyah",tarikh:today(),desc:"",amount:"",cukai:"0.00",resit:"",lampiran:"",files:[],status:"Draf",namaPemohon:"",namaAgensi:"PEMBINA",tarikhAktiviti:"",perincianAktiviti:"",jumlahMadu:"",perincianBelanja:"",gambarLink:"",jumlahDipohon:"",penama:"",bank:"",akaun:"",_open:true,_upd:Date.now()};}
 
@@ -377,19 +391,22 @@ const PHASES=[
 ];
 function phaseState(x){const now=new Date(),cur=now.getFullYear()*12+(now.getMonth()+1),s=x.start[0]*12+x.start[1],e=x.end[0]*12+x.end[1];if(cur>e)return"done";if(cur>=s&&cur<=e)return"now";return"future";}
 function viewRujukan(){
-  const journey=`<div class="grp"><h3>Perjalanan Kemenjadian · Mutabaah → Muhib → Muayyid</h3><div class="journey">
+  const journey=`<div class="rjbox"><div class="rjh">Perjalanan Kemenjadian · Mutabaah → Muhib → Muayyid</div><div class="journey">
     <div class="jstage js1"><div class="s">★</div><div class="nm">Mutabaah</div><div class="nt">Mad'u dalam usrah followup</div></div>
     <div class="jar"><div class="jd">1 bulan</div><div class="jw">Oktober 2026<br>Tarsyih MUT→MHB</div></div>
     <div class="jstage js2"><div class="s">★★</div><div class="nm">Muhib</div><div class="nt">Modul MHB · usrah & coaching</div></div>
     <div class="jar"><div class="jd">6 bulan</div><div class="jw">Nov 2026 – Mei 2027</div></div>
     <div class="jstage js3"><div class="s">★★★</div><div class="nm">Muayyid</div><div class="nt">Kenaikan · Jun 2027</div></div>
   </div></div>`;
-  const tl=PHASES.map((x,i)=>{const st=phaseState(x);const badge=st==="now"?`<span class="pnow-badge">Anda di sini</span>`:`<span class="pfase">${esc(x.fase)}</span>`;
-    return `<div class="phase ${st}"><div class="pnode">${st==="done"?"✓":(i+1)}</div><div class="pcard"><div class="ptop"><span class="pwhen">${esc(x.when)} · ${esc(x.dur)}</span>${badge}</div><div class="ptitle">${esc(x.title)}</div><div class="pfocus"><div class="fh">Fokus PSM</div><ul>${x.focus.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></div></div></div>`;}).join("");
-  const timeline=`<div class="grp"><h3>Garis Masa PSPB 2026 · Peranan PSM</h3><div class="tl">${tl}</div></div>`;
+  const kritMUT=`<div class="rjbox"><div class="rjh">Kriteria Mutabaah → Muhib</div><div class="hint" style="margin-bottom:10px">Tarsyih ± Oktober 2026. Perlu penuhi ketiga-tiga:</div><div class="kk">
+    <div class="kkc kkc-g"><div class="kkn">1</div><div><div class="kkt">Bukan musuh</div><div class="kkd">Tidak memegang prinsip yang jelas bercanggah dengan Islam (cth. ateisme, pro-LGBT).</div></div></div>
+    <div class="kkc kkc-b"><div class="kkn">2</div><div><div class="kkt">Minimum 3× kehadiran</div><div class="kkd">Hadir sekurang-kurangnya 3 kali ke program ISMA / Biro.</div></div></div>
+    <div class="kkc kkc-a"><div class="kkn">3</div><div><div class="kkt">Kecenderungan berubah</div><div class="kkd">Menunjukkan minat / kecenderungan untuk berubah & memperbaiki diri.</div></div></div>
+  </div></div>`;
   const ciri=[["Muayyasyah","c1"],["Komitmen","c2"],["Kerja Berpasukan","c3"],["Ciri Kesolehan","c4"],["Kefahaman Dakwah","c5"]];
-  const kritMAY=`<div class="grp"><h3>Kriteria Muhib → Muayyid</h3><div class="bpmy-badge">⭐ Lulus jika skor BPMy ≥ 50%</div><div class="ciri">${ciri.map(c=>`<div class="ci ci-${c[1]}"><span class="cin">★</span>${c[0]}</div>`).join("")}</div><div class="hint" style="margin-top:8px">Nilai 5 ciri ini bagi setiap muhib melalui borang BPMy dalam tab <b>Pencalonan Muayyid</b>.</div></div>`;
-  return journey+timeline+`<div class="grp"><h3>Kriteria Mutabaah → Muhib</h3><div class="hint" style="margin-bottom:10px">Tarsyih ± Oktober 2026. Perlu penuhi ketiga-tiga:</div><div class="kk"><div class="kkc kkc-g"><div class="kkn">1</div><div><div class="kkt">Bukan musuh</div><div class="kkd">Tidak memegang prinsip yang jelas bercanggah dengan Islam (cth. ateisme, pro-LGBT).</div></div></div><div class="kkc kkc-b"><div class="kkn">2</div><div><div class="kkt">Minimum 3× kehadiran</div><div class="kkd">Hadir sekurang-kurangnya 3 kali ke program ISMA / Biro.</div></div></div><div class="kkc kkc-a"><div class="kkn">3</div><div><div class="kkt">Kecenderungan berubah</div><div class="kkd">Menunjukkan minat / kecenderungan untuk berubah & memperbaiki diri.</div></div></div></div></div>`+kritMAY+`<div class="grp"><h3>Silibus Usrah (MUT / MUH)</h3><div class="hint">Akan dikemas kini selepas pengesahan. Kongsikan silibus apabila sedia dan ia akan dimasukkan di sini.</div></div>`;
+  const kritMAY=`<div class="rjbox"><div class="rjh">Kriteria Muhib → Muayyid</div><div class="bpmy-badge">⭐ Lulus jika skor BPMy ≥ 50%</div><div class="ciri">${ciri.map(c=>`<div class="ci ci-${c[1]}"><span class="cin">★</span>${c[0]}</div>`).join("")}</div><div class="hint" style="margin-top:8px">Nilai 5 ciri ini bagi setiap muhib melalui borang BPMy dalam tab <b>Pencalonan Muayyid</b>.</div></div>`;
+  const silibus=`<div class="rjbox"><div class="rjh">Silibus Usrah (MUT / MUH)</div><div class="hint">Akan dikemas kini selepas pengesahan. Kongsikan silibus apabila sedia dan ia akan dimasukkan di sini.</div></div>`;
+  return journey+kritMUT+kritMAY+silibus;
 }
 
 function setView(v){view=v;document.querySelectorAll(".navtab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render();}
@@ -565,8 +582,8 @@ function muhSection(p){
 /* ---------- MINIT ---------- */
 function viewMinit(){
   const open=[];S.meetings.forEach(m=>m.items.forEach(it=>{if(it.status!=="Selesai")open.push({m,it});}));
-  const ob=`<details class="stats" ${openExp?"open":""}><summary style="cursor:pointer;font-weight:800;color:var(--blue)">Tindakan Terbuka (${open.length})</summary><div style="margin-top:8px">`+
-    (open.length?open.map(({m,it})=>`<div class="stat-row"><span><b style="color:var(--ink)">${esc(it.tugasan||"(tugasan)")}</b> — ${esc([it.pic,it.due,(m.tajuk||"")].filter(Boolean).join(" · "))}</span><button class="delmini" style="background:var(--green-s);border-color:var(--green);color:var(--green)" data-done="${m.id}|${it.id}" >Tandakan selesai</button></div>`).join(""):`<div class="fx">Tiada tindakan terbuka</div>`)+`</div></details>`;
+  const ob=`<details class="stats" ${openExp?"open":""}><summary style="cursor:pointer;font-weight:800;color:var(--blue)">Tindakan (${open.length})</summary><div style="margin-top:8px">`+
+    (open.length?open.map(({m,it})=>`<div class="tind"><div class="tind-l"><div class="tind-pic">${esc(it.pic||"(PIC)")}</div><div class="tind-task">${esc(it.tugasan||"(tugasan)")}</div><div class="tind-from">dari: ${esc(m.tajuk||"(mesyuarat)")}</div></div><div class="tind-r"><div class="tind-due">${esc(it.due||"—")}</div><select data-sumstat="${m.id}|${it.id}" class="tind-sel">${["To do","In progress","Selesai"].map(s=>`<option${s===(it.status||"To do")?" selected":""}>${s}</option>`).join("")}</select></div></div>`).join(""):`<div class="hint">Tiada tindakan.</div>`)+`</div></details>`;
   const list=S.meetings.length?S.meetings.map(meetCard).join(""):`<div class="empty"><b>Belum ada mesyuarat</b></div>`;
   return `<div class="bar"><button class="add" id="addMeetBtn" style="flex:1">＋ Mesyuarat baharu</button></div>${ob}<div class="rows">${list}</div>`;
 }
@@ -581,11 +598,11 @@ function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").lengt
       <div class="g2">${fld("Tajuk mesyuarat",`<input data-med="${m.id}" data-f="tajuk" value="${esc(m.tajuk)}" placeholder="cth. LMM Ogos / Progress Review">`)}${fld("Tarikh",`<input data-med="${m.id}" data-f="tarikh" type="date" value="${esc(m.tarikh)}">`)}</div>
       ${fld("Kehadiran ("+((m.hadir||[]).length)+")",rosterChecklist(m))}
       ${fld("Agenda",`<textarea data-med="${m.id}" data-f="agenda" placeholder="Agenda mesyuarat…">${esc(m.agenda)}</textarea>`)}
-      ${fld("Minit / nota",`<textarea data-med="${m.id}" data-f="minit" placeholder="Perkara dibincang, keputusan…" style="min-height:90px">${esc(m.minit)}</textarea>`)}
+      ${fld("Minit / nota",`<textarea data-med="${m.id}" data-f="minit" placeholder="Perkara dibincang, keputusan…" style="min-height:220px;resize:vertical;line-height:1.55;font-size:14px">${esc(m.minit)}</textarea>`)}
       <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin:12px 0 8px">Tindakan (${m.items.length})</div>
       ${m.items.map(it=>`<div class="subrow"><input data-mit="${m.id}|${it.id}" data-f="tugasan" value="${esc(it.tugasan)}" placeholder="Tugasan…" style="margin-bottom:8px;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px">
         <div class="g2"><input data-mit="${m.id}|${it.id}" data-f="pic" value="${esc(it.pic)}" placeholder="PIC" style="border:1px solid var(--line);border-radius:9px;padding:9px"><input data-mit="${m.id}|${it.id}" data-f="due" type="date" value="${esc(it.due)}" style="border:1px solid var(--line);border-radius:9px;padding:9px"></div>
-        <div class="rowflex" style="margin-top:8px"><select data-mit="${m.id}|${it.id}" data-f="status" style="flex:1;border:1px solid var(--line);border-radius:9px;padding:9px">${["Belum","Dalam proses","Selesai"].map(s=>`<option${s===it.status?" selected":""}>${s}</option>`).join("")}</select><button class="delmini" data-delit="${m.id}|${it.id}">✕</button></div></div>`).join("")}
+        <div class="rowflex" style="margin-top:8px"><select data-mit="${m.id}|${it.id}" data-f="status" style="flex:1;border:1px solid var(--line);border-radius:9px;padding:9px">${["To do","In progress","Selesai"].map(s=>`<option${s===it.status?" selected":""}>${s}</option>`).join("")}</select><button class="delmini" data-delit="${m.id}|${it.id}">✕</button></div></div>`).join("")}
       <button class="addsub" data-addit="${m.id}">＋ Tindakan</button>
       <div class="actions"><button class="del" data-delmeet="${m.id}" style="flex:1">Buang mesyuarat</button></div>
     </div></div>`;
@@ -705,7 +722,7 @@ document.addEventListener("click",e=>{
   const nav=e.target.closest(".navtab");if(nav){setView(nav.dataset.view);return;}
   const stg=e.target.closest("[data-stage]");if(stg){stage=stg.dataset.stage;render();return;}
   const ip=e.target.closest("[data-iptp]");if(ip){const v=ip.dataset.iptp;F.ipt=(v==="__blank__")?"__blank__":(v?decodeURIComponent(v):"");render();return;}
-  const sel=e.target.closest("[data-sel]");if(sel){selId=sel.dataset.sel;render();return;}
+  const sel=e.target.closest("[data-sel]");if(sel){selId=sel.dataset.sel;const _p=get(selId);if(_p)_p._etab=1;render();return;}
   const scl=e.target.closest("[data-selclose]");if(scl){selId=null;render();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
   const arc=e.target.closest("[data-arch]");if(arc){const p=get(arc.dataset.arch);if(p){p.arsip=!p.arsip;stamp(p);selId=null;save();render();toast(p.arsip?"Diarkib":"Dinyah-arkib");}return;}
@@ -767,6 +784,7 @@ document.addEventListener("change",e=>{const t=e.target,d=t.dataset||{};
   if(d.med&&d.f&&(t.tagName==="SELECT"||t.type==="date")){const m=getM(d.med);if(m){m[d.f]=t.value;save();render();}return;}
   if(d.mit&&d.f&&t.tagName==="SELECT"){const[mid,iid]=d.mit.split("|");const m=getM(mid);const it=m&&m.items.find(x=>x.id===iid);if(it){it[d.f]=t.value;save();render();}return;}
   if(d.wed&&d.f&&(t.tagName==="SELECT"||t.type==="date")){const w=getW(d.wed);if(w){w[d.f]=t.value;stamp(w);save();if(t.type!=="date")render();}return;}
+  if(d.sumstat){const[mid,iid]=d.sumstat.split("|");const m=getM(mid);const it=m&&m.items.find(x=>x.id===iid);if(it){it.status=t.value;stamp(m);save();render();}return;}
   if(d.hed&&d.f){const x=getH(d.hed);if(x){x[d.f]=(d.f==="nama"?titleCase(t.value):t.value);t.value=x[d.f];stamp(x);save();if(t.type!=="date")render();}return;}
   if(d.ced&&d.f&&(t.tagName==="SELECT"||t.type==="date")){const c=getC(d.ced);if(c){c[d.f]=t.value;save();render();}return;}
   const flt=t.closest?t.closest("[data-flt]"):null;if(flt){F[flt.dataset.flt]=t.value;render();return;}
