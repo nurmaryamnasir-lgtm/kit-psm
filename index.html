@@ -82,6 +82,8 @@
   .fld input,.fld select,.fld textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink)}
   .fld textarea{resize:vertical;min-height:44px}
   .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .g2>*,.g3>*{min-width:0}
+  input[type=date]{width:100%;min-width:0}
   @media(max-width:640px){.g3{grid-template-columns:1fr 1fr}}
   .toggle{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
   .toggle button{border:none;background:#fff;padding:8px 14px;font-weight:700;font-size:13px;color:var(--muted)}
@@ -158,7 +160,15 @@
   .tind{display:flex;gap:10px;align-items:flex-start;padding:9px 4px;border-bottom:1px solid var(--paper)} .tind:last-child{border-bottom:none}
   .tind-l{flex:1;min-width:0} .tind-pic{font-weight:800;font-size:13px} .tind-task{font-size:13px;margin-top:1px} .tind-from{font-size:11px;color:var(--muted);margin-top:2px}
   .tind-r{flex:0 0 auto;display:flex;flex-direction:column;gap:5px;align-items:flex-end} .tind-due{font-size:11.5px;color:var(--muted);font-weight:700} .tind-sel{border:1px solid var(--line);border-radius:9px;padding:5px 8px;font-size:12px}
+  .wadd{position:relative}
+  .wadd-menu{position:absolute;right:0;top:46px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;z-index:20;min-width:170px;display:flex;flex-direction:column}
+  .wadd-menu button{background:none;border:none;text-align:left;padding:11px 12px;border-radius:8px;font-weight:700;font-size:14px;color:var(--ink);cursor:pointer}
+  .wadd-menu button:hover{background:var(--paper)}
+  .sil{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px;background:#fff}
+  .sil-t{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)} .sil-s{font-weight:800;font-size:15px;margin-top:2px}
+  .sil-btn{flex:0 0 auto;background:var(--blue);color:#fff;text-decoration:none;font-weight:800;font-size:13px;padding:9px 14px;border-radius:11px;white-space:nowrap}
   @media(max-width:720px){
+    .journey{flex-direction:column;align-items:stretch} .jstage{flex:none;width:100%} .jar{width:100%;min-width:0;flex-direction:row;justify-content:center;gap:10px;padding:2px 0}
     .rhead{padding:10px 12px;gap:9px}
     .rav{width:30px;height:30px;font-size:11px;border-radius:8px}
     .rname{white-space:normal;font-size:15px;line-height:1.3}
@@ -405,7 +415,8 @@ function viewRujukan(){
   </div></div>`;
   const ciri=[["Muayyasyah","c1"],["Komitmen","c2"],["Kerja Berpasukan","c3"],["Ciri Kesolehan","c4"],["Kefahaman Dakwah","c5"]];
   const kritMAY=`<div class="rjbox"><div class="rjh">Kriteria Muhib → Muayyid</div><div class="bpmy-badge">⭐ Lulus jika skor BPMy ≥ 50%</div><div class="ciri">${ciri.map(c=>`<div class="ci ci-${c[1]}"><span class="cin">★</span>${c[0]}</div>`).join("")}</div><div class="hint" style="margin-top:8px">Nilai 5 ciri ini bagi setiap muhib melalui borang BPMy dalam tab <b>Pencalonan Muayyid</b>.</div></div>`;
-  const silibus=`<div class="rjbox"><div class="rjh">Silibus Usrah (MUT / MUH)</div><div class="hint">Akan dikemas kini selepas pengesahan. Kongsikan silibus apabila sedia dan ia akan dimasukkan di sini.</div></div>`;
+  const MUW="https://drive.google.com/drive/folders/1oK3s-Bx27PlpKL5WWEN21fgZnO8SR_1N";const KD="https://drive.google.com/drive/folders/1OUXFp4Y7JaYMYk-EZIYWuA2dNKZ9DJWV";
+  const silibus=`<div class="rjbox"><div class="rjh">Silibus Usrah</div><div class="sil"><div class="sil-l"><div class="sil-t">Mutabaah (MUT)</div><div class="sil-s">10 Muwasafat Tarbiah</div></div><a class="sil-btn" href="${MUW}" target="_blank" rel="noopener">Buka bahan ›</a></div><div class="sil"><div class="sil-l"><div class="sil-t">Muhib (MUH)</div><div class="sil-s">Kalam Dakwah</div></div><a class="sil-btn" href="${KD}" target="_blank" rel="noopener">Buka bahan ›</a></div></div>`;
   return journey+kritMUT+kritMAY+silibus;
 }
 
@@ -493,14 +504,13 @@ function renderGrouped(list){
   const years=Object.keys(g).sort((a,b)=>b.localeCompare(a));
   return years.map(y=>`<div class="grouphdr">Tahun PSPB ${esc(y)}<span class="gc">${g[y].length}</span></div>`+g[y].map(rowKeahlian).join("")).join("");}
 function rowKeahlian(p){
-  const st=statusOf(p);const tags=[];
-  if(p.pd1)tags.push(`<span class="tag pd">${esc(p.pd1)}</span>`);if(p.pd2)tags.push(`<span class="tag pd">${esc(p.pd2)}</span>`);
-  if(p.stage!=="muayyid"&&!p.pd1&&!p.pd2)tags.push(`<span class="tag red">Tiada PD</span>`);
-  if(p.stage==="mutabaah")tags.push(`<span class="tag ses">${sesCount(p)} sesi</span>`);
+  const st=statusOf(p);const pdArr=[p.pd1,p.pd2].filter(Boolean);const sub=[];
+  if(p.stage!=="muayyid"){ if(pdArr.length)sub.push(esc(pdArr.join(", "))); else sub.push(`<span style="color:var(--red);font-weight:700">Tiada PD</span>`); }
+  if(p.stage==="mutabaah")sub.push(sesCount(p)+" sesi");
+  if(st.t){const cc={g:"var(--green)",a:"var(--amber)",b:"var(--blueb)",n:"var(--muted)"}[st.k]||"var(--muted)";sub.push(`<span style="color:${cc};font-weight:700">${st.t}</span>`);}
   return `<div class="row${selId===p.id?" sel":""}">
     <div class="rhead" data-sel="${p.id}"><span class="iptblk" style="background:${iptColor(p.universiti)}" title="${esc(p.universiti||"Tiada IPT")}"></span><div class="rav rav-${p.stage}" title="${esc(stageLabel(p.stage))}">${stageCode(p.stage)}</div>
-      <div class="rname${p.nama?"":" empty"}">${p.nama?esc(p.nama):"(nama baharu)"}</div>
-      <div class="rtags">${tags.join("")}${st.t?`<span class="badge b-${st.k}">${st.t}</span>`:""}</div>
+      <div class="rname${p.nama?"":" empty"}">${p.nama?esc(p.nama):"(nama baharu)"}<div class="hsub">${sub.join(" · ")}</div></div>
       <span class="chev">›</span></div>
   </div>`;
 }
@@ -601,7 +611,7 @@ function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").lengt
       ${fld("Minit / nota",`<textarea data-med="${m.id}" data-f="minit" placeholder="Perkara dibincang, keputusan…" style="min-height:220px;resize:vertical;line-height:1.55;font-size:14px">${esc(m.minit)}</textarea>`)}
       <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin:12px 0 8px">Tindakan (${m.items.length})</div>
       ${m.items.map(it=>`<div class="subrow"><input data-mit="${m.id}|${it.id}" data-f="tugasan" value="${esc(it.tugasan)}" placeholder="Tugasan…" style="margin-bottom:8px;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px">
-        <div class="g2"><input data-mit="${m.id}|${it.id}" data-f="pic" value="${esc(it.pic)}" placeholder="PIC" style="border:1px solid var(--line);border-radius:9px;padding:9px"><input data-mit="${m.id}|${it.id}" data-f="due" type="date" value="${esc(it.due)}" style="border:1px solid var(--line);border-radius:9px;padding:9px"></div>
+        <div class="g2" style="grid-template-columns:.8fr 1.2fr"><input data-mit="${m.id}|${it.id}" data-f="pic" value="${esc(it.pic)}" placeholder="PIC" style="border:1px solid var(--line);border-radius:9px;padding:9px"><input data-mit="${m.id}|${it.id}" data-f="due" type="date" value="${esc(it.due)}" style="border:1px solid var(--line);border-radius:9px;padding:9px"></div>
         <div class="rowflex" style="margin-top:8px"><select data-mit="${m.id}|${it.id}" data-f="status" style="flex:1;border:1px solid var(--line);border-radius:9px;padding:9px">${["To do","In progress","Selesai"].map(s=>`<option${s===it.status?" selected":""}>${s}</option>`).join("")}</select><button class="delmini" data-delit="${m.id}|${it.id}">✕</button></div></div>`).join("")}
       <button class="addsub" data-addit="${m.id}">＋ Tindakan</button>
       <div class="actions"><button class="del" data-delmeet="${m.id}" style="flex:1">Buang mesyuarat</button></div>
@@ -609,9 +619,9 @@ function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").lengt
 }
 
 /* ---------- WASILAH ---------- */
-let wasMode="list";
+let wasMode="list"; let wasAddOpen=false;
 function viewWasilah(){
-  const toggle=`<div class="bar"><div class="toggle"><button class="${wasMode==="list"?"on":""}" data-wmode="list">Senarai</button><button class="${wasMode==="cal"?"on":""}" data-wmode="cal">Kalendar</button></div><button class="add" id="addWasBtn" style="margin-left:auto">＋ Program</button><button class="btn2" id="addHolBtn">＋ Tarikh penting</button></div>`;
+  const toggle=`<div class="bar"><div class="toggle"><button class="${wasMode==="list"?"on":""}" data-wmode="list">Senarai</button><button class="${wasMode==="cal"?"on":""}" data-wmode="cal">Kalendar</button></div><div class="wadd" style="margin-left:auto"><button class="add" id="addAnyBtn">＋ Tambah</button>${wasAddOpen?`<div class="wadd-menu"><button data-addprog="1">＋ Program</button><button data-addtp="1">＋ Tarikh penting</button></div>`:""}</div></div>`;
   if(wasMode==="cal")return toggle+calLegend()+calendarHTML()+calDayDetail();
   const MM=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
   const entries=[];S.wasilah.forEach(w=>entries.push({t:"w",d:w.tarikh||"",o:w}));(S.holidays||[]).forEach(x=>entries.push({t:"h",d:x.start||"",o:x}));
@@ -752,6 +762,9 @@ document.addEventListener("click",e=>{
   const cn=e.target.closest("[data-calnav]");if(cn){calDate=new Date(calDate.getFullYear(),calDate.getMonth()+ (+cn.dataset.calnav),1);render();return;}
   const ht=e.target.closest("[data-htog]");if(ht){const x=getH(ht.dataset.htog);if(x){x._open=!x._open;render();}return;}
   if($("#addHolBtn")&&e.target.closest("#addHolBtn")){S.holidays.unshift(newHoliday());holOpen=true;save();render();return;}
+  if(e.target.closest&&e.target.closest("#addAnyBtn")){e.stopPropagation();wasAddOpen=!wasAddOpen;render();return;}
+  const apg=e.target.closest("[data-addprog]");if(apg){S.wasilah.unshift(newWasilah());wasAddOpen=false;save();render();return;}
+  const atp=e.target.closest("[data-addtp]");if(atp){S.holidays.unshift(newHoliday());wasAddOpen=false;save();render();return;}
   const cday=e.target.closest("[data-calday]");if(cday){selDate=cday.dataset.calday;render();return;}
   const wop=e.target.closest("[data-wopen]");if(wop){const w=getW(wop.dataset.wopen);if(w){wasMode="list";w._open=true;render();}return;}
   const holt=e.target.closest("[data-holtoggle]");if(holt){holOpen=!holOpen;render();return;}
@@ -764,6 +777,7 @@ document.addEventListener("click",e=>{
   const ub=e.target.closest("[data-uplbtn]");if(ub){const [kind,id]=ub.dataset.uplbtn.split("|");pickAndUpload(kind,id);return;}
   const ra=e.target.closest("[data-rmatt]");if(ra){const [kind,id,idx]=ra.dataset.rmatt.split("|");if(kind==="person"){const p=get(id);if(p&&p.lampiran){p.lampiran.splice(+idx,1);save();render();}}else if(kind==="claim"){const c=getC(id);if(c&&c.files){c.files.splice(+idx,1);save();render();}}return;}
   if(!e.target.closest(".menu"))$("#menuPop").classList.remove("show");
+  if(wasAddOpen&&!(e.target.closest&&e.target.closest(".wadd"))){wasAddOpen=false;render();}
 });
 document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
   if(d.ed&&d.f){const p=get(d.ed);if(p){let v=t.value;if(d.f==="telefon"){v=fmtPhone(v);t.value=v;}else if(d.f==="poskod"){v=v.replace(/\D/g,"").slice(0,5);t.value=v;}if(d.f.indexOf("rmk_")===0){p.remarks=p.remarks||{};p.remarks[d.f.slice(4)]=v;}else p[d.f]=v;save();}return;}
