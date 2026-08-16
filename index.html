@@ -190,7 +190,7 @@
   .ktbl thead th{text-align:left;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:800;padding:10px 12px;background:var(--paper);border-bottom:1px solid var(--line)}
   .ktbl td{padding:11px 12px;border-bottom:1px solid var(--paper);vertical-align:middle}
   .ktbl tbody tr{cursor:pointer} .ktbl tbody tr:hover{background:var(--paper)} .ktbl tbody tr:last-child td{border-bottom:none}
-  .ktname{font-weight:800}
+  .ktname{font-weight:800} .ktbl th.sortable{cursor:pointer;user-select:none;white-space:nowrap} .ktbl th.sortable:hover{color:var(--blue)}
   .ptag{display:inline-block;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:800}
   .kwrap-card{display:none}
   .kc{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
@@ -380,8 +380,8 @@ const BPMY=[
 const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
-let view="keahlian", stage="all", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:""}; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let rujMain="krit"; let rujTab="muw"; let rujUsr=-1; let rujMuw=-1; let rujKd=-1;
+let view="keahlian", stage="mutabaah", q="", openExp=true, calDate=new Date();
+let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:""}; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=-1; let rujMuw=-1; let rujKd=-1;
 
 const store={async get(k){try{if(window.storage&&window.storage.get)return await window.storage.get(k);}catch(e){}try{const v=localStorage.getItem(k);return v!=null?{value:v}:null;}catch(e){return null;}},
   async set(k,v){try{if(window.storage&&window.storage.set){await window.storage.set(k,v);return;}}catch(e){}try{localStorage.setItem(k,v);}catch(e){}}};
@@ -421,7 +421,7 @@ function bpmy(p){const sc=p.bpmy||{};let total=0;const cats=BPMY.map(c=>{let s=0
 function muhStatus(p){const b=bpmy(p);const pc=Math.round(b.pct*100);if(b.pass)return{k:"g",t:"Layak MAY · "+pc+"%"};if(b.total>0)return{k:"b",t:"BPMy "+pc+"%"};return{k:"n",t:"Baru muhib"};}
 function statusOf(p){if(p.stage==="mutabaah")return mutStatus(p);if(p.stage==="muhib")return muhStatus(p);if(p.stage==="muayyid")return{k:"g",t:"Muayyid"};return{k:"n",t:"Baru"};}
 function eligible(p){if(p.stage==="mutabaah")return sesCount(p)>=3&&p.minatUsrah==="Ya";if(p.stage==="muhib")return bpmy(p).pass;return false;}
-function stageCode(s){return {mutabaah:"MUT",muhib:"MUH",muayyid:"MY"}[s]||"—";}
+function stageCode(s){return {mutabaah:"MUT",muhib:"MUH",muayyid:"MAY"}[s]||"—";}
 function stageLabel(s){return(STAGES.find(x=>x.id===s)||{}).label||s;}
 
 /* =============== RENDER =============== */
@@ -511,6 +511,7 @@ function stageSelect(id,v){return `<select data-ed="${id}" data-f="stage">`+STAG
 /* ---------- KEAHLIAN ---------- */
 function pdOptions(){const set=new Set(S.pds||[]);S.people.forEach(p=>{if(p.pd1)set.add(p.pd1);if(p.pd2)set.add(p.pd2);});return[...set].sort();}
 function iptOptions(){const set=new Set(S.universities||[]);S.people.forEach(p=>{if(p.universiti)set.add(p.universiti);});return[...set].sort();}
+function iptLabel(u){u=(u||"").trim();return {"UiTM Puncak Perdana":"UiTM PP","UiTM Shah Alam":"UiTM SA"}[u]||u;}
 function iptColor(u){u=(u||"").trim();if(!u)return "#b8c2d6";const fixed={"MSU":"#6b3fa0","UiTM Shah Alam":"#e07b39","UiTM Puncak Perdana":"#1f9d55"};if(fixed[u])return fixed[u];const pal=["#147FB3","#c2367a","#3f74d6","#2a9d8f","#7048b6","#d98324"];let s=0;for(let i=0;i<u.length;i++)s=(s+u.charCodeAt(i))%99991;return pal[s%pal.length];}
 function filteredPeople(){let list=S.people.slice();
   if(showArsip)list=list.filter(p=>p.arsip);else list=list.filter(p=>!p.arsip);
@@ -527,13 +528,12 @@ function filteredPeople(){let list=S.people.slice();
 
 function viewKeahlian(){
   const arsipN=S.people.filter(p=>p.arsip).length;
-  const ST=[{id:"all",label:"Semua"},{id:"mutabaah",label:"MUT"},{id:"muhib",label:"MUH"},{id:"muayyid",label:"MAY"}];
+  const ST=[{id:"mutabaah",label:"MUT"},{id:"muhib",label:"MUH"},{id:"muayyid",label:"MAY"}];
   const pills=ST.map(s=>{const n=(s.id==="all"?S.people.filter(p=>!p.arsip):S.people.filter(p=>p.stage===s.id&&!p.arsip)).length;return `<button class="pill${stage===s.id?" active":""}" data-stage="${s.id}">${s.label}<span class="c">${n}</span></button>`;}).join("");
   const showMut=(stage==="all"||stage==="mutabaah");
   const pdOpt=`<option value="">Semua PD</option><option value="__none__"${F.pd==="__none__"?" selected":""}>(Tiada PD)</option>`+pdOptions().map(x=>`<option${F.pd===x?" selected":""}>${esc(x)}</option>`).join("");
   const filters=`<div class="filters">
     <select data-flt="pd">${pdOpt}</select>
-    <select data-flt="tahun"><option value="">Tahun PSPB: semua</option>${PSPB_YEARS.map(y=>`<option${F.tahun===y?" selected":""}>${y}</option>`).join("")}</select>
     <select data-flt="ajk"><option value="">Minat AJK: semua</option><option${F.ajk==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.ajk==="Tidak"?" selected":""}>Tidak</option></select>
     ${showMut?`<select data-flt="minat"><option value="">Minat usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option${F.minat==="Belum"?" selected":""}>Belum</option></select><select data-flt="minSesi"><option value="">Sesi: semua</option><option value="1"${F.minSesi==="1"?" selected":""}>1 sesi</option><option value="2"${F.minSesi==="2"?" selected":""}>2 sesi</option><option value="3"${F.minSesi==="3"?" selected":""}>3+ sesi</option></select>`:""}
   </div>`;
@@ -559,19 +559,20 @@ function statsPD(){const map={};const MM=["Jan","Feb","Mac","Apr","Mei","Jun","J
 function iptPills(){let base=S.people.filter(p=>!p.arsip);if(stage!=="all")base=base.filter(p=>p.stage===stage);
   const counts={};let blank=0;base.forEach(p=>{const u=(p.universiti||"").trim();if(!u)blank++;else counts[u]=(counts[u]||0)+1;});
   const names=Object.keys(counts).sort();const dot=c=>`<span class="iptdot" style="background:${c}"></span>`;
-  let out=`<button class="ipt-pill${!F.ipt?" active":""}" data-iptp=""><span class="lbl">Semua IPT</span><span class="c">${base.length}</span></button>`;
-  out+=names.map(n=>`<button class="ipt-pill${F.ipt===n?" active":""}" data-iptp="${encodeURIComponent(n)}">${dot(iptColor(n))}<span class="lbl">${esc(n)}</span><span class="c">${counts[n]}</span></button>`).join("");
+  let out=`<button class="ipt-pill${!F.ipt?" active":""}" data-iptp=""><span class="lbl">Semua</span><span class="c">${base.length}</span></button>`;
+  out+=names.map(n=>`<button class="ipt-pill${F.ipt===n?" active":""}" data-iptp="${encodeURIComponent(n)}">${dot(iptColor(n))}<span class="lbl">${esc(iptLabel(n))}</span><span class="c">${counts[n]}</span></button>`).join("");
   if(blank)out+=`<button class="ipt-pill blank${F.ipt==="__blank__"?" active":""}" data-iptp="__blank__">${dot("#b8c2d6")}<span class="lbl">(Tiada IPT)</span><span class="c">${blank}</span></button>`;
   return `<div class="iptbar">${out}</div>`;}
 
 function progColor(k){return {g:"var(--green)",a:"var(--amber)",b:"var(--blueb)",n:"var(--muted)"}[k]||"var(--muted)";}
-function ktable(list){return `<table class="ktbl"><thead><tr><th>Peringkat</th><th>Nama</th><th>IPT</th><th>PD</th><th>Sesi</th><th>Progres</th></tr></thead><tbody>`+list.map(p=>{const st=statusOf(p);const pd=[p.pd1,p.pd2].filter(Boolean).join(", ")||(p.stage!=="muayyid"?`<span style="color:var(--red);font-weight:700">Tiada PD</span>`:"—");return `<tr data-sel="${p.id}"><td><span class="ptag rav-${p.stage}">${stageCode(p.stage)}</span></td><td class="ktname">${esc(p.nama||"(nama)")}</td><td>${esc(p.universiti||"—")}</td><td>${pd}</td><td>${p.stage==="mutabaah"?sesCount(p):"—"}</td><td>${st.t?`<span style="color:${progColor(st.k)};font-weight:700">${esc(st.t)}</span>`:"—"}</td></tr>`;}).join("")+`</tbody></table>`;}
-function kcards(list){return list.map(p=>{const st=statusOf(p);const pdArr=[p.pd1,p.pd2].filter(Boolean);const sub=[esc(p.universiti||"Tiada IPT")];if(p.stage!=="muayyid")sub.push(pdArr.length?esc(pdArr.join(", ")):`<span style="color:var(--red)">Tiada PD</span>`);return `<div class="kc" data-sel="${p.id}"><div class="kc-av rav-${p.stage}">${stageCode(p.stage)}</div><div class="kc-main"><div class="kc-name">${esc(p.nama||"(nama)")}</div><div class="kc-sub">${sub.join(" · ")}${st.t?` · <span style="color:${progColor(st.k)};font-weight:700">${esc(st.t)}</span>`:""}</div></div><span class="chev">›</span></div>`;}).join("");}
+function ktable(list){const ar=k=>sortKey===k?(sortDir==="asc"?" ↑":" ↓"):" ⇅";return `<table class="ktbl"><thead><tr><th>Peringkat</th><th class="sortable" data-sort="nama">Nama${ar("nama")}</th><th>IPT</th><th>PD</th><th class="sortable" data-sort="sesi">Sesi${ar("sesi")}</th><th>Progres</th></tr></thead><tbody>`+list.map(p=>{const st=statusOf(p);const pd=[p.pd1,p.pd2].filter(Boolean).join(", ")||(p.stage!=="muayyid"?`<span style="color:var(--red);font-weight:700">Tiada PD</span>`:"—");return `<tr data-sel="${p.id}"><td><span class="ptag rav-${p.stage}">${stageCode(p.stage)}</span></td><td class="ktname">${esc(p.nama||"(nama)")}</td><td>${p.universiti?`<span class="iptdot" style="background:${iptColor(p.universiti)};margin-right:6px"></span>${esc(iptLabel(p.universiti))}`:"—"}</td><td>${pd}</td><td>${p.stage==="mutabaah"?sesCount(p):"—"}</td><td>${st.t?`<span style="color:${progColor(st.k)};font-weight:700">${esc(st.t)}</span>`:"—"}</td></tr>`;}).join("")+`</tbody></table>`;}
+function kcards(list){return list.map(p=>{const st=statusOf(p);const pdArr=[p.pd1,p.pd2].filter(Boolean);const sub=[p.universiti?`<span class="iptdot" style="background:${iptColor(p.universiti)};margin-right:5px"></span>${esc(iptLabel(p.universiti))}`:"Tiada IPT"];if(p.stage!=="muayyid")sub.push(pdArr.length?esc(pdArr.join(", ")):`<span style="color:var(--red)">Tiada PD</span>`);return `<div class="kc" data-sel="${p.id}"><div class="kc-av rav-${p.stage}">${stageCode(p.stage)}</div><div class="kc-main"><div class="kc-name">${esc(p.nama||"(nama)")}</div><div class="kc-sub">${sub.join(" · ")}${st.t?` · <span style="color:${progColor(st.k)};font-weight:700">${esc(st.t)}</span>`:""}</div></div><span class="chev">›</span></div>`;}).join("");}
+function sortList(l){const d=sortDir==="asc"?1:-1;return l.slice().sort((a,b)=>sortKey==="sesi"?(sesCount(a)-sesCount(b))*d:(a.nama||"~").localeCompare(b.nama||"~")*d);}
 function renderGrouped(list){
   if(!list.length)return `<div class="empty"><b>Tiada rekod</b><br>Tekan ＋ Tambah atau muat senarai Excel.</div>`;
   const g={};list.forEach(p=>{const y=p.tahunPSPB||"(Tiada tahun)";(g[y]=g[y]||[]).push(p);});
   const years=Object.keys(g).sort((a,b)=>b.localeCompare(a));
-  return years.map(y=>`<div class="grouphdr">Tahun PSPB ${esc(y)}<span class="gc">${g[y].length}</span></div><div class="kwrap-tbl">${ktable(g[y])}</div><div class="kwrap-card">${kcards(g[y])}</div>`).join("");
+  return years.map(y=>{const l=sortList(g[y]);return `<div class="grouphdr">Tahun PSPB ${esc(y)}<span class="gc">${l.length}</span></div><div class="kwrap-tbl">${ktable(l)}</div><div class="kwrap-card">${kcards(l)}</div>`;}).join("");
 }
 
 function rowKeahlian(p){
@@ -806,6 +807,7 @@ document.addEventListener("click",e=>{
   const sel=e.target.closest("[data-sel]");if(sel){selId=sel.dataset.sel;const _p=get(selId);if(_p)_p._etab=1;render();return;}
   const scl=e.target.closest("[data-selclose]");if(scl){selId=null;render();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
+  const so=e.target.closest("[data-sort]");if(so){const k=so.dataset.sort;if(sortKey===k)sortDir=sortDir==="asc"?"desc":"asc";else{sortKey=k;sortDir=(k==="sesi"?"desc":"asc");}render();return;}
   const rjm=e.target.closest("[data-rujmain]");if(rjm){rujMain=rjm.dataset.rujmain;render();return;}
   const rjt=e.target.closest("[data-rujtab]");if(rjt){rujTab=rjt.dataset.rujtab;render();return;}
   const rmw=e.target.closest("[data-rujmuw]");if(rmw){const i=+rmw.dataset.rujmuw;rujMuw=(rujMuw===i?-1:i);render();return;}
