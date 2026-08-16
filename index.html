@@ -447,7 +447,7 @@ const USRAH=[
 function viewRujukan(){
   const MUW="https://drive.google.com/drive/folders/1oK3s-Bx27PlpKL5WWEN21fgZnO8SR_1N";
   const KD="https://drive.google.com/drive/folders/1OUXFp4Y7JaYMYk-EZIYWuA2dNKZ9DJWV";
-  const mainNav=`<div class="rjtabs"><button class="rjtab${rujMain==="krit"?" on":""}" data-rujmain="krit">Kriteria</button><button class="rjtab${rujMain==="sil"?" on":""}" data-rujmain="sil">Silibus Usrah</button></div>`;
+  const mainNav=`<div class="rjtabs"><button class="rjtab${rujMain==="krit"?" on":""}" data-rujmain="krit">Kriteria</button><button class="rjtab${rujMain==="sil"?" on":""}" data-rujmain="sil">Silibus Usrah</button><button class="rjtab${rujMain==="borang"?" on":""}" data-rujmain="borang">Borang</button></div>`;
   if(rujMain==="krit"){
     const journey=`<div class="rjbox"><div class="rjh">Perjalanan Kemenjadian · Mutabaah → Muhib → Muayyid</div><div class="journey">
       <div class="jstage js1"><div class="s">★</div><div class="nm">Mutabaah</div><div class="nt">Mad'u dalam usrah followup</div></div>
@@ -463,6 +463,13 @@ function viewRujukan(){
     const ciri=[["Muayyasyah","c1"],["Komitmen","c2"],["Kerja Berpasukan","c3"],["Ciri Kesolehan","c4"],["Kefahaman Dakwah","c5"]];
     const kritMAY=`<div class="rjbox"><div class="rjh">Kriteria Muhib → Muayyid</div><div class="bpmy-badge">⭐ Lulus jika skor BPMy ≥ 50%</div><div class="ciri">${ciri.map(c=>`<div class="ci ci-${c[1]}"><span class="cin">★</span>${c[0]}</div>`).join("")}</div><div class="hint" style="margin-top:8px">Nilai 5 ciri ini bagi setiap muhib melalui borang BPMy dalam tab <b>Pencalonan Muayyid</b>.</div></div>`;
     return mainNav+journey+kritMUT+kritMAY;
+  }
+  if(rujMain==="borang"){
+    const BP="https://drive.google.com/drive/folders/1gAw4pGwQuf-JH90K7uZaC4rJsbSod5o-?usp=drive_link";
+    const BM="https://forms.gle/55HFkyr4yn8UQ76J9";
+    return mainNav+`<div class="rjbox"><div class="rjh">Borang</div>
+      <div class="sil"><div class="sil-l"><div class="sil-t">Perpindahan</div><div class="sil-s">Borang Perpindahan</div></div><a class="sil-btn" href="${BP}" target="_blank" rel="noopener">Buka ›</a></div>
+      <div class="sil"><div class="sil-l"><div class="sil-t">Pencalonan</div><div class="sil-s">Borang Pencalonan Muhib</div></div><a class="sil-btn" href="${BM}" target="_blank" rel="noopener">Buka ›</a></div></div>`;
   }
   const subs=[["muw","10 Muwasafat"],["kd","Kalam Dakwah"],["mhb","Silibus MHB"]];
   const subNav=`<div class="rjtabs">`+subs.map(t=>`<button class="rjtab${rujTab===t[0]?" on":""}" data-rujtab="${t[0]}">${t[1]}</button>`).join("")+`</div>`;
