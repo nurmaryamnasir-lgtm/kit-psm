@@ -777,12 +777,10 @@ function claimCard(c){const sb={"Draf":"b-n","Dihantar":"b-b","Lulus":"b-g","Tol
   const muay=(true)?`
     <div class="grp"><h3>Butiran Bajet Muayyasyah</h3>
      <div class="g2">${fld("Nama pemohon",CT(c.id,"namaPemohon",c.namaPemohon))}${fld("Nama agensi",CT(c.id,"namaAgensi",c.namaAgensi))}</div>
-     ${fld("Tarikh aktiviti muayyasyah",CT(c.id,"tarikhAktiviti",c.tarikhAktiviti,"date"))}
+     <div class="g2">${fld("Tarikh aktiviti muayyasyah",CT(c.id,"tarikhAktiviti",c.tarikhAktiviti,"date"))}${fld("Jumlah mad'u & mas'ul terlibat",CT(c.id,"jumlahMadu",c.jumlahMadu))}</div>
      ${fld("Perincian aktiviti",CTA(c.id,"perincianAktiviti",c.perincianAktiviti))}
-     ${fld("Jumlah mad'u & mas'ul terlibat",CT(c.id,"jumlahMadu",c.jumlahMadu))}
      ${fld("Perincian perbelanjaan",CTA(c.id,"perincianBelanja",c.perincianBelanja))}
-     ${fld("Pautan gambar bersama mad'u",CT(c.id,"gambarLink",c.gambarLink,"","https://…"))}
-     ${fld("Jumlah bantuan kewangan dipohon (RM)",CT(c.id,"jumlahDipohon",c.jumlahDipohon))}
+     <div class="g2">${fld("Jumlah bantuan kewangan dipohon (RM)",CT(c.id,"jumlahDipohon",c.jumlahDipohon))}<div></div></div>
      <div class="g3">${fld("Penama akaun",CT(c.id,"penama",c.penama))}${fld("Nama bank",CT(c.id,"bank",c.bank))}${fld("No. akaun",CT(c.id,"akaun",c.akaun))}</div>
     </div>`:`
     <div class="grp"><h3>Butiran tuntutan</h3>
@@ -793,13 +791,11 @@ function claimCard(c){const sb={"Draf":"b-n","Dihantar":"b-b","Lulus":"b-g","Tol
     <div class="rtags">${money?`<span class="tag ses">RM ${esc(money)}</span>`:``}<span class="badge ${sb}">${esc(c.status)}</span></div><span class="chev">▾</span></div>
     <div class="rbody">
       <div class="grp"><h3>Am</h3>
-        ${fld("Nama laporan",CT(c.id,"reportName",c.reportName,"","Eg: Muayyasyah Usrah A"))}
-        ${fld("Tarikh transaksi",CT(c.id,"tarikh",c.tarikh,"date"))}
-        ${fld("Pautan lampiran (resit/dokumen)",CT(c.id,"lampiran",c.lampiran,"","https://…"))}
+        <div class="g2">${fld("Nama laporan",CT(c.id,"reportName",c.reportName,"","Eg: Muayyasyah Usrah A"))}${fld("Tarikh transaksi",CT(c.id,"tarikh",c.tarikh,"date"))}</div>
         ${fld("Status",CS(c.id,"status",c.status,CLAIM_STATUS))}
       </div>
       ${muay}
-      ${attList("claim",c.id,c.files)}<div class="actions"><button class="del" data-delclaim="${c.id}" style="flex:1">Buang</button></div>
+      <div class="hint" style="margin:8px 0 4px">Namakan fail lampiran: <b>[Nama Pemohon]-[Tarikh transaksi]</b> (cth. Maryam-2026-08-16).</div>${attList("claim",c.id,c.files)}<div class="actions"><button class="del" data-delclaim="${c.id}" style="flex:1">Buang</button></div>
     </div></div>`;
 }
 function CT(id,f,v,type,ph){return `<input data-ced="${id}" data-f="${f}" type="${type||"text"}" value="${esc(v)}" placeholder="${ph||""}">`;}
