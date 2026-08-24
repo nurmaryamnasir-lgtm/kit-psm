@@ -144,6 +144,9 @@
   .memcal{margin-bottom:12px} .memday.us{background:var(--blue-s)} .memday.df{background:#e3f5f1} .memday.pg{background:#fff3c9}
   .memtag{font-size:9px;font-weight:800;margin-top:2px;line-height:1.1}
   .memday.us .memtag{color:var(--blueb)} .memday.df .memtag{color:#1f8f80} .memday.pg .memtag{color:var(--amber)}
+  .memday.abs{background:#fdecea;border-color:#f5c6c2} .memday.abs .memtag{color:var(--red)}
+  .memleg{display:flex;gap:16px;margin-top:8px;font-size:11.5px;color:var(--muted)} .memleg span{display:flex;align-items:center;gap:5px}
+  .memleg .lg{width:11px;height:11px;border-radius:3px;display:inline-block} .memleg .lg.us{background:var(--blue-s)} .memleg .lg.abs{background:#fdecea;border:1px solid #f5c6c2}
   .wdate,.hdate{flex:0 0 auto;width:46px;border-radius:10px;text-align:center;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
   .wdate .wdd,.hdate .hdd{font-size:18px;font-weight:800} .wdate .wdm,.hdate .hdm{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
   .wdate.pa{background:var(--blue-s);color:var(--blueb)} .wdate.pc{background:#e3f5f1;color:#1f8f80} .hdate{background:var(--paper);color:var(--muted)}
@@ -680,10 +683,16 @@ function memCalendar(p){
   const MM=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
   const dows=["Isn","Sel","Rab","Kha","Jum","Sab","Ahd"];
   const byDay={};(p.sessions||[]).forEach(s=>{if(!s.tarikh)return;(byDay[s.tarikh]=byDay[s.tarikh]||[]).push(s);});
+  // absences: usrah/DF held by this mad'u's PD but not attended
+  const mine=new Set((p.sessions||[]).map(s=>s._usrahId).filter(Boolean));
+  const absent={};usrahGroups().forEach(g=>{if(!g.tarikh)return;if(g.jenis!=="Usrah")return;const myPD=g.pd&&(g.pd===p.pd1||g.pd===p.pd2);if(myPD&&!mine.has(g.id)&&!byDay[g.tarikh]){absent[g.tarikh]=(absent[g.tarikh]||0)+1;}});
   const first=new Date(y,mo,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
-  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toISOString().slice(0,10);const out=d.getMonth()!==mo;const ss=byDay[iso]||[];const cls=ss.length?(ss[0].jenis==="DF"?"df":(ss[0].jenis==="Program"?"pg":"us")):"";
-    cells+=`<div class="cald memday ${cls}${out?" out":""}" title="${ss.map(x=>esc(x.jenis)+(x.oleh?" · "+esc(x.oleh):"")).join(", ")}"><div class="dn">${d.getDate()}</div>${ss.length?`<div class="memtag">${ss.length>1?ss.length+" sesi":esc(ss[0].jenis)}</div>`:""}</div>`;}
-  return `<div class="memcal"><div class="caltop"><button class="btn2" data-memcal="-1">‹</button><h3>${MM[mo]} ${y}</h3><button class="btn2" data-memcal="1">›</button></div><div class="cal">${dows.map(x=>`<div class="calh">${x}</div>`).join("")}${cells}</div></div>`;
+  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toISOString().slice(0,10);const out=d.getMonth()!==mo;const ss=byDay[iso]||[];const ab=absent[iso];const cls=ss.length?(ss[0].jenis==="DF"?"df":(ss[0].jenis==="Program"?"pg":"us")):(ab?"abs":"");
+    const tag=ss.length?(ss.length>1?ss.length+" sesi":esc(ss[0].jenis)):(ab?"Absen":"");
+    const tt=ss.length?ss.map(x=>esc(x.jenis)+(x.oleh?" · "+esc(x.oleh):"")).join(", "):(ab?"Tidak hadir usrah PD":"");
+    cells+=`<div class="cald memday ${cls}${out?" out":""}" title="${tt}"><div class="dn">${d.getDate()}</div>${tag?`<div class="memtag">${tag}</div>`:""}</div>`;}
+  const nAbs=Object.keys(absent).filter(k=>k.slice(0,7)===(y+"-"+String(mo+1).padStart(2,"0"))).length;
+  return `<div class="memcal"><div class="caltop"><button class="btn2" data-memcal="-1">‹</button><h3>${MM[mo]} ${y}</h3><button class="btn2" data-memcal="1">›</button></div><div class="cal">${dows.map(x=>`<div class="calh">${x}</div>`).join("")}${cells}</div><div class="memleg"><span><i class="lg us"></i>Hadir</span><span><i class="lg abs"></i>Tidak hadir${nAbs?" ("+nAbs+")":""}</span></div></div>`;
 }
 function mutSection(p){
   const ses=(p.sessions||[]).map(s=>`<div class="subrow">
