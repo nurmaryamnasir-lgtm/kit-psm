@@ -182,6 +182,7 @@
   .ciri{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px} .ci{display:flex;align-items:center;gap:8px;border-radius:12px;padding:11px 13px;font-weight:800;font-size:13.5px;color:#fff} .ci .cin{opacity:.85}
   .ci-c1{background:#147FB3} .ci-c2{background:var(--blueb)} .ci-c3{background:#2a9d8f} .ci-c4{background:var(--purple)} .ci-c5{background:var(--amber)}
   .rjbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+  .rjdef{border-left:4px solid var(--yellow);background:#fffdf5}
   .rjh{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:10px}
   .rjh::before{content:"";width:20px;height:3px;background:var(--yellow);border-radius:2px}
   .tind{display:flex;gap:10px;align-items:flex-start;padding:9px 4px;border-bottom:1px solid var(--paper)} .tind:last-child{border-bottom:none}
@@ -492,7 +493,8 @@ function viewRujukan(){
       <div class="kkc kkc-a"><div class="kkn">3</div><div><div class="kkt">Kecenderungan berubah</div><div class="kkd">Menunjukkan minat / kecenderungan untuk berubah & memperbaiki diri.</div></div></div></div></div>`;
     const ciri=[["Muayyasyah","c1"],["Komitmen","c2"],["Kerja Berpasukan","c3"],["Ciri Kesolehan","c4"],["Kefahaman Dakwah","c5"]];
     const kritMAY=`<div class="rjbox"><div class="rjh">Kriteria Muhib → Muayyid</div><div class="bpmy-badge">⭐ Lulus jika skor BPMy ≥ 50%</div><div class="ciri">${ciri.map(c=>`<div class="ci ci-${c[1]}"><span class="cin">★</span>${c[0]}</div>`).join("")}</div><div class="hint" style="margin-top:8px">Nilai 5 ciri ini bagi setiap muhib melalui borang BPMy dalam tab <b>Pencalonan Muayyid</b>.</div></div>`;
-    return mainNav+journey+kritMUT+kritMAY;
+    const def=`<div class="rjbox rjdef"><div class="rjh">Definisi Tarsyih</div><p style="margin:0;font-size:13.5px;line-height:1.6"><b>Tarsyih</b> ialah proses <b>pencalonan / syor kenaikan</b> seorang mad'u ke peringkat tarbiah seterusnya (Mutabaah \u2192 Muhib atau Muhib \u2192 Muayyid) setelah memenuhi kriteria yang ditetapkan. Penggerak Dakwah menilai kesediaan mad'u dan mencalonkannya untuk dinaikkan pada tempoh tarsyih yang ditetapkan.</p></div>`;
+    return mainNav+def+journey+kritMUT+kritMAY;
   }
   if(rujMain==="borang"){
     const BP="https://drive.google.com/drive/folders/1gAw4pGwQuf-JH90K7uZaC4rJsbSod5o-?usp=drive_link";
