@@ -337,7 +337,7 @@
 <nav class="topnav"><div class="navin" id="navin">
   <button class="navtab active" data-view="keahlian">Keahlian</button>
   <button class="navtab" data-view="minit">Minit &amp; Tindakan</button>
-  <button class="navtab" data-view="usrah">Usrah</button>
+  <button class="navtab" data-view="usrah">Log</button>
   <button class="navtab" data-view="wasilah">Wasilah</button>
   <button class="navtab" data-view="tuntutan">Tuntutan</button>
   <button class="navtab" data-view="rujukan">Rujukan</button>
@@ -515,16 +515,17 @@ function usrahGroups(){const g={};S.people.forEach(p=>{(p.sessions||[]).forEach(
 function viewUsrah(){
   const MM=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
   const pds=pdOptions();const madu=eligibleMadu();
-  const grpPD=uForm.pd?[uForm.pd]:pds;
-  let checklist=grpPD.map(pd=>{const mem=madu.filter(m=>m.pd1===pd||m.pd2===pd);if(!mem.length)return "";return `<div class="ugrp"><div class="ugrp-h">${esc(pd||"(Tiada PD)")}<span class="c">${mem.length}</span></div><div class="uchips">${mem.map(m=>`<button class="uchip${uForm.att[m.id]?" on":""}" data-uatt="${m.id}">${esc(m.nama||"(nama)")}</button>`).join("")}</div></div>`;}).join("");
-  if(!uForm.pd){const none=madu.filter(m=>!m.pd1&&!m.pd2);if(none.length)checklist+=`<div class="ugrp"><div class="ugrp-h">(Tiada PD)<span class="c">${none.length}</span></div><div class="uchips">${none.map(m=>`<button class="uchip${uForm.att[m.id]?" on":""}" data-uatt="${m.id}">${esc(m.nama||"(nama)")}</button>`).join("")}</div></div>`;}
+  let checklist;
+  if(uForm.pd){const mem=madu.filter(m=>m.pd1===uForm.pd||m.pd2===uForm.pd);
+    checklist=mem.length?`<div class="uchips">${mem.map(m=>`<button class="uchip${uForm.att[m.id]?" on":""}" data-uatt="${m.id}">${esc(m.nama||"(nama)")}</button>`).join("")}</div>`:`<div class="hint">Tiada mad'u di bawah PD ini.</div>`;}
+  else checklist=`<div class="hint">Pilih Penggerak Dakwah dahulu untuk papar senarai mad'u.</div>`;
   const nSel=Object.values(uForm.att).filter(Boolean).length;
   const form=`<div class="grp"><h3>Log usrah / DF</h3>
     <div class="g2">${fld("Tarikh",`<input data-uf="tarikh" type="date" value="${esc(uForm.tarikh)}">`)}${fld("Jenis",`<select data-uf="jenis">${SES_JENIS.map(x=>`<option${uForm.jenis===x?" selected":""}>${x}</option>`).join("")}</select>`)}</div>
-    ${fld("Penggerak Dakwah (PD)",`<select data-uf="pd"><option value="">Semua PD</option>${pds.map(x=>`<option${uForm.pd===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}
+    ${fld("Penggerak Dakwah (PD)",`<select data-uf="pd"><option value="">— Pilih PD —</option>${pds.map(x=>`<option${uForm.pd===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}
+    ${uForm.pd?`<div class="hint" style="margin:8px 0 6px">Tanda mad'u yang <b>hadir</b> (setiap tanda = 1 sesi automatik).</div>`:""}
+    ${checklist}
     ${fld("Butiran (pilihan)",`<input data-uf="butiran" value="${esc(uForm.butiran)}" placeholder="Tajuk / tema usrah">`)}
-    <div class="hint" style="margin:10px 0 6px">Tanda mad'u yang <b>hadir</b>. Setiap yang ditanda dapat 1 sesi kehadiran automatik.</div>
-    ${checklist||`<div class="hint">Tiada mad'u untuk PD ini.</div>`}
     <button class="add" id="saveUsrahBtn" style="width:100%;margin-top:12px"${nSel?"":" disabled"}>Simpan usrah · ${nSel} hadir</button>
   </div>`;
   const groups=usrahGroups().sort((a,b)=>(b.tarikh||"").localeCompare(a.tarikh||""));
@@ -915,7 +916,7 @@ document.addEventListener("click",e=>{
   if(!e.target.closest(".menu"))$("#menuPop").classList.remove("show");
   if(wasAddOpen&&!(e.target.closest&&e.target.closest(".wadd"))){wasAddOpen=false;render();}
 });
-document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(d.uf){uForm[d.uf]=t.value;return;}if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(d.uf){uForm[d.uf]=t.value;if(t.tagName==="SELECT"||t.type==="date")render();return;}if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
   if(d.ed&&d.f){const p=get(d.ed);if(p){let v=t.value;if(d.f==="telefon"){v=fmtPhone(v);t.value=v;}else if(d.f==="poskod"){v=v.replace(/\D/g,"").slice(0,5);t.value=v;}if(d.f.indexOf("rmk_")===0){p.remarks=p.remarks||{};p.remarks[d.f.slice(4)]=v;}else p[d.f]=v;save();}return;}
   if(d.ses&&d.f){const[pid,sid]=d.ses.split("|");const p=get(pid);const s=p&&p.sessions.find(x=>x.id===sid);if(s){s[d.f]=t.value;save();}return;}
   if(d.med&&d.f){const m=getM(d.med);if(m){m[d.f]=t.value;save();}return;}
