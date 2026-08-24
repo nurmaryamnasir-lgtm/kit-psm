@@ -119,9 +119,9 @@
   .cev.pes-akhawat{background:var(--blue-s);color:var(--blueb)} .cev.pes-campur{background:#e3f5f1;color:#1f8f80}
   .rj{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:#fff;box-shadow:var(--shadow)}
   .rj-h{font-weight:800;color:var(--blue);margin-bottom:6px} .rj-b{font-size:13.5px;line-height:1.55}
-  .jrny{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
-  .jst{flex:1 1 120px;border-radius:14px;padding:16px 12px;text-align:center;border:1px solid var(--line);min-width:110px}
-  .jst .jstar{font-size:15px;letter-spacing:3px;color:var(--yellow)} .jst .jname{font-weight:800;font-size:16px;margin-top:6px}
+  
+  
+   
   .js1{background:var(--paper)} .js2{background:linear-gradient(160deg,var(--blue-ink),var(--blue));border-color:transparent;color:#fff} .js3{background:linear-gradient(160deg,#fff7e0,#ffeab4);border-color:#f2dda6}
   .jarrow{display:flex;align-items:center;justify-content:center;min-width:78px} .jdur{background:var(--blue);color:#fff;font-weight:800;font-size:12px;padding:5px 12px;border-radius:20px;white-space:nowrap}
   .kk{display:grid;gap:10px}
@@ -132,15 +132,27 @@
   .kkt{font-weight:800;font-size:14.5px} .kkd{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5}
   .arsiplink{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:4px}
   .arch{background:var(--paper);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:0 14px;font-weight:700}
+  .pdrow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
+  .pdrow .iptblk{min-height:34px}
+  .pdname{flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;padding:9px;font-weight:700}
+  .pdipt{flex:0 0 auto;width:150px;max-width:40%;border:1px solid var(--line);border-radius:9px;padding:9px}
+  .pdcount{flex:0 0 auto;font-size:11.5px;color:var(--muted);font-weight:700;white-space:nowrap}
+  .pddel{flex:0 0 auto;background:none;border:none;color:var(--red);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
+  .syncpill{position:fixed;right:14px;bottom:14px;z-index:40;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:6px 13px;font-size:12px;font-weight:700;color:var(--muted);display:none}
+  .syncpill.on{color:var(--blue)}
+  :focus-visible{outline:3px solid var(--blueb);outline-offset:2px;border-radius:4px}
+  .row [data-sel],.kc,.ktbl tbody tr{cursor:pointer}
+  .ktbl tbody tr:focus-visible{outline:3px solid var(--blueb);outline-offset:-3px}
+  @media(max-width:720px){ .pdipt{width:120px} .syncpill{bottom:auto;top:70px;right:10px;padding:5px 10px;font-size:11px} }
   .ugrp{margin-bottom:12px} .ugrp-h{font-weight:800;font-size:13px;color:var(--blue);margin-bottom:6px;display:flex;align-items:center} .ugrp-h .c{background:var(--blue-s);color:var(--blue);border-radius:20px;padding:1px 9px;font-size:11px;margin-left:8px}
   .uchips{display:flex;flex-wrap:wrap;gap:6px}
   .uchip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:7px 13px;font-weight:700;font-size:13px;cursor:pointer}
   .uchip.on{background:var(--green);border-color:var(--green);color:#fff}
   .urow{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px;overflow:hidden}
   .urow-h{display:flex;align-items:center;gap:12px;padding:11px 13px;cursor:pointer} .urow-b{padding:0 13px 13px}
-  .datechips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px}
-  .datechip{border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700}
-  .datechip.us{background:var(--blue-s);color:var(--blueb)} .datechip.df{background:#e3f5f1;color:#1f8f80} .datechip.pg{background:#fff3c9;color:var(--amber)}
+  
+  
+   .datechip.df{background:#e3f5f1;color:#1f8f80} .datechip.pg{background:#fff3c9;color:var(--amber)}
   .memcal{margin-bottom:12px} .memday.us{background:var(--blue-s)} .memday.df{background:#e3f5f1} .memday.pg{background:#fff3c9}
   .memtag{font-size:9px;font-weight:800;margin-top:2px;line-height:1.1}
   .memday.us .memtag{color:var(--blueb)} .memday.df .memtag{color:#1f8f80} .memday.pg .memtag{color:var(--amber)}
@@ -340,6 +352,7 @@
 <nav class="topnav"><div class="navin" id="navin">
   <button class="navtab active" data-view="keahlian">Keahlian</button>
   <button class="navtab" data-view="minit">Minit &amp; Tindakan</button>
+  <button class="navtab" data-view="pd">PD</button>
   <button class="navtab" data-view="usrah">Log</button>
   <button class="navtab" data-view="wasilah">Wasilah</button>
   <button class="navtab" data-view="tuntutan">Tuntutan</button>
@@ -357,7 +370,8 @@
     <div id="gErr" class="gerr"></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="syncPill" class="syncpill" role="status" aria-live="polite"></div>
 
 <script>
 "use strict";
@@ -513,6 +527,16 @@ function viewRujukan(){
 }
 
 function setView(v){view=v;document.querySelectorAll(".navtab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render();}
+function getPd(id){return (S.pdList||[]).find(x=>x.id===id);}
+function viewPD(){
+  const list=(S.pdList||[]).slice().sort((a,b)=>(a.nama||"~").localeCompare(b.nama||"~"));
+  const ipts=(S.universities||[]).slice();
+  const rows=list.map(pd=>{const n=S.people.filter(p=>!p.arsip&&(p.pd1===pd.nama||p.pd2===pd.nama)).length;
+    return `<div class="pdrow"><span class="iptblk" style="background:${iptColor(pd.ipt)}" title="${esc(pd.ipt||"Tiada IPT")}"></span><input class="pdname" data-pded="${pd.id}" data-f="nama" value="${esc(pd.nama)}" placeholder="Nama PD"><select class="pdipt" data-pded="${pd.id}" data-f="ipt"><option value="">— IPT —</option>${ipts.map(x=>`<option${pd.ipt===x?" selected":""}>${esc(x)}</option>`).join("")}</select><span class="pdcount">${n} mad'u</span><button class="pddel" data-pddel="${pd.id}" title="Buang" aria-label="Buang PD">×</button></div>`;}).join("");
+  return `<div class="bar"><h3 style="margin:0;font-size:16px">Penggerak Dakwah</h3><button class="add" id="addPdBtn" style="margin-left:auto">＋ Tambah PD</button></div>
+    <div class="hint" style="margin-bottom:10px">Senarai PD & IPT masing-masing. Nama ini muncul dalam dropdown PD di Keahlian & Log.</div>
+    <div class="rows">${rows||`<div class="empty"><b>Belum ada PD</b><br>Tekan ＋ Tambah PD untuk mula.</div>`}</div>`;
+}
 function eligibleMadu(){return S.people.filter(p=>!p.arsip&&(p.stage==="mutabaah"||p.stage==="muhib"));}
 function usrahGroups(){const g={};S.people.forEach(p=>{(p.sessions||[]).forEach(s=>{if(!s._usrahId)return;const k=s._usrahId;(g[k]=g[k]||{id:k,tarikh:s.tarikh,jenis:s.jenis,pd:s.oleh,butiran:s.nota,att:[]});g[k].att.push(p.nama||"(tanpa nama)");});});return Object.values(g);}
 function viewUsrah(){
@@ -541,6 +565,7 @@ function viewUsrah(){
 function render(){const _dsb=document.querySelector(".drawer-body");const _sc=_dsb?_dsb.scrollTop:0;const a=$("#app");
   if(view==="keahlian")a.innerHTML=viewKeahlian();
   else if(view==="minit")a.innerHTML=viewMinit();
+  else if(view==="pd")a.innerHTML=viewPD();
   else if(view==="usrah")a.innerHTML=viewUsrah();
   else if(view==="wasilah")a.innerHTML=viewWasilah();
   else if(view==="tuntutan")a.innerHTML=viewTuntutan();
@@ -558,7 +583,7 @@ function selManaged(id,f,v,list){const opts=S[list]||[];const cur=(v&&!opts.incl
 function stageSelect(id,v){return `<select data-ed="${id}" data-f="stage">`+STAGES.map(s=>`<option value="${s.id}"${s.id===v?" selected":""}>${s.label}</option>`).join("")+`</select>`;}
 
 /* ---------- KEAHLIAN ---------- */
-function pdOptions(){const set=new Set(S.pds||[]);S.people.forEach(p=>{if(p.pd1)set.add(p.pd1);if(p.pd2)set.add(p.pd2);});return[...set].sort();}
+function pdOptions(){const set=new Set(S.pds||[]);(S.pdList||[]).forEach(x=>{if(x.nama)set.add(x.nama);});S.people.forEach(p=>{if(p.pd1)set.add(p.pd1);if(p.pd2)set.add(p.pd2);});return[...set].sort();}
 function iptOptions(){const set=new Set(S.universities||[]);S.people.forEach(p=>{if(p.universiti)set.add(p.universiti);});return[...set].sort();}
 function iptLabel(u){u=(u||"").trim();return {"UiTM Puncak Perdana":"UiTM PP","UiTM Shah Alam":"UiTM SA"}[u]||u;}
 function iptColor(u){u=(u||"").trim();if(!u)return "#b8c2d6";const fixed={"MSU":"#6b3fa0","UiTM Shah Alam":"#e07b39","UiTM Puncak Perdana":"#1f9d55"};if(fixed[u])return fixed[u];const pal=["#147FB3","#c2367a","#3f74d6","#2a9d8f","#7048b6","#d98324"];let s=0;for(let i=0;i<u.length;i++)s=(s+u.charCodeAt(i))%99991;return pal[s%pal.length];}
@@ -589,7 +614,7 @@ function viewKeahlian(){
   const rows=renderGrouped(filteredPeople());
   return `<div class="bar">${pills}</div>
     ${iptPills()}
-    <div class="bar"><div class="search"><span class="ic">⌕</span><input id="search" value="${esc(q)}" placeholder="Cari nama…"></div><button class="add" id="addBtn">＋ Tambah</button></div>
+    <div class="bar"><div class="search"><span class="ic">⌕</span><input id="search" value="${esc(q)}" placeholder="Cari nama…" aria-label="Cari nama ahli"></div><button class="add" id="addBtn">＋ Tambah</button></div>
     ${(arsipN>0||showArsip)?`<div style="display:flex;justify-content:flex-end;margin:2px 0 8px"><button class="arsiplink" data-arsip="1">${showArsip?"← Senarai aktif":("Arkib ("+arsipN+")")}</button></div>`:""}
     ${filters}${statsPD()}
     <div class="rows">${rows}</div>${detailDrawer()}`;
@@ -614,8 +639,8 @@ function iptPills(){let base=S.people.filter(p=>!p.arsip);if(stage!=="all")base=
   return `<div class="iptbar">${out}</div>`;}
 
 function progColor(k){return {g:"var(--green)",a:"var(--amber)",b:"var(--blueb)",n:"var(--muted)"}[k]||"var(--muted)";}
-function ktable(list){const ar=k=>sortKey===k?(sortDir==="asc"?" ↑":" ↓"):" ⇅";return `<table class="ktbl"><thead><tr><th>Peringkat</th><th class="sortable" data-sort="nama">Nama${ar("nama")}</th><th>IPT</th><th>PD</th><th class="sortable" data-sort="sesi">Sesi${ar("sesi")}</th><th>Progres</th></tr></thead><tbody>`+list.map(p=>{const st=statusOf(p);const pd=[p.pd1,p.pd2].filter(Boolean).join(", ")||(p.stage!=="muayyid"?`<span style="color:var(--red);font-weight:700">Tiada PD</span>`:"—");return `<tr data-sel="${p.id}"><td><span class="ptag rav-${p.stage}">${stageCode(p.stage)}</span></td><td class="ktname">${esc(p.nama||"(nama)")}</td><td>${p.universiti?`<span class="iptdot" style="background:${iptColor(p.universiti)};margin-right:6px"></span>${esc(iptLabel(p.universiti))}`:"—"}</td><td>${pd}</td><td>${p.stage==="mutabaah"?sesCount(p):"—"}</td><td>${st.t?`<span style="color:${progColor(st.k)};font-weight:700">${esc(st.t)}</span>`:"—"}</td></tr>`;}).join("")+`</tbody></table>`;}
-function kcards(list){return list.map(p=>{const st=statusOf(p);const pdArr=[p.pd1,p.pd2].filter(Boolean);const sub=[p.universiti?`<span class="iptdot" style="background:${iptColor(p.universiti)};margin-right:5px"></span>${esc(iptLabel(p.universiti))}`:"Tiada IPT"];if(p.stage!=="muayyid")sub.push(pdArr.length?esc(pdArr.join(", ")):`<span style="color:var(--red)">Tiada PD</span>`);return `<div class="kc" data-sel="${p.id}"><div class="kc-av rav-${p.stage}">${stageCode(p.stage)}</div><div class="kc-main"><div class="kc-name">${esc(p.nama||"(nama)")}</div><div class="kc-sub">${sub.join(" · ")}${st.t?` · <span style="color:${progColor(st.k)};font-weight:700">${esc(st.t)}</span>`:""}</div></div><span class="chev">›</span></div>`;}).join("");}
+function ktable(list){const ar=k=>sortKey===k?(sortDir==="asc"?" ↑":" ↓"):" ⇅";return `<table class="ktbl"><thead><tr><th>Peringkat</th><th class="sortable" data-sort="nama">Nama${ar("nama")}</th><th>IPT</th><th>PD</th><th class="sortable" data-sort="sesi">Sesi${ar("sesi")}</th><th>Progres</th></tr></thead><tbody>`+list.map(p=>{const st=statusOf(p);const pd=[p.pd1,p.pd2].filter(Boolean).join(", ")||(p.stage!=="muayyid"?`<span style="color:var(--red);font-weight:700">Tiada PD</span>`:"—");return `<tr data-sel="${p.id}" role="button" tabindex="0" aria-label="Buka ${esc(p.nama||"ahli")}"><td><span class="ptag rav-${p.stage}">${stageCode(p.stage)}</span></td><td class="ktname">${esc(p.nama||"(nama)")}</td><td>${p.universiti?`<span class="iptdot" style="background:${iptColor(p.universiti)};margin-right:6px"></span>${esc(iptLabel(p.universiti))}`:"—"}</td><td>${pd}</td><td>${p.stage==="mutabaah"?sesCount(p):"—"}</td><td>${st.t?`<span style="color:${progColor(st.k)};font-weight:700">${esc(st.t)}</span>`:"—"}</td></tr>`;}).join("")+`</tbody></table>`;}
+function kcards(list){return list.map(p=>{const st=statusOf(p);const pdArr=[p.pd1,p.pd2].filter(Boolean);const sub=[p.universiti?`<span class="iptdot" style="background:${iptColor(p.universiti)};margin-right:5px"></span>${esc(iptLabel(p.universiti))}`:"Tiada IPT"];if(p.stage!=="muayyid")sub.push(pdArr.length?esc(pdArr.join(", ")):`<span style="color:var(--red)">Tiada PD</span>`);return `<div class="kc" data-sel="${p.id}" role="button" tabindex="0" aria-label="Buka ${esc(p.nama||"ahli")}"><div class="kc-av rav-${p.stage}">${stageCode(p.stage)}</div><div class="kc-main"><div class="kc-name">${esc(p.nama||"(nama)")}</div><div class="kc-sub">${sub.join(" · ")}${st.t?` · <span style="color:${progColor(st.k)};font-weight:700">${esc(st.t)}</span>`:""}</div></div><span class="chev">›</span></div>`;}).join("");}
 function sortList(l){const d=sortDir==="asc"?1:-1;return l.slice().sort((a,b)=>sortKey==="sesi"?(sesCount(a)-sesCount(b))*d:(a.nama||"~").localeCompare(b.nama||"~")*d);}
 function renderGrouped(list){
   if(!list.length)return `<div class="empty"><b>Tiada rekod</b><br>Tekan ＋ Tambah atau muat senarai Excel.</div>`;
@@ -636,7 +661,7 @@ function rowKeahlian(p){
   </div>`;
 }
 function detailDrawer(){const p=get(selId);if(!p)return "";
-  return `<div class="drawer-back" data-selclose="1"></div><div class="drawer"><div class="drawer-head"><span class="iptblk" style="background:${iptColor(p.universiti)}"></span><div class="rav">${initials(p.nama)}</div><div class="dname">${p.nama?esc(p.nama):"(nama baharu)"}</div><button class="drawer-close" data-selclose="1">✕</button></div><div class="drawer-body">${editorKeahlian(p)}</div></div>`;}
+  return `<div class="drawer-back" data-selclose="1"></div><div class="drawer" role="dialog" aria-modal="true" aria-label="Butiran ahli" tabindex="-1"><div class="drawer-head"><span class="iptblk" style="background:${iptColor(p.universiti)}"></span><div class="rav">${initials(p.nama)}</div><div class="dname">${p.nama?esc(p.nama):"(nama baharu)"}</div><button class="drawer-close" data-selclose="1" aria-label="Tutup">✕</button></div><div class="drawer-body">${editorKeahlian(p)}</div></div>`;}
 
 function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
     ${fld("Nama penuh",T(p.id,"nama",p.nama,"Nama"))}
@@ -692,7 +717,7 @@ function memCalendar(p){
     const tt=ss.length?ss.map(x=>esc(x.jenis)+(x.oleh?" · "+esc(x.oleh):"")).join(", "):(ab?"Tidak hadir usrah PD":"");
     cells+=`<div class="cald memday ${cls}${out?" out":""}" title="${tt}"><div class="dn">${d.getDate()}</div>${tag?`<div class="memtag">${tag}</div>`:""}</div>`;}
   const nAbs=Object.keys(absent).filter(k=>k.slice(0,7)===(y+"-"+String(mo+1).padStart(2,"0"))).length;
-  return `<div class="memcal"><div class="caltop"><button class="btn2" data-memcal="-1">‹</button><h3>${MM[mo]} ${y}</h3><button class="btn2" data-memcal="1">›</button></div><div class="cal">${dows.map(x=>`<div class="calh">${x}</div>`).join("")}${cells}</div><div class="memleg"><span><i class="lg us"></i>Hadir</span><span><i class="lg abs"></i>Tidak hadir${nAbs?" ("+nAbs+")":""}</span></div></div>`;
+  return `<div class="memcal"><div class="caltop"><button class="btn2" data-memcal="-1" aria-label="Bulan sebelum">‹</button><h3>${MM[mo]} ${y}</h3><button class="btn2" data-memcal="1" aria-label="Bulan seterusnya">›</button></div><div class="cal">${dows.map(x=>`<div class="calh">${x}</div>`).join("")}${cells}</div><div class="memleg"><span><i class="lg us"></i>Hadir</span><span><i class="lg abs"></i>Tidak hadir${nAbs?" ("+nAbs+")":""}</span></div></div>`;
 }
 function mutSection(p){
   const ses=(p.sessions||[]).map(s=>`<div class="subrow">
@@ -769,9 +794,6 @@ function viewWasilah(){
   return toggle+`<div class="rows">${body}</div>`;
 }
 function calLegend(){const L=(c,t)=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:${c};display:inline-block"></span>${t}</span>`;return `<div class="hint" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:8px">${L("var(--blueb)","Akhawat")}${L("#1f8f80","Campur")}${L("var(--red)","Cuti umum")}${L("var(--purple)","Cuti semester")}${L("var(--amber)","Study week")}<span>\uD83C\uDF82 Hari lahir</span></div>`;}
-function holSection(){const list=(S.holidays||[]).slice().sort((a,b)=>(a.start||"").localeCompare(b.start||""));
-  return `<div class="stats" style="margin-top:12px"><div data-holtoggle="1" style="cursor:pointer;font-weight:800;color:var(--blue);display:flex;align-items:center;justify-content:space-between">Tarikh Penting & Cuti (${list.length})<span style="font-size:12px;color:var(--muted)">${holOpen?"Sembunyi ▲":"Papar ▼"}</span></div>${holOpen?`<div class="hint" style="margin-top:8px">Cuti umum Selangor (tarikh tetap) telah diisi. Tambah cuti semester UiTM/MSU, study week, atau cuti bergerak (Raya/CNY) di sini — sahkan tarikh rasmi.</div><div class="rows" style="margin-top:8px">${list.map(holCard).join("")}</div>`:""}</div>`;}
-
 function holCard(h){const c=holColor(h.jenis);return `<div class="row hrow${h._open?" open":""}" style="border-left:5px solid ${c}"><div class="rhead" data-htog="${h.id}"><div class="hdate"><div class="hdd">${(h.start||"").slice(8,10)||"—"}</div><div class="hdm">${monShort(h.start)}</div></div><div class="rname${h.nama?"":" empty"}">${h.nama?esc(h.nama):"(tarikh penting)"}<div class="hsub" style="color:${c}">${esc(h.jenis)}${h.end&&h.end!==h.start?" · s/d "+esc(h.end):""}</div></div><span class="chev">▾</span></div><div class="rbody"><div class="g2">${fld("Nama",`<input data-hed="${h.id}" data-f="nama" value="${esc(h.nama)}">`)}${fld("Jenis",`<select data-hed="${h.id}" data-f="jenis">${H_TYPES.map(o=>`<option${o===h.jenis?" selected":""}>${o}</option>`).join("")}</select>`)}</div><div class="g2">${fld("Tarikh mula",`<input data-hed="${h.id}" data-f="start" type="date" value="${esc(h.start)}">`)}${fld("Tarikh tamat (pilihan)",`<input data-hed="${h.id}" data-f="end" type="date" value="${esc(h.end)}">`)}</div><div class="actions"><button class="del" data-delhol="${h.id}" style="flex:1">Buang</button></div></div></div>`;}
 function monShort(iso){const MS=["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogos","Sep","Okt","Nov","Dis"];const m=+((iso||"").slice(5,7));return m?MS[m-1]:"";}
 function holColor(j){return j==="Study Week"?"var(--amber)":j==="Exam Week"?"var(--red)":j==="Semester Break"?"var(--purple)":j==="Mid Semester Break"?"var(--blueb)":j==="Minggu Orientasi"?"var(--green)":j==="Cuti Umum"?"var(--red)":"var(--muted)";}
@@ -808,7 +830,7 @@ function calendarHTML(){
     const evs=S.wasilah.filter(w=>w.tarikh&&iso>=w.tarikh&&iso<=(w.tarikhTamat||w.tarikh));
     const bd=bdays.filter(x=>x.b.mm===cm&&x.b.dd===cd);
     cells+=`<div class="cald${out?" out":""}${selDate===iso?" sel":""}" data-calday="${iso}"><div class="dn">${d.getDate()}</div>`+hs.map(x=>`<div class="cev ${holClass(x.jenis)}">${esc(x.nama||"cuti")}</div>`).join("")+bd.map(x=>`<div class="cev bday">\uD83C\uDF82 ${esc(x.n)}</div>`).join("")+evs.map(w=>`<div class="cev pes-${(w.peserta==="Campur")?"campur":"akhawat"}" title="${esc(w.nama)} · ${esc(w.status)}${w.kolab?" · kolab":""}">${esc(w.nama||"program")}</div>`).join("")+`</div>`;}
-  return `<div class="caltop"><button class="btn2" data-calnav="-1">‹</button><h3>${months[mo]} ${y}</h3><button class="btn2" data-calnav="1">›</button></div>
+  return `<div class="caltop"><button class="btn2" data-calnav="-1" aria-label="Bulan sebelum">‹</button><h3>${months[mo]} ${y}</h3><button class="btn2" data-calnav="1" aria-label="Bulan seterusnya">›</button></div>
     <div class="cal">${dows.map(d=>`<div class="calh">${d}</div>`).join("")}${cells}</div>`;
 }
 function calDayDetail(){
@@ -867,7 +889,7 @@ document.addEventListener("click",e=>{
   const nav=e.target.closest(".navtab");if(nav){setView(nav.dataset.view);return;}
   const stg=e.target.closest("[data-stage]");if(stg){stage=stg.dataset.stage;if(stage!=="mutabaah"&&stage!=="all"){F.minat="";F.minSesi="";}render();return;}
   const ip=e.target.closest("[data-iptp]");if(ip){const v=ip.dataset.iptp;F.ipt=(v==="__blank__")?"__blank__":(v?decodeURIComponent(v):"");render();return;}
-  const sel=e.target.closest("[data-sel]");if(sel){selId=sel.dataset.sel;const _p=get(selId);if(_p){_p._etab=1;const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();return;}
+  const sel=e.target.closest("[data-sel]");if(sel){selId=sel.dataset.sel;const _p=get(selId);if(_p){_p._etab=1;const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);return;}
   const scl=e.target.closest("[data-selclose]");if(scl){selId=null;render();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
   const so=e.target.closest("[data-sort]");if(so){const k=so.dataset.sort;if(sortKey===k)sortDir=sortDir==="asc"?"desc":"asc";else{sortKey=k;sortDir=(k==="sesi"?"desc":"asc");}render();return;}
@@ -878,6 +900,8 @@ document.addEventListener("click",e=>{
   const usx=e.target.closest("[data-usr]");if(usx){const i=+usx.dataset.usr;rujUsr=(rujUsr===i?-1:i);render();return;}
   const arc=e.target.closest("[data-arch]");if(arc){const p=get(arc.dataset.arch);if(p){p.arsip=!p.arsip;stamp(p);selId=null;save();render();toast(p.arsip?"Diarkib":"Dinyah-arkib");}return;}
   const mcn=e.target.closest("[data-memcal]");if(mcn){memCalDate.setMonth(memCalDate.getMonth()+(+mcn.dataset.memcal));render();return;}
+  if(e.target.closest&&e.target.closest("#addPdBtn")){S.pdList.unshift({id:uid("pd_"),nama:"",ipt:"",_upd:Date.now()});save();render();return;}
+  const pdd=e.target.closest("[data-pddel]");if(pdd){const id=pdd.dataset.pddel;S._del[id]=Date.now();S.pdList=S.pdList.filter(x=>x.id!==id);save();render();return;}
   const ua=e.target.closest("[data-uatt]");if(ua){const id=ua.dataset.uatt;uForm.att[id]=!uForm.att[id];render();return;}
   const ulg=e.target.closest("[data-ulog]");if(ulg){uLogOpen=(uLogOpen===ulg.dataset.ulog?"":ulg.dataset.ulog);render();return;}
   const udl=e.target.closest("[data-udel]");if(udl){const uid=udl.dataset.udel;if(!confirm("Padam usrah ini? Kehadiran mad'u akan ditarik balik."))return;S.people.forEach(pp=>{if(pp.sessions){const b=pp.sessions.length;pp.sessions=pp.sessions.filter(s=>s._usrahId!==uid);if(pp.sessions.length!==b)stamp(pp);}});save();render();toast("Usrah dipadam");return;}
@@ -915,6 +939,7 @@ document.addEventListener("click",e=>{
   const wop=e.target.closest("[data-wopen]");if(wop){const w=getW(wop.dataset.wopen);if(w){wasMode="list";w._open=true;render();}return;}
   const holt=e.target.closest("[data-holtoggle]");if(holt){holOpen=!holOpen;render();return;}
   if(d.uf){uForm[d.uf]=t.value;render();return;}
+  if(d.pded){const pd=getPd(d.pded);if(pd){pd[d.f]=t.value;pd._upd=Date.now();save();render();}return;}
   const wtg=e.target.closest("[data-wtgl]");if(wtg){const pr=wtg.dataset.wtgl.split("|");const w=getW(pr[0]);if(w){w[pr[1]]=(pr[2]==="true"?true:(pr[2]==="false"?false:pr[2]));if(pr[1]==="multi"&&pr[2]==="false")w.tarikhTamat="";stamp(w);save();render();}return;}
   const dhl=e.target.closest("[data-delhol]");if(dhl){const x=getH(dhl.dataset.delhol);if(x&&confirm("Buang tarikh ini?")){S._del[x.id]=Date.now();S.holidays=S.holidays.filter(y=>y.id!==x.id);save();render();}return;}
   // claims
@@ -926,7 +951,8 @@ document.addEventListener("click",e=>{
   if(!e.target.closest(".menu"))$("#menuPop").classList.remove("show");
   if(wasAddOpen&&!(e.target.closest&&e.target.closest(".wadd"))){wasAddOpen=false;render();}
 });
-document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(d.uf){uForm[d.uf]=t.value;if(t.tagName==="SELECT"||t.type==="date")render();return;}if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&selId){selId=null;render();return;}if((e.key==="Enter"||e.key===" ")){const a=document.activeElement;if(a&&a.matches&&a.matches("[data-sel]")){e.preventDefault();a.click();}}});
+document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(d.uf){uForm[d.uf]=t.value;if(t.tagName==="SELECT"||t.type==="date")render();return;}if(d.pded){const pd=getPd(d.pded);if(pd){pd[d.f]=t.value;pd._upd=Date.now();save();}return;}if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
   if(d.ed&&d.f){const p=get(d.ed);if(p){let v=t.value;if(d.f==="telefon"){v=fmtPhone(v);t.value=v;}else if(d.f==="poskod"){v=v.replace(/\D/g,"").slice(0,5);t.value=v;}if(d.f.indexOf("rmk_")===0){p.remarks=p.remarks||{};p.remarks[d.f.slice(4)]=v;}else p[d.f]=v;save();}return;}
   if(d.ses&&d.f){const[pid,sid]=d.ses.split("|");const p=get(pid);const s=p&&p.sessions.find(x=>x.id===sid);if(s){s[d.f]=t.value;save();}return;}
   if(d.med&&d.f){const m=getM(d.med);if(m){m[d.f]=t.value;save();}return;}
@@ -970,7 +996,7 @@ function promote(p){if(!p)return;if(!eligible(p)){if(!confirm("Belum layak. Teru
 function importNames(file){
   const ext=(file.name.split(".").pop()||"").toLowerCase();
   const addRows=rows=>{ // rows: array of objects keyed by header (lowercased)
-    let added=0;
+    const cands=[];
     rows.forEach(o=>{const nama=o.nama||o.name||o["nama penuh"]||"";if(!String(nama).trim())return;
       const p=newPerson((String(o["status tarbiyyah"]||o.peringkat||o.stage||"mutabaah")).trim().toLowerCase());p._open=false;
       p.nama=titleCase(String(nama).trim());
@@ -988,11 +1014,14 @@ function importNames(file){
       p.minatAJK=/^ya/i.test(String(o["berminat untuk menjadi ajk pembina?"]||o["minat ajk"]||o.minatajk||""))?"Ya":"Tidak";
       p.minatUsrah=/^ya/i.test(String(o["berminat untuk menyertai usrah?"]||o["minat usrah"]||o.minatusrah||""))?"Ya":"Belum";
       if(!STAGES.find(s=>s.id===p.stage))p.stage="mutabaah";
-      if(p.pd1&&!S.pds.includes(p.pd1))S.pds.push(p.pd1);
-      if(p.pd2&&!S.pds.includes(p.pd2))S.pds.push(p.pd2);
-      if(p.universiti&&!S.universities.includes(p.universiti))S.universities.push(p.universiti);
-      S.people.push(p);added++;});
-    S.pds.sort();S.universities.sort();save();render();toast(added+" nama ditambah");
+      cands.push(p);});
+    if(!cands.length){toast("Tiada nama sah dijumpai dalam fail");return;}
+    const nrm=s=>(s||"").trim().toLowerCase();
+    const existing=new Set(S.people.filter(x=>!x.arsip).map(x=>nrm(x.nama)));const seen=new Set();const fresh=[],dups=[];
+    cands.forEach(p=>{const key=nrm(p.nama);if(existing.has(key)||seen.has(key))dups.push(p);else{fresh.push(p);seen.add(key);}});
+    if(!confirm("Import "+cands.length+" baris:\n\u2022 "+fresh.length+" nama baharu\n\u2022 "+dups.length+" kemungkinan duplikat (nama sama) \u2014 akan dilangkau\n\nTeruskan tambah "+fresh.length+" nama baharu?"))return;
+    fresh.forEach(p=>{if(p.pd1&&!S.pds.includes(p.pd1))S.pds.push(p.pd1);if(p.pd2&&!S.pds.includes(p.pd2))S.pds.push(p.pd2);if(p.universiti&&!S.universities.includes(p.universiti))S.universities.push(p.universiti);S.people.push(p);});
+    S.pds.sort();S.universities.sort();save();render();toast(fresh.length+" nama ditambah"+(dups.length?" \u00b7 "+dups.length+" duplikat dilangkau":""));
   };
   const r=new FileReader();
   if(ext==="csv"){r.onload=()=>{addRows(parseCSV(r.result));};r.readAsText(file);}
@@ -1028,7 +1057,7 @@ function exportBPMy(p){if(!p)return;const b=bpmy(p);
   XLSX.writeFile(wb,`BPMy-${(p.nama||"Nama").replace(/\s+/g,"_")}-${today()}.xlsx`);toast("BPMy Excel dimuat turun");}
 
 /* ---- normalize + holidays ---- */
-function normalizeS(){S.people=S.people||[];S.meetings=S.meetings||[];S.wasilah=S.wasilah||[];S.claims=S.claims||[];S.universities=(S.universities&&S.universities.length)?S.universities:["UiTM Shah Alam","UiTM Puncak Perdana","MSU"];S.pds=S.pds||[];S.kolej=S.kolej||[];S.roster=S.roster||[];S.holidays=S.holidays||[];S._del=S._del||{};S.people.forEach(p=>{if(p&&p.ic){const b=icBirthday(p.ic);if(b&&!p.tarikhLahir){const dg=(p.ic||"").replace(/\D/g,"");const yy=+dg.slice(0,2);const yr=yy<30?2000+yy:1900+yy;p.tarikhLahir=yr+"-"+String(b.mm).padStart(2,"0")+"-"+String(b.dd).padStart(2,"0");}delete p.ic;}});seedHolidays();}
+function normalizeS(){S.people=S.people||[];S.meetings=S.meetings||[];S.wasilah=S.wasilah||[];S.claims=S.claims||[];S.universities=(S.universities&&S.universities.length)?S.universities:["UiTM Shah Alam","UiTM Puncak Perdana","MSU"];S.pds=S.pds||[];S.kolej=S.kolej||[];S.roster=S.roster||[];S.holidays=S.holidays||[];S._del=S._del||{};S.pdList=S.pdList||[];if(!S._pdSeeded){const have=new Set(S.pdList.map(x=>(x.nama||"").toLowerCase()));const nm=new Set(S.pds||[]);S.people.forEach(p=>{if(p.pd1)nm.add(p.pd1);if(p.pd2)nm.add(p.pd2);});nm.forEach(n=>{if(n&&!have.has(n.toLowerCase())){S.pdList.push({id:uid("pd_"),nama:n,ipt:"",_upd:1});have.add(n.toLowerCase());}});S._pdSeeded=true;}S.people.forEach(p=>{if(p&&p.ic){const b=icBirthday(p.ic);if(b&&!p.tarikhLahir){const dg=(p.ic||"").replace(/\D/g,"");const yy=+dg.slice(0,2);const yr=yy<30?2000+yy:1900+yy;p.tarikhLahir=yr+"-"+String(b.mm).padStart(2,"0")+"-"+String(b.dd).padStart(2,"0");}delete p.ic;}});seedHolidays();}
 function seedHolidays(){if(S._holSeeded)return;const seed=[["Tahun Baharu","2026-01-01"],["Hari Pekerja","2026-05-01"],["Hari Kebangsaan","2026-08-31"],["Hari Malaysia","2026-09-16"],["Keputeraan Sultan Selangor","2026-12-11"],["Krismas","2026-12-25"],["Tahun Baharu","2027-01-01"],["Hari Pekerja","2027-05-01"],["Hari Kebangsaan","2027-08-31"],["Hari Malaysia","2027-09-16"],["Keputeraan Sultan Selangor","2027-12-11"],["Krismas","2027-12-25"]];seed.forEach(([n,dd])=>S.holidays.push({id:"hs_"+dd+"_"+n.replace(/\s+/g,""),nama:n,jenis:"Cuti Umum",start:dd,end:"",_open:false,_upd:1}));S._holSeeded=true;}
 function newHoliday(){return{id:uid("h_"),nama:"",jenis:"Cuti Semester",start:today(),end:"",_open:true,_upd:Date.now()};}
 function getH(id){return(S.holidays||[]).find(x=>x.id===id);}
@@ -1038,7 +1067,8 @@ const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbwrMS4lqkxOyeRjbk
 let cfg={url:APPS_SCRIPT_URL,name:""};const CFGKEY="kitpd_cfg";
 function loadCfg(){try{const v=localStorage.getItem(CFGKEY);if(v){const o=JSON.parse(v);if(o.url)cfg.url=o.url;if(o.name)cfg.name=o.name;}}catch(e){} if(!cfg.url)cfg.url=APPS_SCRIPT_URL;}
 function saveCfg(){try{localStorage.setItem(CFGKEY,JSON.stringify({url:cfg.url,name:cfg.name}));}catch(e){}}
-let SYNC={ok:false,code:"",busy:false}; let dirty=false; let pollT=null;
+let SYNC={ok:false,code:"",busy:false}; let dirty=false; let pollT=null; let lastSyncAt=0;
+function setSyncUI(saving){const el=document.getElementById("syncPill");if(!el)return;if(!SYNC.ok){el.style.display="none";return;}el.style.display="block";if(saving){el.textContent="Menyegerak…";el.classList.add("on");}else{el.classList.remove("on");el.textContent=lastSyncAt?("✓ Segerak "+new Date(lastSyncAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})):"";}}
 function stamp(o){if(o)o._upd=Date.now();}
 function recFromDataset(d){d=d||{};
   if(d.ed)return get(d.ed);
@@ -1067,9 +1097,9 @@ function isEditing(){const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAR
 async function apiGet(code){const u=cfg.url+(cfg.url.indexOf("?")>-1?"&":"?")+"action=get&code="+encodeURIComponent(code);const r=await fetch(u);return await r.json();}
 async function apiSave(){const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})});return await r.json();}
 function sig(x){try{const o=Object.assign({},x);delete o._localSavedAt;return JSON.stringify(o);}catch(e){return Math.random()+"";}}
-async function syncNow(){if(!SYNC.ok||!cfg.url||!SYNC.code||SYNC.busy)return;SYNC.busy=true;try{const r=await apiSave();if(r&&r.ok){dirty=false;if(r.data&&!isEditing()){try{const before=sig(S);S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();if(sig(S)!==before)render();}catch(e){}}}}catch(e){}SYNC.busy=false;}
+async function syncNow(){if(!SYNC.ok||!cfg.url||!SYNC.code||SYNC.busy)return;SYNC.busy=true;setSyncUI(true);try{const r=await apiSave();if(r&&r.ok){dirty=false;lastSyncAt=Date.now();if(r.data&&!isEditing()){try{const before=sig(S);S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();if(sig(S)!==before)render();}catch(e){}}}}catch(e){}SYNC.busy=false;setSyncUI(false);}
 function pushSync(){syncNow();}
-async function pullMerge(){if(!SYNC.ok||dirty||SYNC.busy||isEditing())return;try{const r=await apiGet(SYNC.code);if(r&&r.ok&&r.data){const before=sig(S);S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();if(sig(S)!==before)render();}}catch(e){}}
+async function pullMerge(){if(!SYNC.ok||dirty||SYNC.busy||isEditing())return;setSyncUI(true);try{const r=await apiGet(SYNC.code);if(r&&r.ok&&r.data){const before=sig(S);S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();lastSyncAt=Date.now();if(sig(S)!==before)render();}}catch(e){}setSyncUI(false);}
 function startPolling(){if(pollT)clearInterval(pollT);pollT=setInterval(pullMerge,25000);}
 async function pullNow(){if(!SYNC.ok){toast("Log masuk dahulu");return;}try{const r=await apiGet(SYNC.code);if(r&&r.ok){if(r.data){S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();}render();toast("Data terkini ditarik");}else toast("Gagal menarik data");}catch(e){toast("Tidak dapat menyambung");}}
 function logout(){SYNC={ok:false,code:"",busy:false};dirty=false;if(pollT)clearInterval(pollT);try{localStorage.removeItem(KEY);}catch(e){}S={};normalizeS();render();gateShow();toast("Telah log keluar");}
