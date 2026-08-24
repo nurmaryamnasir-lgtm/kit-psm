@@ -1,0 +1,12 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# jangan commit rahsia / eksport data
+*.local
+secrets.*
+*-backup-*.json
+data-export*.json

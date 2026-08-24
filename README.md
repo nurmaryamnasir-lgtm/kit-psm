@@ -1,30 +1,41 @@
-# Kit PD — PEMBINA Shah Alam
+# Kit PD · PEMBINA Shah Alam
 
-Dua laman statik (web + telefon), untuk kegunaan Penggerak Dakwah. Tiada pemasangan.
+Suite ringkas untuk pengurusan gerak kerja tarbiah PSPB 2026 (Mutabaah → Muhib → Muayyid).
 
-| Fail | Fungsi |
+## Fail dalam repo ini
+
+| Fail | Guna |
 |---|---|
-| `index.html` | **Kit PD** — Keahlian (senarai induk MUT/MUH/Muayyid + BPMy), Minit & Tindakan, Wasilah (senarai + kalendar), Tuntutan. |
-| `gagasan.html` | **Kad Gagasan** — Visi & Misi · Objektif · Gagasan · **Rujukan** (bahan PD). |
+| `index.html` | **Kit PD** — aplikasi utama PD: keahlian, log usrah & kehadiran, minit & tindakan, wasilah, tuntutan, rujukan. |
+| `papan-psm.html` | **KPI PSM** — papan pemuka (baca sahaja) untuk pantau KPI, IPT, PD, kalendar usrah & notifikasi perubahan. |
+| `gagasan.html` | **Kad Gagasan** — rujukan produk gagasan. |
+| `Code.gs` | **Backend Google Apps Script** — simpan/gabung data, muat naik lampiran, backup harian. |
 
-Berpaut: butang **Gagasan** pada Kit PD; **← Kit PD** pada kad gagasan.
+## Model data & keselamatan
 
-## Keahlian
-- Tab **Keahlian** = senarai induk semua ahli. Tapis: Semua / Mutabaah / Muhib / Muayyid, dan ikut PD, minat usrah, minat AJK, bilangan sesi, aktif/tidak aktif. Nama disusun ikut abjad; setiap baris boleh diklik untuk buka.
-- Butiran penuh: universiti, bidang, tarikh mula/tamat pengajian, alamat cawangan & kampung, 2 tag PD, tajmik, passing ke cawangan lain (pautan borang).
-- **MUT**: kehadiran direkod ikut sesi (Usrah / Program / DF + tarikh + oleh PD); bilangan sesi tertera; boleh tanda tidak aktif; minat usrah & minat AJK.
-- **MUH**: Borang Pencalonan Muayyid (BPMy) penuh — 5 ciri berwajaran, skor 0–5, lulus ≥50%; remarks setiap ciri; program jadi AJK; **Export BPMy (Excel)**.
-- **📊 Frekuensi usrah/program/DF ikut PD** (dalam tab Keahlian).
-- **Muat senarai nama (Excel/CSV)** dari menu ⋮ — lajur `Nama` wajib; pilihan: `Universiti, Bidang, PD, PD2, Peringkat, Telefon`.
+- Semua data disimpan dalam **satu Google Sheet**, diakses melalui **satu Apps Script** (`Code.gs`).
+- Akses dilindungi oleh **satu kod pasukan** (`SECRET` dalam `Code.gs`) — kod ini **tidak** disimpan dalam HTML.
+- URL `/exec` dibakar dalam `index.html` & `papan-psm.html` (cari `APPS_SCRIPT_URL`).
+- **Privasi:** aplikasi menyimpan **tarikh lahir** (bukan nombor IC penuh) untuk hari lahir. Rekod lama yang ada IC akan ditukar ke tarikh lahir & IC dipadam secara automatik apabila dibuka.
 
-## Minit, Wasilah, Tuntutan
-- **Minit**: tajuk tersuai, tarikh, kehadiran, agenda, minit + tindakan (PIC/tarikh/status). Kotak Tindakan Terbuka mengumpul semua yang belum selesai.
-- **Wasilah**: nama program, bahan, perincian (tarikh, target, venue, budget), medium, PIC, status, dapatan (MUH/MUT). Papar sebagai **senarai** atau **kalendar**.
-- **Tuntutan**: format ala BrioHR; jenis "Bajet Muayyasah" membuka medan agensi, akaun bank, jumlah dipohon dll.
+## Cara deploy
 
-## Data & deploy
-- Disimpan dalam pelayar peranti (localStorage). **Simpan/Muat JSON** untuk backup & pindah peranti; **Export CSV/Excel** untuk Sheets.
-- GitHub Pages: upload `index.html`, `gagasan.html`, `README.md` ke satu repo → Settings → Pages → main / root.
+1. **Backend:** Extensions → Apps Script, tampal `Code.gs`, simpan. Deploy → New/Manage deployment → Web app (Execute as Me, Anyone).
+2. Jalankan `authorizeDrive` sekali (benarkan Google Drive) untuk lampiran.
+3. Jalankan `installBackupTrigger` sekali untuk backup harian automatik (2 pagi) ke folder Drive **KitPD Backups** (30 salinan terkini disimpan).
+4. **Frontend:** pastikan `APPS_SCRIPT_URL` dalam `index.html` & `papan-psm.html` = URL `/exec` anda, kemudian upload ke repo GitHub Pages.
 
-## Belum siap (menunggu bahan)
-- Tab **Rujukan** pada gagasan: kad untuk Kit Kemenjadian PD, Modul & Silibus Usrah, Bahan Usrah (Kalam Dakwah), Gagasan Deck — pautan & kata laluan akan dimasukkan setelah dikongsi.
+## Backup & pemulihan
+
+- Backup automatik harian → folder Drive **KitPD Backups** (`kitpd-backup-YYYY-MM-DD-...json`).
+- `backupDaily()` boleh dijalankan manual bila-bila masa untuk snapshot segera.
+- Untuk pulih: buka fail backup, ambil JSON, dan tampal semula ke Sheet (hubungi admin/dev).
+
+## Cadangan penambahbaikan akan datang
+
+- Tukar kod pasukan → **Google Sign-in + senarai emel** (identiti sebenar per orang).
+- Bila ahli bertambah banyak: simpan **satu baris per ahli** (bukan satu blob JSON).
+- Ujian aksesibiliti (fokus keyboard, aria-label) untuk pengguna telefon.
+
+---
+_Dibina secara berperingkat bersama pasukan PSM. Simpan setiap perubahan sebagai commit berasingan untuk sejarah & rollback._

@@ -640,7 +640,7 @@ function detailDrawer(){const p=get(selId);if(!p)return "";
 
 function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
     ${fld("Nama penuh",T(p.id,"nama",p.nama,"Nama"))}
-    <div class="g2">${fld("No. Kad Pengenalan",T(p.id,"ic",p.ic,"cth. 020101-10-1234"))}${fld("Email",T(p.id,"email",p.email,"nama@email.com","email"))}</div>
+    <div class="g2">${fld("Tarikh lahir",T(p.id,"tarikhLahir",p.tarikhLahir,"","date"))}${fld("Email",T(p.id,"email",p.email,"nama@email.com","email"))}</div>
     <div class="g2">${fld("No. telefon",T(p.id,"telefon",p.telefon,"01_-___ ____","tel"))}${fld("Status ahli",`<div class="toggle g"><button data-tgl="${p.id}|statusAhli|Ya" class="${p.statusAhli==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|statusAhli|Belum" class="${p.statusAhli!=="Ya"?"on":""}">Belum</button></div>`)}</div>
     ${fld("Institut Pengajian Tinggi (IPT)",selManaged(p.id,"universiti",p.universiti,"universities"))}
     <div class="g2">${fld("Bidang pengajian",T(p.id,"bidang",p.bidang,"cth. Perubatan"))}${fld("Tahap pengajian",T(p.id,"tahap",p.tahap,"cth. Sarjana Muda"))}</div>
@@ -795,13 +795,14 @@ function wasCard(w){const sb={"Sudah":"b-g","Belum":"b-n","Tangguh":"b-a"}[w.sta
 function SELw(id,f,v,opts){return `<select data-wed="${id}" data-f="${f}">`+opts.map(o=>`<option${o===v?" selected":""}>${esc(o)}</option>`).join("")+`</select>`;}
 function wtgl(id,f,v,opts){return `<div class="toggle${opts.length>2?" g":""}">`+opts.map(o=>`<button data-wtgl="${id}|${f}|${esc(o)}" class="${v===o?"on":""}">${esc(o)}</button>`).join("")+`</div>`;}
 function holClass(j){return j==="Cuti Umum"?"hol-umum":j==="Cuti Semester"?"hol-sem":j==="Study Week"?"hol-study":"hol-lain";}
+function bdayOf(p){if(p&&p.tarikhLahir){const m=+p.tarikhLahir.slice(5,7),d=+p.tarikhLahir.slice(8,10);if(m>=1&&m<=12&&d>=1&&d<=31)return{mm:m,dd:d};}return null;}
 function icBirthday(ic){const d=(ic||"").replace(/\D/g,"");if(d.length<6)return null;const mm=+d.slice(2,4),dd=+d.slice(4,6);if(mm<1||mm>12||dd<1||dd>31)return null;return{mm:mm,dd:dd};}
 function calendarHTML(){
   const y=calDate.getFullYear(),mo=calDate.getMonth();
   const first=new Date(y,mo,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
   const months=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
   const dows=["Isn","Sel","Rab","Kha","Jum","Sab","Ahd"];
-  const bdays=S.people.map(p=>({b:icBirthday(p.ic),n:(p.nama||"").split(/\s+/)[0]||"?"})).filter(x=>x.b);
+  const bdays=S.people.map(p=>({b:bdayOf(p),n:(p.nama||"").split(/\s+/)[0]||"?"})).filter(x=>x.b);
   let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toISOString().slice(0,10);const out=d.getMonth()!==mo;const cm=d.getMonth()+1,cd=d.getDate();
     const hs=(S.holidays||[]).filter(x=>x.start&&iso>=x.start&&iso<=(x.end||x.start));
     const evs=S.wasilah.filter(w=>w.tarikh&&iso>=w.tarikh&&iso<=(w.tarikhTamat||w.tarikh));
@@ -818,7 +819,7 @@ function calDayDetail(){
   const cm=dt.getMonth()+1,cd=dt.getDate();
   const hs=(S.holidays||[]).filter(x=>x.start&&iso>=x.start&&iso<=(x.end||x.start));
   const ws=(S.wasilah||[]).filter(w=>w.tarikh&&iso>=w.tarikh&&iso<=(w.tarikhTamat||w.tarikh));
-  const bd=(S.people||[]).map(x=>({b:icBirthday(x.ic),n:x.nama})).filter(x=>x.b&&x.b.mm===cm&&x.b.dd===cd);
+  const bd=(S.people||[]).map(x=>({b:bdayOf(x),n:x.nama})).filter(x=>x.b&&x.b.mm===cm&&x.b.dd===cd);
   let items="";
   hs.forEach(x=>{const c=x.jenis==="Cuti Umum"?"var(--red)":x.jenis==="Cuti Semester"?"var(--purple)":x.jenis==="Study Week"?"var(--amber)":"var(--muted)";items+=`<div class="dd-item"><span class="dd-dot" style="background:${c}"></span><div><b>${esc(x.nama||"Cuti")}</b><div class="dd-sub">${esc(x.jenis)}</div></div></div>`;});
   ws.forEach(w=>items+=`<div class="dd-item" data-wopen="${w.id}" style="cursor:pointer"><span class="dd-dot" style="background:${(w.peserta==="Campur")?"#1f8f80":"var(--blueb)"}"></span><div style="flex:1"><b>${esc(w.nama||"(program)")}</b><div class="dd-sub">${esc(w.peserta||"Akhawat")}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · "+esc(w.tarikh)+" → "+esc(w.tarikhTamat):""} · ${esc(w.status)}${w.kolab?" · kolab: "+esc(w.kolabNama||"ya"):""}</div></div><span class="chev">›</span></div>`);
@@ -977,7 +978,7 @@ function importNames(file){
       p.bidang=titleCase(o.bidang||o.kursus||o["bidang pengajian"]||"");
       p.tahap=titleCase(o["tahap pengajian"]||o.tahap||"");
       p.tahunMasuk=String(o["tahun kemasukan ke ipt"]||o["tahun kemasukan"]||o.tahunmasuk||"");
-      p.ic=String(o.ic||o["no kad pengenalan"]||o.kp||"");
+      const _ic=String(o.ic||o["no kad pengenalan"]||o.kp||"");const _tl=String(o["tarikh lahir"]||o["birth date"]||o["dob"]||"");if(/\d{4}-\d{2}-\d{2}/.test(_tl))p.tarikhLahir=_tl.slice(0,10);else if(_ic){const _b=icBirthday(_ic);if(_b){const _g=_ic.replace(/\D/g,"");const _yy=+_g.slice(0,2),_yr=_yy<30?2000+_yy:1900+_yy;p.tarikhLahir=_yr+"-"+String(_b.mm).padStart(2,"0")+"-"+String(_b.dd).padStart(2,"0");}}
       p.statusAhli=(o["status ahli"]?(/^ya/i.test(String(o["status ahli"]))?"Ya":"Belum"):((o.keahlian||o["no keahlian"]||o.nokeahlian)?"Ya":"Belum"));
       p.email=String(o.email||o.emel||"").trim().toLowerCase();
       p.negeri=o.negeri||"";
@@ -1008,8 +1009,8 @@ function parseCSV(txt){txt=txt.replace(/^\ufeff/,"");const lines=txt.split(/\r?\
 function dl(name,text,type){const b=new Blob([text],{type});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
 function cc(v){v=(v==null?"":String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
 function exportJSON(){dl(`KitPD-${today()}.json`,JSON.stringify(S,null,2),"application/json");toast("JSON dimuat turun");}
-function exportCSV(){const head=["Nama","Peringkat","Tahun PSPB","Status ahli","IC","Email","Status","IPT","Kolej","Bidang","Tahap","Tahun masuk IPT","Telefon","PD1","PD2","Poskod","Negeri","Tajmik","Sesi","Minat usrah","Minat AJK","BPMy %","Keadaan"];
-  const rows=S.people.map(p=>[p.nama,stageLabel(p.stage),p.tahunPSPB,p.statusAhli,p.ic,p.email,p.kerja,p.universiti,p.kolej,p.bidang,p.tahap,p.tahunMasuk,p.telefon,p.pd1,p.pd2,p.poskod,p.negeri,p.tajmik,sesCount(p),p.minatUsrah,p.minatAJK,p.stage==="muhib"?Math.round(bpmy(p).pct*100):"",statusOf(p).t].map(cc).join(","));
+function exportCSV(){const head=["Nama","Peringkat","Tahun PSPB","Status ahli","Tarikh lahir","Email","Status","IPT","Kolej","Bidang","Tahap","Tahun masuk IPT","Telefon","PD1","PD2","Poskod","Negeri","Tajmik","Sesi","Minat usrah","Minat AJK","BPMy %","Keadaan"];
+  const rows=S.people.map(p=>[p.nama,stageLabel(p.stage),p.tahunPSPB,p.statusAhli,p.tarikhLahir,p.email,p.kerja,p.universiti,p.kolej,p.bidang,p.tahap,p.tahunMasuk,p.telefon,p.pd1,p.pd2,p.poskod,p.negeri,p.tajmik,sesCount(p),p.minatUsrah,p.minatAJK,p.stage==="muhib"?Math.round(bpmy(p).pct*100):"",statusOf(p).t].map(cc).join(","));
   dl(`KitPD-Keahlian-${today()}.csv`,"\ufeff"+[head.join(","),...rows].join("\n"),"text/csv");toast("CSV dimuat turun");}
 
 function exportBPMy(p){if(!p)return;const b=bpmy(p);
@@ -1027,7 +1028,7 @@ function exportBPMy(p){if(!p)return;const b=bpmy(p);
   XLSX.writeFile(wb,`BPMy-${(p.nama||"Nama").replace(/\s+/g,"_")}-${today()}.xlsx`);toast("BPMy Excel dimuat turun");}
 
 /* ---- normalize + holidays ---- */
-function normalizeS(){S.people=S.people||[];S.meetings=S.meetings||[];S.wasilah=S.wasilah||[];S.claims=S.claims||[];S.universities=(S.universities&&S.universities.length)?S.universities:["UiTM Shah Alam","UiTM Puncak Perdana","MSU"];S.pds=S.pds||[];S.kolej=S.kolej||[];S.roster=S.roster||[];S.holidays=S.holidays||[];S._del=S._del||{};seedHolidays();}
+function normalizeS(){S.people=S.people||[];S.meetings=S.meetings||[];S.wasilah=S.wasilah||[];S.claims=S.claims||[];S.universities=(S.universities&&S.universities.length)?S.universities:["UiTM Shah Alam","UiTM Puncak Perdana","MSU"];S.pds=S.pds||[];S.kolej=S.kolej||[];S.roster=S.roster||[];S.holidays=S.holidays||[];S._del=S._del||{};S.people.forEach(p=>{if(p&&p.ic){const b=icBirthday(p.ic);if(b&&!p.tarikhLahir){const dg=(p.ic||"").replace(/\D/g,"");const yy=+dg.slice(0,2);const yr=yy<30?2000+yy:1900+yy;p.tarikhLahir=yr+"-"+String(b.mm).padStart(2,"0")+"-"+String(b.dd).padStart(2,"0");}delete p.ic;}});seedHolidays();}
 function seedHolidays(){if(S._holSeeded)return;const seed=[["Tahun Baharu","2026-01-01"],["Hari Pekerja","2026-05-01"],["Hari Kebangsaan","2026-08-31"],["Hari Malaysia","2026-09-16"],["Keputeraan Sultan Selangor","2026-12-11"],["Krismas","2026-12-25"],["Tahun Baharu","2027-01-01"],["Hari Pekerja","2027-05-01"],["Hari Kebangsaan","2027-08-31"],["Hari Malaysia","2027-09-16"],["Keputeraan Sultan Selangor","2027-12-11"],["Krismas","2027-12-25"]];seed.forEach(([n,dd])=>S.holidays.push({id:"hs_"+dd+"_"+n.replace(/\s+/g,""),nama:n,jenis:"Cuti Umum",start:dd,end:"",_open:false,_upd:1}));S._holSeeded=true;}
 function newHoliday(){return{id:uid("h_"),nama:"",jenis:"Cuti Semester",start:today(),end:"",_open:true,_upd:Date.now()};}
 function getH(id){return(S.holidays||[]).find(x=>x.id===id);}
