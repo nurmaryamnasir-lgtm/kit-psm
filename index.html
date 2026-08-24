@@ -132,6 +132,18 @@
   .kkt{font-weight:800;font-size:14.5px} .kkd{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5}
   .arsiplink{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:4px}
   .arch{background:var(--paper);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:0 14px;font-weight:700}
+  .ugrp{margin-bottom:12px} .ugrp-h{font-weight:800;font-size:13px;color:var(--blue);margin-bottom:6px;display:flex;align-items:center} .ugrp-h .c{background:var(--blue-s);color:var(--blue);border-radius:20px;padding:1px 9px;font-size:11px;margin-left:8px}
+  .uchips{display:flex;flex-wrap:wrap;gap:6px}
+  .uchip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:7px 13px;font-weight:700;font-size:13px;cursor:pointer}
+  .uchip.on{background:var(--green);border-color:var(--green);color:#fff}
+  .urow{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px;overflow:hidden}
+  .urow-h{display:flex;align-items:center;gap:12px;padding:11px 13px;cursor:pointer} .urow-b{padding:0 13px 13px}
+  .datechips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px}
+  .datechip{border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700}
+  .datechip.us{background:var(--blue-s);color:var(--blueb)} .datechip.df{background:#e3f5f1;color:#1f8f80} .datechip.pg{background:#fff3c9;color:var(--amber)}
+  .memcal{margin-bottom:12px} .memday.us{background:var(--blue-s)} .memday.df{background:#e3f5f1} .memday.pg{background:#fff3c9}
+  .memtag{font-size:9px;font-weight:800;margin-top:2px;line-height:1.1}
+  .memday.us .memtag{color:var(--blueb)} .memday.df .memtag{color:#1f8f80} .memday.pg .memtag{color:var(--amber)}
   .wdate,.hdate{flex:0 0 auto;width:46px;border-radius:10px;text-align:center;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
   .wdate .wdd,.hdate .hdd{font-size:18px;font-weight:800} .wdate .wdm,.hdate .hdm{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
   .wdate.pa{background:var(--blue-s);color:var(--blueb)} .wdate.pc{background:#e3f5f1;color:#1f8f80} .hdate{background:var(--paper);color:var(--muted)}
@@ -325,6 +337,7 @@
 <nav class="topnav"><div class="navin" id="navin">
   <button class="navtab active" data-view="keahlian">Keahlian</button>
   <button class="navtab" data-view="minit">Minit &amp; Tindakan</button>
+  <button class="navtab" data-view="usrah">Usrah</button>
   <button class="navtab" data-view="wasilah">Wasilah</button>
   <button class="navtab" data-view="tuntutan">Tuntutan</button>
   <button class="navtab" data-view="rujukan">Rujukan</button>
@@ -381,7 +394,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="keahlian", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:""}; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=-1; let rujMuw=-1; let rujKd=-1;
+let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:""}; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",butiran:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=-1; let rujMuw=-1; let rujKd=-1;
 
 const store={async get(k){try{if(window.storage&&window.storage.get)return await window.storage.get(k);}catch(e){}try{const v=localStorage.getItem(k);return v!=null?{value:v}:null;}catch(e){return null;}},
   async set(k,v){try{if(window.storage&&window.storage.set){await window.storage.set(k,v);return;}}catch(e){}try{localStorage.setItem(k,v);}catch(e){}}};
@@ -497,9 +510,34 @@ function viewRujukan(){
 }
 
 function setView(v){view=v;document.querySelectorAll(".navtab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render();}
+function eligibleMadu(){return S.people.filter(p=>!p.arsip&&(p.stage==="mutabaah"||p.stage==="muhib"));}
+function usrahGroups(){const g={};S.people.forEach(p=>{(p.sessions||[]).forEach(s=>{if(!s._usrahId)return;const k=s._usrahId;(g[k]=g[k]||{id:k,tarikh:s.tarikh,jenis:s.jenis,pd:s.oleh,butiran:s.nota,att:[]});g[k].att.push(p.nama||"(tanpa nama)");});});return Object.values(g);}
+function viewUsrah(){
+  const MM=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+  const pds=pdOptions();const madu=eligibleMadu();
+  const grpPD=uForm.pd?[uForm.pd]:pds;
+  let checklist=grpPD.map(pd=>{const mem=madu.filter(m=>m.pd1===pd||m.pd2===pd);if(!mem.length)return "";return `<div class="ugrp"><div class="ugrp-h">${esc(pd||"(Tiada PD)")}<span class="c">${mem.length}</span></div><div class="uchips">${mem.map(m=>`<button class="uchip${uForm.att[m.id]?" on":""}" data-uatt="${m.id}">${esc(m.nama||"(nama)")}</button>`).join("")}</div></div>`;}).join("");
+  if(!uForm.pd){const none=madu.filter(m=>!m.pd1&&!m.pd2);if(none.length)checklist+=`<div class="ugrp"><div class="ugrp-h">(Tiada PD)<span class="c">${none.length}</span></div><div class="uchips">${none.map(m=>`<button class="uchip${uForm.att[m.id]?" on":""}" data-uatt="${m.id}">${esc(m.nama||"(nama)")}</button>`).join("")}</div></div>`;}
+  const nSel=Object.values(uForm.att).filter(Boolean).length;
+  const form=`<div class="grp"><h3>Log usrah / DF</h3>
+    <div class="g2">${fld("Tarikh",`<input data-uf="tarikh" type="date" value="${esc(uForm.tarikh)}">`)}${fld("Jenis",`<select data-uf="jenis">${SES_JENIS.map(x=>`<option${uForm.jenis===x?" selected":""}>${x}</option>`).join("")}</select>`)}</div>
+    ${fld("Penggerak Dakwah (PD)",`<select data-uf="pd"><option value="">Semua PD</option>${pds.map(x=>`<option${uForm.pd===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}
+    ${fld("Butiran (pilihan)",`<input data-uf="butiran" value="${esc(uForm.butiran)}" placeholder="Tajuk / tema usrah">`)}
+    <div class="hint" style="margin:10px 0 6px">Tanda mad'u yang <b>hadir</b>. Setiap yang ditanda dapat 1 sesi kehadiran automatik.</div>
+    ${checklist||`<div class="hint">Tiada mad'u untuk PD ini.</div>`}
+    <button class="add" id="saveUsrahBtn" style="width:100%;margin-top:12px"${nSel?"":" disabled"}>Simpan usrah · ${nSel} hadir</button>
+  </div>`;
+  const groups=usrahGroups().sort((a,b)=>(b.tarikh||"").localeCompare(a.tarikh||""));
+  let past="";
+  if(groups.length){const byM={};groups.forEach(gr=>{const mk=(gr.tarikh||"").slice(0,7)||"zzzz";(byM[mk]=byM[mk]||[]).push(gr);});
+    past=Object.keys(byM).sort((a,b)=>b.localeCompare(a)).map(mk=>{const lbl=mk==="zzzz"?"Tiada tarikh":(MM[(+mk.slice(5,7))-1]+" "+mk.slice(0,4));return `<div class="grouphdr">${lbl}<span class="gc">${byM[mk].length}</span></div>`+byM[mk].map(gr=>`<div class="urow"><div class="urow-h" data-ulog="${gr.id}"><div class="wdate pa"><div class="wdd">${(gr.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(gr.tarikh)}</div></div><div class="rname">${esc(gr.jenis)}${gr.butiran?" · "+esc(gr.butiran):""}<div class="hsub">${esc(gr.pd||"(Tiada PD)")} · ${gr.att.length} hadir</div></div><span class="chev">${uLogOpen===gr.id?"▴":"▾"}</span></div>${uLogOpen===gr.id?`<div class="urow-b"><div class="uchips">${gr.att.map(nm=>`<span class="uchip on" style="cursor:default">${esc(nm)}</span>`).join("")}</div><button class="del" data-udel="${gr.id}" style="margin-top:10px;width:100%">Padam usrah ini</button></div>`:""}</div>`).join("");}).join("");
+  }else past=`<div class="empty"><b>Belum ada usrah direkod</b><br>Log usrah pertama di atas.</div>`;
+  return form+`<div class="grp"><h3>Usrah direkod</h3>${past}</div>`;
+}
 function render(){const _dsb=document.querySelector(".drawer-body");const _sc=_dsb?_dsb.scrollTop:0;const a=$("#app");
   if(view==="keahlian")a.innerHTML=viewKeahlian();
   else if(view==="minit")a.innerHTML=viewMinit();
+  else if(view==="usrah")a.innerHTML=viewUsrah();
   else if(view==="wasilah")a.innerHTML=viewWasilah();
   else if(view==="tuntutan")a.innerHTML=viewTuntutan();
   else if(view==="rujukan")a.innerHTML=viewRujukan();
@@ -636,6 +674,16 @@ function editorKeahlian(p){
   return nav+tabs[t-1][1]+act;
 }
 
+function memCalendar(p){
+  const y=memCalDate.getFullYear(),mo=memCalDate.getMonth();
+  const MM=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+  const dows=["Isn","Sel","Rab","Kha","Jum","Sab","Ahd"];
+  const byDay={};(p.sessions||[]).forEach(s=>{if(!s.tarikh)return;(byDay[s.tarikh]=byDay[s.tarikh]||[]).push(s);});
+  const first=new Date(y,mo,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toISOString().slice(0,10);const out=d.getMonth()!==mo;const ss=byDay[iso]||[];const cls=ss.length?(ss[0].jenis==="DF"?"df":(ss[0].jenis==="Program"?"pg":"us")):"";
+    cells+=`<div class="cald memday ${cls}${out?" out":""}" title="${ss.map(x=>esc(x.jenis)+(x.oleh?" · "+esc(x.oleh):"")).join(", ")}"><div class="dn">${d.getDate()}</div>${ss.length?`<div class="memtag">${ss.length>1?ss.length+" sesi":esc(ss[0].jenis)}</div>`:""}</div>`;}
+  return `<div class="memcal"><div class="caltop"><button class="btn2" data-memcal="-1">‹</button><h3>${MM[mo]} ${y}</h3><button class="btn2" data-memcal="1">›</button></div><div class="cal">${dows.map(x=>`<div class="calh">${x}</div>`).join("")}${cells}</div></div>`;
+}
 function mutSection(p){
   const ses=(p.sessions||[]).map(s=>`<div class="subrow">
      <div class="g2">${fld("Jenis",SELf2(p.id,s.id,"jenis",s.jenis,SES_JENIS))}${fld("Tarikh",Ts(p.id,s.id,"tarikh",s.tarikh,"date"))}</div>
@@ -643,6 +691,7 @@ function mutSection(p){
      <div class="rowflex"><div style="flex:1">${fld("Butiran (pilihan)",Ts(p.id,s.id,"nota",s.nota,"nota"))}</div><button class="delmini" data-delses="${p.id}|${s.id}">✕</button></div>
    </div>`).join("");
   return `<div class="grp"><h3>Kehadiran usrah / DF · ${sesCount(p)} sesi</h3>
+    <div class="hint" style="margin-bottom:6px">Kalendar kehadiran</div>${memCalendar(p)}
     ${ses||`<div class="hint">Belum ada sesi direkod.</div>`}
     <button class="addsub" data-addses="${p.id}">＋ Tambah sesi</button>
     <div class="g2" style="margin-top:11px">
@@ -807,7 +856,7 @@ document.addEventListener("click",e=>{
   const nav=e.target.closest(".navtab");if(nav){setView(nav.dataset.view);return;}
   const stg=e.target.closest("[data-stage]");if(stg){stage=stg.dataset.stage;if(stage!=="mutabaah"&&stage!=="all"){F.minat="";F.minSesi="";}render();return;}
   const ip=e.target.closest("[data-iptp]");if(ip){const v=ip.dataset.iptp;F.ipt=(v==="__blank__")?"__blank__":(v?decodeURIComponent(v):"");render();return;}
-  const sel=e.target.closest("[data-sel]");if(sel){selId=sel.dataset.sel;const _p=get(selId);if(_p)_p._etab=1;render();return;}
+  const sel=e.target.closest("[data-sel]");if(sel){selId=sel.dataset.sel;const _p=get(selId);if(_p){_p._etab=1;const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();return;}
   const scl=e.target.closest("[data-selclose]");if(scl){selId=null;render();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
   const so=e.target.closest("[data-sort]");if(so){const k=so.dataset.sort;if(sortKey===k)sortDir=sortDir==="asc"?"desc":"asc";else{sortKey=k;sortDir=(k==="sesi"?"desc":"asc");}render();return;}
@@ -817,6 +866,11 @@ document.addEventListener("click",e=>{
   const rkd=e.target.closest("[data-rujkd]");if(rkd){const i=+rkd.dataset.rujkd;rujKd=(rujKd===i?-1:i);render();return;}
   const usx=e.target.closest("[data-usr]");if(usx){const i=+usx.dataset.usr;rujUsr=(rujUsr===i?-1:i);render();return;}
   const arc=e.target.closest("[data-arch]");if(arc){const p=get(arc.dataset.arch);if(p){p.arsip=!p.arsip;stamp(p);selId=null;save();render();toast(p.arsip?"Diarkib":"Dinyah-arkib");}return;}
+  const mcn=e.target.closest("[data-memcal]");if(mcn){memCalDate.setMonth(memCalDate.getMonth()+(+mcn.dataset.memcal));render();return;}
+  const ua=e.target.closest("[data-uatt]");if(ua){const id=ua.dataset.uatt;uForm.att[id]=!uForm.att[id];render();return;}
+  const ulg=e.target.closest("[data-ulog]");if(ulg){uLogOpen=(uLogOpen===ulg.dataset.ulog?"":ulg.dataset.ulog);render();return;}
+  const udl=e.target.closest("[data-udel]");if(udl){const uid=udl.dataset.udel;if(!confirm("Padam usrah ini? Kehadiran mad'u akan ditarik balik."))return;S.people.forEach(pp=>{if(pp.sessions){const b=pp.sessions.length;pp.sessions=pp.sessions.filter(s=>s._usrahId!==uid);if(pp.sessions.length!==b)stamp(pp);}});save();render();toast("Usrah dipadam");return;}
+  if(e.target.closest&&e.target.closest("#saveUsrahBtn")){const ids=Object.keys(uForm.att).filter(k=>uForm.att[k]);if(!ids.length){toast("Tanda sekurang-kurangnya seorang");return;}const uid="u_"+Date.now();ids.forEach(id=>{const pp=get(id);if(pp){pp.sessions=pp.sessions||[];pp.sessions.push({id:"s_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),_usrahId:uid,jenis:uForm.jenis,tarikh:uForm.tarikh,oleh:uForm.pd,oleh2:"",nota:uForm.butiran});stamp(pp);}});uForm.att={};uForm.butiran="";save();render();toast(ids.length+" kehadiran direkod");return;}
   const et=e.target.closest("[data-etab]");if(et){const[id,t]=et.dataset.etab.split("|");const p=get(id);if(p){p._etab=+t;render();}return;}
   const tgl=e.target.closest("[data-tgl]");if(tgl){const[id,f,v]=tgl.dataset.tgl.split("|");const p=get(id);if(p){p[f]=(v==="true"?true:(v==="false"?false:v));save();render();}return;}
   const sc=e.target.closest("[data-score]");if(sc){const[id,it,v]=sc.dataset.score.split("|");const p=get(id);if(p){p.bpmy=p.bpmy||{};p.bpmy[it]=+v;save();render();}return;}
@@ -849,6 +903,7 @@ document.addEventListener("click",e=>{
   const cday=e.target.closest("[data-calday]");if(cday){selDate=cday.dataset.calday;render();return;}
   const wop=e.target.closest("[data-wopen]");if(wop){const w=getW(wop.dataset.wopen);if(w){wasMode="list";w._open=true;render();}return;}
   const holt=e.target.closest("[data-holtoggle]");if(holt){holOpen=!holOpen;render();return;}
+  if(d.uf){uForm[d.uf]=t.value;render();return;}
   const wtg=e.target.closest("[data-wtgl]");if(wtg){const pr=wtg.dataset.wtgl.split("|");const w=getW(pr[0]);if(w){w[pr[1]]=(pr[2]==="true"?true:(pr[2]==="false"?false:pr[2]));if(pr[1]==="multi"&&pr[2]==="false")w.tarikhTamat="";stamp(w);save();render();}return;}
   const dhl=e.target.closest("[data-delhol]");if(dhl){const x=getH(dhl.dataset.delhol);if(x&&confirm("Buang tarikh ini?")){S._del[x.id]=Date.now();S.holidays=S.holidays.filter(y=>y.id!==x.id);save();render();}return;}
   // claims
@@ -860,7 +915,7 @@ document.addEventListener("click",e=>{
   if(!e.target.closest(".menu"))$("#menuPop").classList.remove("show");
   if(wasAddOpen&&!(e.target.closest&&e.target.closest(".wadd"))){wasAddOpen=false;render();}
 });
-document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(d.uf){uForm[d.uf]=t.value;return;}if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
   if(d.ed&&d.f){const p=get(d.ed);if(p){let v=t.value;if(d.f==="telefon"){v=fmtPhone(v);t.value=v;}else if(d.f==="poskod"){v=v.replace(/\D/g,"").slice(0,5);t.value=v;}if(d.f.indexOf("rmk_")===0){p.remarks=p.remarks||{};p.remarks[d.f.slice(4)]=v;}else p[d.f]=v;save();}return;}
   if(d.ses&&d.f){const[pid,sid]=d.ses.split("|");const p=get(pid);const s=p&&p.sessions.find(x=>x.id===sid);if(s){s[d.f]=t.value;save();}return;}
   if(d.med&&d.f){const m=getM(d.med);if(m){m[d.f]=t.value;save();}return;}
