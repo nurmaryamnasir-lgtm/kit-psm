@@ -437,7 +437,7 @@ function getM(id){return S.meetings.find(m=>m.id===id);}
 function getW(id){return S.wasilah.find(w=>w.id===id);}
 function getC(id){return S.claims.find(c=>c.id===id);}
 
-function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],minatUsrah:"Belum",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",_open:true,_etab:1,arsip:false,_upd:Date.now()};}
+function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Belum",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",_open:true,_etab:1,arsip:false,_upd:Date.now()};}
 function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_open:true,_upd:Date.now()};}
 function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"To do"};}
 function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_open:true,_upd:Date.now()};}
@@ -445,13 +445,13 @@ function newClaim(){return{id:uid("cl_"),reportName:"",jenis:"Bajet Muayyasyah",
 
 /* ---- MUT status ---- */
 function sesCount(p){return(p.sessions||[]).length;}
-function mutStatus(p){const n=sesCount(p);if(n>=3&&p.minatUsrah==="Ya")return{k:"g",t:"Layak Tarsyih"};if(n>=3)return{k:"a",t:"Tunggu minat usrah"};if(n>0)return{k:"",t:""};return{k:"n",t:"Belum mula"};}
+function mutStatus(p){const n=sesCount(p);if(p.bukanMusuh==="Tidak")return{k:"a",t:"Tidak layak (musuh Islam)"};if(n>=3&&p.minatUsrah==="Ya")return{k:"g",t:"Layak Tarsyih"};if(n>=3)return{k:"a",t:"Tunggu minat usrah"};if(n>0)return{k:"",t:""};return{k:"n",t:"Belum mula"};}
 /* ---- BPMy ---- */
 function bpmy(p){const sc=p.bpmy||{};let total=0;const cats=BPMY.map(c=>{let s=0,max=0;c.items.forEach(it=>{s+=(sc[it.id]||0)*it.w;max+=5*it.w;});total+=s;return{id:c.id,name:c.name,score:s,max:max};});
   return{cats,total,pct:total/BPMY_MAX,pass:(total/BPMY_MAX)>=0.5};}
 function muhStatus(p){const b=bpmy(p);const pc=Math.round(b.pct*100);if(b.pass)return{k:"g",t:"Layak MAY · "+pc+"%"};if(b.total>0)return{k:"b",t:"BPMy "+pc+"%"};return{k:"n",t:"Baru muhib"};}
 function statusOf(p){if(p.stage==="mutabaah")return mutStatus(p);if(p.stage==="muhib")return muhStatus(p);if(p.stage==="muayyid")return{k:"g",t:"Muayyid"};return{k:"n",t:"Baru"};}
-function eligible(p){if(p.stage==="mutabaah")return sesCount(p)>=3&&p.minatUsrah==="Ya";if(p.stage==="muhib")return bpmy(p).pass;return false;}
+function eligible(p){if(p.stage==="mutabaah")return sesCount(p)>=3&&p.minatUsrah==="Ya"&&p.bukanMusuh!=="Tidak";if(p.stage==="muhib")return bpmy(p).pass;return false;}
 function stageCode(s){return {mutabaah:"MUT",muhib:"MUH",muayyid:"MAY"}[s]||"—";}
 function stageLabel(s){return(STAGES.find(x=>x.id===s)||{}).label||s;}
 
@@ -733,6 +733,7 @@ function mutSection(p){
     <button class="addsub" data-addses="${p.id}">＋ Tambah sesi</button>
     <div class="g2" style="margin-top:11px">
       ${p.stage!=="muhib"?fld("Berminat sertai usrah? (syarat tarsyih)",`<div class="toggle g"><button data-tgl="${p.id}|minatUsrah|Ya" class="${p.minatUsrah==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|minatUsrah|Belum" class="${p.minatUsrah!=="Ya"?"on":""}">Belum</button></div>`):""}
+      ${p.stage!=="muhib"?fld("Bukan musuh Islam? (syarat tarsyih)",`<div class="toggle"><button data-tgl="${p.id}|bukanMusuh|Ya" class="${p.bukanMusuh!=="Tidak"?"on":""}">Ya</button><button data-tgl="${p.id}|bukanMusuh|Tidak" class="${p.bukanMusuh==="Tidak"?"on":""}">Tidak</button></div>`):""}
       ${fld("Berminat jadi AJK?",`<div class="toggle"><button data-tgl="${p.id}|minatAJK|Ya" class="${p.minatAJK==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|minatAJK|Tidak" class="${p.minatAJK!=="Ya"?"on":""}">Tidak</button></div>`)}
     </div></div>`;
 }
