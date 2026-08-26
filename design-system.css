@@ -1,0 +1,68 @@
+:root {
+  --blue: #0a3b8c;
+  --blue-ink: #072a63;
+  --blue-2: #1657c4;
+  --yellow: #ffce33;
+  --ink: #0e1726;
+  --muted: #5b6b86;
+  --line: #e3e9f4;
+  --paper: #eef2fa;
+  --card: #fff;
+  --green: #1f9d55;
+  --green-s: #e4f6ec;
+  --amber: #dd9021;
+  --amber-s: #fcf1dc;
+  --blueb: #3f74d6;
+  --blue-s: #e4ecfb;
+  --grey-s: #eef1f7;
+  --red: #d3453f;
+  --red-s: #fbe6e5;
+  --purple: #6b3fa0;
+  --shadow: 0 1px 2px rgba(9, 30, 66, .06), 0 6px 18px rgba(9, 30, 66, .07);
+  --font: ui-sans-serif, system-ui, "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; overflow-x: hidden; }
+body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.4; -webkit-font-smoothing: antialiased; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; font-size: 15px; }
+h1, h2, h3 { margin: 0; }
+:focus-visible { outline: 3px solid var(--blueb); outline-offset: 2px; border-radius: 4px; }
+
+.add { background: var(--blue); color: #fff; border: none; border-radius: 11px; padding: 10px 16px; font-weight: 800; font-size: 14px; box-shadow: var(--shadow); white-space: nowrap; }
+.add:active { background: var(--blue-2); }
+.btn2 { background: #fff; border: 1px solid var(--line); border-radius: 11px; padding: 10px 14px; font-weight: 700; font-size: 13.5px; color: var(--ink); box-shadow: var(--shadow); }
+.del { border: 1px solid var(--red-s); background: #fff; color: var(--red); border-radius: 11px; padding: 12px 15px; font-weight: 700; font-size: 14px; }
+.addsub { width: 100%; border: 1px dashed var(--line); background: var(--paper); color: var(--blue); border-radius: 10px; padding: 10px; font-weight: 800; font-size: 13px; margin-top: 4px; }
+
+.pill, .ipt-pill, .rjtab { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 22px; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; }
+.pill { flex: 0 0 auto; padding: 8px 14px; font-size: 13px; box-shadow: var(--shadow); }
+.pill .c, .ipt-pill .c { background: var(--paper); border-radius: 10px; padding: 1px 7px; font-size: 12px; font-weight: 800; }
+.pill.active, .ipt-pill.active, .rjtab.on { background: var(--blue); color: #fff; border-color: var(--blue); }
+.pill.active .c, .ipt-pill.active .c { background: var(--yellow); color: var(--blue-ink); }
+.ipt-pill { padding: 6px 11px; font-size: 12.5px; }
+.ipt-pill .c { border-radius: 9px; font-size: 11px; }
+.rjtab { padding: 9px 14px; font-size: 13px; }
+
+.row { background: #fff; border: 1px solid var(--line); border-radius: 13px; box-shadow: var(--shadow); overflow: hidden; }
+.grp { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+.fld { margin-bottom: 11px; }
+.fld:last-child { margin-bottom: 0; }
+.fld label { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+.fld input, .fld select, .fld textarea { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 10px 11px; background: #fff; color: var(--ink); }
+.fld textarea { resize: vertical; min-height: 44px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.g2 > *, .g3 > * { min-width: 0; }
+input[type=date] { width: 100%; min-width: 0; }
+
+.toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.toggle button { border: none; background: #fff; padding: 8px 14px; font-weight: 700; font-size: 13px; color: var(--muted); }
+.toggle button.on { background: var(--blue); color: #fff; }
+.toggle.g button.on { background: var(--green); }
+.toggle.r button.on { background: var(--red); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
