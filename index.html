@@ -424,6 +424,29 @@
   .cand .passpill.no{background:var(--red-s)}
   @media(max-width:720px){.cand-a{margin-left:0;width:100%;justify-content:flex-end}.cand-x{flex:1 1 100%}.cand-main{flex-basis:100%}.catg{flex:1 1 auto;width:auto}}
 
+  /* ---------- Log usrah & perjumpaan (member drawer) ----------
+     Collapsed rows; clicking one expands the EXISTING edit fields in place. */
+  .slog{border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:#fff;margin-bottom:7px;overflow:hidden}
+  .slog.open{border-color:var(--border-strong);box-shadow:var(--shadow-xs)}
+  .slog-h{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;background:var(--surface-sunken);text-align:left;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard)}
+  .slog-h:hover{background:var(--biru-100)}
+  .slog.open .slog-h{background:#fff;border-bottom:1px solid var(--border-subtle)}
+  .slog-t{flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .slog-d{flex:0 0 auto;font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap}
+  .slog-b{padding:12px}
+  .jpill{flex:0 0 auto;display:inline-flex;align-items:center;height:21px;padding:0 9px;border-radius:var(--radius-pill);font-size:10.5px;font-weight:600;white-space:nowrap}
+  .j-usrah{background:var(--surface-brand-soft);color:var(--biru-700)}
+  .j-df{background:var(--cyan-100);color:var(--cyan-700)}
+  .j-program{background:var(--surface-accent-soft);color:var(--emas-600)}
+  .j-lain{background:var(--surface-sunken);color:var(--kabus-600)}
+  .caltgl{display:flex;align-items:center;gap:9px;width:100%;margin-top:11px;padding:10px 12px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:#fff;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard)}
+  .caltgl:hover{background:var(--surface-sunken);color:var(--ink)}
+  .caltgl .chev{margin-left:auto;width:auto}
+  .caltgl-m{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--kabus-500)}
+  .pnote{margin-top:15px;display:flex;flex-direction:column;gap:8px}
+  .pnote-h{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--cyan-700)}
+  .pnote-b{margin:0;padding:13px 14px;border-radius:var(--radius-md);background:var(--cyan-100);font-size:13.5px;line-height:1.6;color:var(--ink);white-space:pre-wrap}
+
   /* ---------- Density: Padat tightens spacing, CSS only ---------- */
   body.dens-padat .app{padding-top:12px}
   body.dens-padat .rows{gap:6px}
@@ -443,6 +466,8 @@
   body.dens-padat .pp-row{padding:8px 11px}
   body.dens-padat .pcl{gap:11px}
   body.dens-padat .cand{padding:8px 12px;margin-bottom:6px}
+  body.dens-padat .slog-h{padding:7px 11px}
+  body.dens-padat .slog-b{padding:10px}
   body.dens-padat .navtab{height:37px}
 
   /* ---------- Sidebar folds back to a horizontal strip on small screens ---------- */
@@ -555,7 +580,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:""}; let onlyElig=false; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",butiran:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=-1; let rujMuw=-1; let rujKd=-1; let previousFocus=null;
+let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:""}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",butiran:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=-1; let rujMuw=-1; let rujKd=-1; let previousFocus=null;
 
 const store={async get(k){try{if(window.storage&&window.storage.get)return await window.storage.get(k);}catch(e){}try{const v=localStorage.getItem(k);return v!=null?{value:v}:null;}catch(e){return null;}},
   async set(k,v){try{if(window.storage&&window.storage.set){await window.storage.set(k,v);return;}}catch(e){}try{localStorage.setItem(k,v);}catch(e){}}};
@@ -743,6 +768,9 @@ function viewPencalonan(){
     ${tile("t-may","Muayyid",nStage("muayyid"),"Telah naik")}
     ${tile("t-elig cor-e","Layak tarsyih",eligAll.length,"Cukup syarat sekarang")}
   </div>`;
+  /* Records outside the three stages are counted nowhere above — say so. */
+  const orphan=ppl.length-STAGES.reduce((a,st)=>a+nStage(st.id),0);
+  const orphanWarn=orphan>0?`<div class="hint" style="border-left:3px solid var(--merah-500)">⚠ <b>${orphan}</b> rekod tiada peringkat sah (bukan Mutabaah/Muhib/Muayyid), jadi tidak muncul dalam mana-mana senarai di bawah. Buka <b>Keahlian</b> dan tetapkan peringkatnya.</div>`:"";
 
   /* Filters: the PD select reuses the existing data-flt="pd" handler and F.pd. */
   const pdOpt=`<option value="">Semua PD</option><option value="__none__"${F.pd==="__none__"?" selected":""}>(Tiada PD)</option>`+pdOptions().map(x=>`<option${F.pd===x?" selected":""}>${esc(x)}</option>`).join("");
@@ -781,6 +809,7 @@ function viewPencalonan(){
   const empty=t=>`<div class="pp-empty">${esc(t)}</div>`;
   return `<div class="pcl">
     ${corong}
+    ${orphanWarn}
     ${bar}
     <div>
       <div class="grouphdr">Tarsyih Mutabaah → Muhib<span class="gc">${listA.length}</span></div>
@@ -809,10 +838,14 @@ function viewPapan(){
     {k:"Layak tarsyih",v:elig.length,s:"Cukup syarat naik peringkat",t:"t-elig"}
   ].map(x=>`<div class="kpi ${x.t}"><div class="kpi-k">${esc(x.k)}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${esc(x.s)}</div></div>`).join("");
 
-  const funnel=STAGES.map(st=>{
-    const n=nStage(st.id), pct=total?Math.round(n/total*100):0;
-    return `<div class="fnl-r"><div class="fnl-t"><span class="fnl-d" style="background:${STAGE_DOT[st.id]}"></span><span class="fnl-l">${esc(st.label)}</span><span class="fnl-n">${n}</span><span class="fnl-p">${pct}%</span></div><div class="fnl-bar"><i style="width:${pct}%;background:${STAGE_DOT[st.id]}"></i></div></div>`;
-  }).join("");
+  const fnlRow=(label,n,colour,title)=>{const pct=total?Math.round(n/total*100):0;
+    return `<div class="fnl-r"${title?` title="${esc(title)}"`:""}><div class="fnl-t"><span class="fnl-d" style="background:${colour}"></span><span class="fnl-l">${esc(label)}</span><span class="fnl-n">${n}</span><span class="fnl-p">${pct}%</span></div><div class="fnl-bar"><i style="width:${pct}%;background:${colour}"></i></div></div>`;};
+  /* Anyone whose stage is not one of the three would otherwise vanish from the
+     funnel while still counting in "Jumlah mad'u". Surface them instead. */
+  const tiered=STAGES.reduce((a,st)=>a+nStage(st.id),0);
+  const other=total-tiered;
+  const funnel=STAGES.map(st=>fnlRow(st.label,nStage(st.id),STAGE_DOT[st.id])).join("")
+    +(other>0?fnlRow("Tiada peringkat",other,"var(--merah-500)","Rekod tanpa peringkat sah — buka Keahlian dan tetapkan peringkat."):"");
 
   const actRows=elig.map(p=>{
     const st=statusOf(p);
@@ -1040,21 +1073,44 @@ function memCalendar(p){
   const nAbs=Object.keys(absent).filter(k=>k.slice(0,7)===(y+"-"+String(mo+1).padStart(2,"0"))).length;
   return `<div class="memcal"><div class="caltop"><button class="btn2" data-memcal="-1" aria-label="Bulan sebelum">‹</button><h3>${MM[mo]} ${y}</h3><button class="btn2" data-memcal="1" aria-label="Bulan seterusnya">›</button></div><div class="cal">${dows.map(x=>`<div class="calh">${x}</div>`).join("")}${cells}</div><div class="memleg"><span><i class="lg us"></i>Hadir</span><span><i class="lg abs"></i>Tidak hadir${nAbs?" ("+nAbs+")":""}</span></div></div>`;
 }
+/* Session-type pill class. Display only. */
+function jenisKey(j){return {Usrah:"usrah",DF:"df",Program:"program"}[j]||"lain";}
+
 function mutSection(p){
-  const ses=(p.sessions||[]).map(s=>`<div class="subrow">
-     <div class="g2">${fld("Jenis",SELf2(p.id,s.id,"jenis",s.jenis,SES_JENIS))}${fld("Tarikh",Ts(p.id,s.id,"tarikh",s.tarikh,"date"))}</div>
-     <div class="g2">${fld("PD 1",SESpd(p.id,s.id,"oleh",s.oleh))}${fld("PD 2",SESpd(p.id,s.id,"oleh2",s.oleh2))}</div>
-     <div class="rowflex"><div style="flex:1">${fld("Butiran (pilihan)",Ts(p.id,s.id,"nota",s.nota,"nota"))}</div><button class="delmini" data-delses="${p.id}|${s.id}">✕</button></div>
-   </div>`).join("");
-  return `<div class="grp"><h3>Kehadiran usrah / DF · ${sesCount(p)} sesi</h3>
-    <div class="hint" style="margin-bottom:6px">Kalendar kehadiran</div>${memCalendar(p)}
+  /* Display-only sort: oldest first, undated last. Edit fields stay keyed by s.id. */
+  const list=(p.sessions||[]).slice().sort((a,b)=>(a.tarikh||"9999-99").localeCompare(b.tarikh||"9999-99"));
+  const ses=list.map(s=>{
+    const key=p.id+"|"+s.id, open=sesOpen===key;
+    const jenis=s.jenis||"Usrah";
+    const tajuk=String(s.nota||"").trim()||jenis;
+    const d=s.tarikh?(+s.tarikh.slice(8,10))+" "+monShort(s.tarikh):"Tiada tarikh";
+    return `<div class="slog${open?" open":""}">
+      <button type="button" class="slog-h" data-sestgl="${esc(key)}" aria-expanded="${open}">
+        <span class="jpill j-${jenisKey(jenis)}">${esc(jenis)}</span>
+        <span class="slog-t">${esc(tajuk)}</span>
+        <span class="slog-d">${esc(d)}</span>
+        <span class="chev">${open?"▴":"▾"}</span>
+      </button>
+      ${open?`<div class="slog-b">
+        <div class="g2">${fld("Jenis",SELf2(p.id,s.id,"jenis",s.jenis,SES_JENIS))}${fld("Tarikh",Ts(p.id,s.id,"tarikh",s.tarikh,"date"))}</div>
+        <div class="g2">${fld("PD 1",SESpd(p.id,s.id,"oleh",s.oleh))}${fld("PD 2",SESpd(p.id,s.id,"oleh2",s.oleh2))}</div>
+        <div class="rowflex"><div style="flex:1">${fld("Butiran (pilihan)",Ts(p.id,s.id,"nota",s.nota,"nota"))}</div><button class="delmini" data-delses="${p.id}|${s.id}">✕</button></div>
+      </div>`:""}
+    </div>`;}).join("");
+  const nota=String(p.catatan||"").trim();
+  const notaBox=nota?`<div class="pnote"><span class="pnote-h">✎ Catatan penggerak</span><p class="pnote-b">${esc(nota)}</p></div>`:"";
+  /* Calendar is collapsed by default so the log reads first. */
+  const calLbl=monShort(memCalDate.getFullYear()+"-"+String(memCalDate.getMonth()+1).padStart(2,"0")+"-01")+" "+memCalDate.getFullYear();
+  const cal=`<button type="button" class="caltgl" data-caltgl="1" aria-expanded="${memCalOpen}">📅 Kalendar kehadiran<span class="caltgl-m">${esc(calLbl)}</span><span class="chev">${memCalOpen?"▴":"▾"}</span></button>${memCalOpen?memCalendar(p):""}`;
+  return `<div class="grp"><h3>Log usrah &amp; perjumpaan · ${sesCount(p)} sesi</h3>
     ${ses||`<div class="hint">Belum ada sesi direkod.</div>`}
     <button class="addsub" data-addses="${p.id}">＋ Tambah sesi</button>
+    ${cal}
     <div class="g2" style="margin-top:11px">
       ${p.stage!=="muhib"?fld("Berminat sertai usrah? (syarat tarsyih)",`<div class="toggle g"><button data-tgl="${p.id}|minatUsrah|Ya" class="${p.minatUsrah==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|minatUsrah|Belum" class="${p.minatUsrah!=="Ya"?"on":""}">Belum</button></div>`):""}
       ${p.stage!=="muhib"?fld("Bukan musuh Islam? (syarat tarsyih)",`<div class="toggle"><button data-tgl="${p.id}|bukanMusuh|Ya" class="${p.bukanMusuh!=="Tidak"?"on":""}">Ya</button><button data-tgl="${p.id}|bukanMusuh|Tidak" class="${p.bukanMusuh==="Tidak"?"on":""}">Tidak</button></div>`):""}
       ${fld("Berminat jadi AJK?",`<div class="toggle"><button data-tgl="${p.id}|minatAJK|Ya" class="${p.minatAJK==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|minatAJK|Tidak" class="${p.minatAJK!=="Ya"?"on":""}">Tidak</button></div>`)}
-    </div></div>`;
+    </div>${notaBox}</div>`;
 }
 
 function Ts(pid,sid,f,v,type){return `<input data-ses="${pid}|${sid}" data-f="${f}" type="${type||"text"}" value="${esc(v)}">`;}
@@ -1236,6 +1292,7 @@ document.addEventListener("click",e=>{
   const tgl=e.target.closest("[data-tgl]");if(tgl){const[id,f,v]=tgl.dataset.tgl.split("|");const p=get(id);if(p){p[f]=(v==="true"?true:(v==="false"?false:v));save();render();}return;}
   const sc=e.target.closest("[data-score]");if(sc){const[id,it,v]=sc.dataset.score.split("|");const p=get(id);if(p){p.bpmy=p.bpmy||{};p.bpmy[it]=+v;save();render();}return;}
   const as=e.target.closest("[data-addses]");if(as){const p=get(as.dataset.addses);if(p){p.sessions=p.sessions||[];p.sessions.push({id:uid("s_"),jenis:"Usrah",tarikh:today(),oleh:p.pd1||"",oleh2:p.pd2||"",nota:""});save();render();}return;}
+  const st=e.target.closest("[data-sestgl]");if(st){const k=st.dataset.sestgl;sesOpen=(sesOpen===k)?"":k;render();return;}
   const ds=e.target.closest("[data-delses]");if(ds){const[pid,sid]=ds.dataset.delses.split("|");const p=get(pid);if(p){p.sessions=p.sessions.filter(x=>x.id!==sid);save();render();}return;}
   const pr=e.target.closest("[data-promote]");if(pr){promote(get(pr.dataset.promote));return;}
   const del=e.target.closest("[data-del]");if(del){const p=get(del.dataset.del);if(p&&confirm(`Buang "${p.nama||"rekod"}"?`)){S._del[p.id]=Date.now();S.people=S.people.filter(x=>x.id!==p.id);if(selId===p.id)selId=null;save();render();toast("Dibuang");}return;}
