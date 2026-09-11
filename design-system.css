@@ -1,27 +1,73 @@
-:root {
-  --blue: #0a3b8c;
-  --blue-ink: #072a63;
-  --blue-2: #1657c4;
-  --yellow: #ffce33;
-  --ink: #0e1726;
-  --muted: #5b6b86;
-  --line: #e3e9f4;
-  --paper: #eef2fa;
-  --card: #fff;
-  --green: #1f9d55;
-  --green-s: #e4f6ec;
-  --amber: #dd9021;
-  --amber-s: #fcf1dc;
-  --blueb: #3f74d6;
-  --blue-s: #e4ecfb;
-  --grey-s: #eef1f7;
-  --red: #d3453f;
-  --red-s: #fbe6e5;
-  --purple: #6b3fa0;
-  --shadow: 0 1px 2px rgba(9, 30, 66, .06), 0 6px 18px rgba(9, 30, 66, .07);
-  --font: ui-sans-serif, system-ui, "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+/* ============================================================
+   PEMBINA Shah Alam — Kit PD design system
+   RE-SKIN BUILD. Applies the new logo-based palette, fonts and
+   shadows to the EXISTING app with no markup changes.
+
+   How it works:
+   1) New brand tokens (biru / cyan / dakwat / emas ramps)
+   2) A LEGACY BRIDGE that re-points the app's old variables
+      (--blue, --line, --paper...) onto the new tokens.
+   3) The original component rules, kept verbatim.
+
+   To go back to the old look, just restore the previous file.
+   ============================================================ */
+
+/* Google Fonts: Archivo (display), Inter (body), IBM Plex Mono */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+/* ---------- 1. NEW BRAND TOKENS ---------- */
+:root{
+  /* Biru — primary, sampled from the logo */
+  --biru-900:#101C42; --biru-800:#18296B; --biru-700:#1F3785;
+  --biru-600:#28459D; --biru-500:#3D5AB8; --biru-400:#6480CE;
+  --biru-300:#9AAEE3; --biru-200:#C6D2F1; --biru-100:#E4EAF9; --biru-050:#F0F4FD;
+  /* Cyan — secondary, from the logo */
+  --cyan-700:#1183AD; --cyan-600:#189CCC; --cyan-500:#2EBBEB;
+  --cyan-400:#63CDF1; --cyan-300:#95DEF6; --cyan-200:#C2ECFA; --cyan-100:#E3F6FD;
+  /* Dakwat (ink) + Kabus (muted) + Kertas (paper) */
+  --dakwat-900:#0B1224; --dakwat-800:#14203A; --dakwat-700:#26334F;
+  --kabus-600:#5C6B82; --kabus-500:#7C8AA0; --kabus-400:#A3AEC0;
+  --kabus-300:#C7CEDA; --kabus-200:#DFE4EC; --kertas-100:#F5F7FB; --putih:#FFFFFF;
+  /* Emas — sparing gold accent */
+  --emas-600:#AC8836; --emas-500:#C8A24A; --emas-300:#E2C88C; --emas-100:#F7EFDC;
+  /* Status hues */
+  --hijau-600:#187A5B; --hijau-500:#1E9C72; --hijau-100:#E1F4EE;
+  --amber-600:#A86A10; --amber-500:#D08A1C; --amber-100:#FCF1DD;
+  --merah-600:#B4302E; --merah-500:#D94A47; --merah-100:#FBE7E6;
+
+  --font-display:"Archivo",system-ui,sans-serif;
+  --font-body:"Inter",system-ui,-apple-system,sans-serif;
+
+  --shadow-sm:0 2px 6px rgba(20,32,58,.06),0 1px 2px rgba(20,32,58,.04);
+  --shadow-md:0 8px 20px -6px rgba(20,32,58,.12),0 2px 6px rgba(20,32,58,.05);
 }
 
+/* ---------- 2. LEGACY BRIDGE (old app tokens -> new brand) ---------- */
+:root{
+  --blue:      var(--biru-600);
+  --blue-ink:  var(--biru-900);
+  --blue-2:    var(--biru-500);
+  --blueb:     var(--biru-500);
+  --blue-s:    var(--biru-100);
+  --yellow:    var(--emas-500);   /* bright yellow -> refined gold accent */
+  --ink:       var(--dakwat-800);
+  --muted:     var(--kabus-600);
+  --line:      var(--kabus-200);
+  --paper:     var(--biru-050);   /* soft blue page wash */
+  --card:      var(--putih);
+  --grey-s:    var(--kertas-100);
+  --green:     var(--hijau-500);  --green-s: var(--hijau-100);
+  --amber:     var(--amber-500);  --amber-s: var(--amber-100);
+  --red:       var(--merah-500);  --red-s:   var(--merah-100);
+  --purple:    #6b3fa0;           /* kept: paired with a hard-coded soft bg */
+  --shadow:    var(--shadow-sm);
+  --font:      var(--font-body);
+}
+
+/* Bring the display font to the app's own headers & nav (additive, safe) */
+.htxt h1, .navtab, .grp > h3 { font-family: var(--font-display); letter-spacing: -.01em; }
+
+/* ---------- 3. ORIGINAL COMPONENT RULES (verbatim) ---------- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; overflow-x: hidden; }
 body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.4; -webkit-font-smoothing: antialiased; }
