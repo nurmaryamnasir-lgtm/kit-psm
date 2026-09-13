@@ -187,18 +187,85 @@
   .muwc{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);padding:var(--pad-card);box-shadow:var(--shadow-xs)}
   .muwn{flex:0 0 auto;width:30px;height:30px;border-radius:var(--radius-sm);background:var(--blue);color:#fff;display:grid;place-items:center;font-family:var(--font-mono);font-weight:600;font-size:13px}
   .muwt{font-weight:700;font-size:14.5px;letter-spacing:-.01em} .muwa{font-size:12px;color:var(--blueb);font-weight:600} .muwd{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5}
-  .kd-slide{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);overflow:hidden;box-shadow:var(--shadow-xs);margin-top:12px}
-  .kd-head{background:#c0201f;color:#fff;font-family:var(--font-display);font-weight:700;padding:12px 16px;font-size:13.5px;letter-spacing:.02em}
-  .kd-body{padding:var(--pad-card-lg)} .kd-list{margin:0;padding-left:20px} .kd-list li{font-size:13.5px;margin-bottom:6px;line-height:1.5}
   .kd-sub{margin-top:12px;border-top:1px solid var(--border-subtle);padding-top:12px} .kd-sub h5{font-size:11px;text-transform:uppercase;letter-spacing:var(--tracking-eyebrow);color:#c0201f;font-weight:700;margin:0 0 7px}
   .kd-obj3{display:grid;gap:8px} .kd-o{background:var(--surface-sunken);border-radius:var(--radius-md);padding:11px 13px} .kd-o b{color:var(--blue)} .kd-o div{font-size:12.5px;color:var(--muted);margin-top:3px}
-  .usr{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);box-shadow:var(--shadow-xs);margin-bottom:10px;overflow:hidden}
-  .usr-h{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer}
-  .usr-n{flex:0 0 auto;width:32px;height:30px;border-radius:var(--radius-sm);background:var(--surface-brand-soft);color:var(--biru-700);display:grid;place-items:center;font-family:var(--font-mono);font-weight:600;font-size:11.5px}
-  .usr-t{flex:1;font-weight:700;font-size:14.5px;min-width:0;letter-spacing:-.01em} .usr-b{padding:2px 16px 16px}
-  .usr-sec{margin-top:14px} .usr-sec h5{font-size:11px;text-transform:uppercase;letter-spacing:var(--tracking-eyebrow);color:var(--muted);font-weight:700;margin:0 0 7px}
-  .usr-sec ul{margin:0;padding-left:18px} .usr-sec li{font-size:13px;margin-bottom:5px;line-height:1.5}
-  .usr-chips{display:flex;flex-wrap:wrap;gap:6px} .usr-chip{background:var(--surface-sunken);border-radius:var(--radius-pill);padding:5px 11px;font-size:11.5px;font-weight:500;color:var(--muted)}
+  /* ---------- Panduan penggerak hero ---------- */
+  .rjhero{position:relative;overflow:hidden;margin-bottom:14px;padding:26px 28px 22px;border-radius:var(--radius-lg);background:var(--biru-600);color:var(--putih)}
+  .rjhero::before{content:"";position:absolute;top:-130px;right:-80px;width:300px;height:300px;border-radius:50%;border:1px solid rgba(255,255,255,.08)}
+  .rjhero>*{position:relative}
+  .rjhero-eb{margin:0 0 6px;font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--cyan-300)}
+  .rjhero-h{margin:0 0 10px;font-family:var(--font-display);font-size:27px;font-weight:900;line-height:1.15;letter-spacing:var(--tracking-heading);color:var(--putih);text-wrap:balance}
+  .rjhero-p{max-width:62ch;margin:0 0 20px;font-size:13.5px;line-height:1.6;color:var(--biru-100)}
+  .rjhero-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .rjstep{display:flex;flex-direction:column;gap:9px;padding:15px 16px 16px;border-radius:var(--radius-md);background:rgba(255,255,255,.1)}
+  .rjstep-n{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--cyan-500);color:var(--biru-900);font-family:var(--font-display);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+  .rjstep-t{font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--putih)}
+  .rjstep-d{font-size:12.5px;line-height:1.5;color:var(--biru-100)}
+  .rjstep.todo .rjstep-n{background:rgba(255,255,255,.18);color:var(--biru-100)}
+  .rjstep.todo .rjstep-t,.rjstep.todo .rjstep-d{color:var(--biru-200);font-style:italic;font-weight:600}
+  .rjhero-f{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.13);font-size:12.5px;color:var(--biru-100)}
+  .rjhero-fl{font-weight:700;color:var(--cyan-300)}
+  .rjadab{display:inline-flex;align-items:center;gap:7px}
+  .rjadab i{display:block;width:14px;height:14px;color:var(--cyan-300)}.rjadab i svg{display:block;width:100%;height:100%}
+  /* Stays two-up on a phone: six full-width steps would bury the reference
+     material this section exists for under a screen and a half of preamble. */
+  @media(max-width:900px){.rjhero-g{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.rjhero{padding:20px 18px}.rjhero-h{font-size:22px}.rjhero-g{gap:10px}.rjstep{padding:13px 13px 14px}}
+
+  /* ---------- Silibus: index on the left, the selected entry on the right ----
+     Shared by Silibus Usrah and Kalam Dakwah so the two read as one system. */
+  .sild{display:grid;grid-template-columns:300px 1fr;gap:0;background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);overflow:hidden;box-shadow:var(--shadow-xs)}
+  .sild-l{display:flex;flex-direction:column;gap:2px;padding:16px 14px;background:var(--kertas-100);border-right:1px solid var(--border-subtle)}
+  .sild-lh{margin:0 0 8px;padding:0 6px;font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
+  .sild-i{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:1px solid transparent;border-radius:var(--radius-md);background:none;text-align:left;color:var(--ink);transition:background var(--dur-fast) var(--ease-standard)}
+  .sild-i:hover{background:var(--biru-100)}
+  .sild-i.on{background:#fff;border-color:var(--border-subtle);box-shadow:var(--shadow-xs)}
+  .sild-n{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--biru-100);color:var(--biru-700);font-family:var(--font-mono);font-size:11px;font-weight:600;font-variant-numeric:tabular-nums}
+  .sild-i.on .sild-n{background:var(--biru-700);color:var(--putih)}
+  .sild-x{flex:1;min-width:0;font-size:13.5px;line-height:1.35;font-weight:600}
+  .sild-i.on .sild-x{font-weight:700}
+  .sild-i .chev{color:var(--kabus-400)}
+  .sild-r{padding:24px 26px 26px;min-width:0}
+  .sild-eb{margin:0 0 7px;font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--cyan-800)}
+  .sild-t{margin:0;font-family:var(--font-display);font-size:26px;font-weight:900;line-height:1.12;letter-spacing:var(--tracking-heading);color:var(--ink);text-wrap:balance}
+  .sild-hr{height:1px;margin:20px 0;background:var(--border-subtle)}
+  .sild-h{display:flex;align-items:center;gap:9px;margin:0 0 11px;font-family:var(--font-display);font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+  .sild-h i{display:block;flex:0 0 auto;width:19px;height:19px;color:var(--biru-600)}.sild-h i svg{display:block;width:100%;height:100%}
+  .sild-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .sild-list li{display:flex;gap:11px;font-size:14px;line-height:1.5}
+  .sild-list li>i{display:block;flex:0 0 auto;width:17px;height:17px;margin-top:2px;color:var(--cyan-600)}
+  .sild-list li>i svg{display:block;width:100%;height:100%}
+  .sild-list.arr li>i{color:var(--biru-600)}
+  .sild-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  .sild-box{padding:13px 15px;border-radius:var(--radius-md)}
+  .sild-box.dalil{background:var(--cyan-100)}
+  .sild-box.paksi{background:var(--emas-100)}
+  .sild-bh{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase}
+  .sild-box.dalil .sild-bh{color:var(--cyan-800)}
+  .sild-box.paksi .sild-bh{color:var(--emas-700)}
+  .sild-bh i{display:block;flex:0 0 auto;width:15px;height:15px}.sild-bh i svg{display:block;width:100%;height:100%}
+  .sild-box p{margin:0 0 5px;font-size:13.5px;line-height:1.45;color:var(--ink)}.sild-box p:last-child{margin:0}
+  .sild-box.paksi p{display:inline-block;margin:0 4px 4px 0;padding:6px 12px;border-radius:var(--radius-pill);background:rgba(255,255,255,.75);font-weight:600;color:var(--emas-700)}
+  .sild-sec{margin-top:22px}
+  .sild-fh{margin:0 0 10px;font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
+  .sild-pills{display:flex;flex-wrap:wrap;gap:8px}
+  .sild-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--border-subtle);border-radius:var(--radius-pill);background:#fff;font-size:13px;font-weight:500;color:var(--ink)}
+  .sild-pill i{display:block;flex:0 0 auto;width:15px;height:15px;color:var(--kabus-500)}.sild-pill i svg{display:block;width:100%;height:100%}
+  .sild-sub{margin-top:16px;padding:14px 16px;border-radius:var(--radius-md);background:var(--surface-sunken)}
+  .sild-sub h5{margin:0 0 9px;font-size:11px;font-weight:700;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
+  .sild-ol{margin:0;padding-left:19px}.sild-ol li{font-size:13.5px;line-height:1.5;margin-bottom:5px}
+  @media(max-width:860px){
+    .sild{grid-template-columns:1fr}
+    .sild-l{flex-direction:row;overflow-x:auto;gap:8px;padding:12px;border-right:none;border-bottom:1px solid var(--border-subtle);scrollbar-width:none}
+    .sild-l::-webkit-scrollbar{display:none}
+    .sild-lh{display:none}
+    .sild-i{width:auto;flex:0 0 auto;max-width:230px}
+    .sild-i .chev{display:none}
+    .sild-r{padding:20px 18px 22px}
+    .sild-t{font-size:22px}
+    .sild-2{grid-template-columns:1fr}
+  }
+
   /* ---------- Direktori header ---------- */
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   .dirhead{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
@@ -238,7 +305,6 @@
   .kt-av{flex:0 0 auto;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-size:12.5px;font-weight:700;letter-spacing:.02em}
   .kt-idm{display:flex;flex-direction:column;gap:2px;min-width:0}
   .kt-name{font-weight:700;font-size:14.5px;letter-spacing:-.01em;line-height:1.25}
-  .kt-code{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--muted)}
   .kt-ipt{gap:7px;font-weight:500}
   .kt-sub{display:block;font-size:12px;color:var(--muted);line-height:1.35;margin-top:3px}
   .kt-dim{color:var(--kabus-400)} .kt-warn{color:var(--merah-600);font-weight:700}
@@ -271,7 +337,6 @@
   .kc-main .kprog{margin-top:8px} .kc-act{margin-top:7px;font-size:13px}
   .muwc{overflow:hidden} .muwh{cursor:pointer;display:flex;align-items:center;gap:12px}
   .kdh{cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-  .rajah{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px} .rajah-c{background:#fbe6e5;color:#c0201f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700}
   /* Seven columns need room; hand over to the stacked cards well before phone width. */
   @media(max-width:1000px){ .kwrap-tbl{display:none} .kwrap-card{display:block} }
   @media(max-width:720px){
@@ -828,7 +893,22 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",butiran:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=-1; let rujMuw=-1; let rujKd=-1; let previousFocus=null; let noteEdit="";
+let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",butiran:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit="";
+/* Which editor tab is open. This lives here, not on the person, because
+   syncNow() and pullMerge() replace the whole of S with the server's copy every
+   25 seconds — anything parked on a person record is overwritten by whatever
+   value that record happens to carry, which used to yank the open drawer onto
+   another tab mid-read. Only one editor is open at a time, so one variable. */
+let eTab=1;
+/* Which list rows are expanded, for the same reason: a row's open/closed state
+   is something the reader did, not something about the minit or the tuntutan,
+   and parking it on the record let the poll collapse rows mid-read. Ids are
+   unique across types, so one set covers minit, wasilah, tuntutan and cuti. */
+const openRows=new Set();
+const isOpen=id=>openRows.has(id);
+function toggleOpen(id){if(!openRows.delete(id))openRows.add(id);}
+/* New records open so the blank form is there to fill in. */
+function addOpen(rec){openRows.add(rec.id);return rec;}
 
 const store={async get(k){try{if(window.storage&&window.storage.get)return await window.storage.get(k);}catch(e){}try{const v=localStorage.getItem(k);return v!=null?{value:v}:null;}catch(e){return null;}},
   async set(k,v){try{if(window.storage&&window.storage.set){await window.storage.set(k,v);return;}}catch(e){}try{localStorage.setItem(k,v);}catch(e){}}};
@@ -855,11 +935,11 @@ function getM(id){return S.meetings.find(m=>m.id===id);}
 function getW(id){return S.wasilah.find(w=>w.id===id);}
 function getC(id){return S.claims.find(c=>c.id===id);}
 
-function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Belum",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",_open:true,_etab:1,arsip:false,_upd:Date.now()};}
-function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_open:true,_upd:Date.now()};}
+function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Belum",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",arsip:false,_upd:Date.now()};}
+function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_upd:Date.now()};}
 function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"To do"};}
-function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_open:true,_upd:Date.now()};}
-function newClaim(){return{id:uid("cl_"),reportName:"",jenis:"Bajet Muayyasyah",tarikh:today(),desc:"",amount:"",cukai:"0.00",resit:"",lampiran:"",files:[],status:"Draf",namaPemohon:"",namaAgensi:"PEMBINA",tarikhAktiviti:"",perincianAktiviti:"",jumlahMadu:"",perincianBelanja:"",gambarLink:"",jumlahDipohon:"",penama:"",bank:"",akaun:"",_open:true,_upd:Date.now()};}
+function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_upd:Date.now()};}
+function newClaim(){return{id:uid("cl_"),reportName:"",jenis:"Bajet Muayyasyah",tarikh:today(),desc:"",amount:"",cukai:"0.00",resit:"",lampiran:"",files:[],status:"Draf",namaPemohon:"",namaAgensi:"PEMBINA",tarikhAktiviti:"",perincianAktiviti:"",jumlahMadu:"",perincianBelanja:"",gambarLink:"",jumlahDipohon:"",penama:"",bank:"",akaun:"",_upd:Date.now()};}
 
 /* ---- MUT status ---- */
 function sesCount(p){return(p.sessions||[]).length;}
@@ -879,7 +959,6 @@ function stageLabel(s){return(STAGES.find(x=>x.id===s)||{}).label||s;}
 
 /* Short human-quotable reference for a mad'u. p.id is an opaque uid, so we fold it
    into a stable 4-digit code — same record, same code, on every device. */
-function maduCode(p){const s=String((p&&p.id)||"");let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%10000;return "KPD-"+String(h).padStart(4,"0");}
 
 /* Year of study, inferred from the intake year. Only shown when the intake year is
    a plausible 4-digit year, so a blank or malformed field prints nothing. */
@@ -961,10 +1040,33 @@ const USRAH=[
  {tajuk:"Projek OBI2121",kandungan:["Perkongsian dapatan channel (PEMIKIR, IRIS) dari usrah lepas","Pembentukan individu asas menuju ustaziatul alam","7 Maratib Amal","10 Muwasafat Tarbiah","Projek MU2040 & OBI2121","Posisikan diri dalam agenda — perancangan hidup, potensi & kecenderungan"],dalil:["Hadis 40: 37"],aktiviti:["PD tunjuk video-video bersesuaian"],bahan:["7 Maratib Amal","10 Muwasafat Tarbiah","Kalam Dakwah"],muw:["10 Muwasafat Tarbiah"],paksi:["Thaqafah Dakwah","Sikap Jihad & Semangat"]},
  {tajuk:"Usrah Wida' / Bonding Akhir Sem",kandungan:["Sesi bonding akhir sem (selepas 2 semester usrah bersama)","Sesi Wida (bagi yang naik MAY atau tamat pengajian)","Refleksi apa yang diperoleh sepanjang usrah","Lihat target awal — berapa ramai berjaya ajak kawan daftar & sertai usrah/program PEMBINA"],dalil:["Al-Fatihah (keseluruhan surah)"],aktiviti:["Sesi santai, boleh dibuat dalam pelbagai bentuk"],bahan:["Ulang kaji / ringkasan bahan yang telah dilalui"],muw:["10 Muwasafat Tarbiah"],paksi:["Thaqafah Ammah","Thaqafah Syar'iyah","Thaqafah Dakwah","Sikap Jihad & Semangat","Kemahiran Dakwah"]}
 ];
+/* Silibus master–detail: the index on the left, the selected entry on the right.
+   Both syllabus tabs render through this, so Silibus Usrah and Kalam Dakwah read
+   as one document rather than two unrelated screens. */
+function silShell(label,titles,sel,attr,detail,nums){
+  const list=titles.map((t,i)=>`<button type="button" class="sild-i${sel===i?" on":""}" data-${attr}="${i}" aria-current="${sel===i?"true":"false"}"><span class="sild-n">${esc(nums?nums[i]:String(i+1).padStart(2,"0"))}</span><span class="sild-x">${esc(t)}</span><span class="chev" aria-hidden="true">›</span></button>`).join("");
+  return `<div class="sild"><div class="sild-l"><div class="sild-lh">${esc(label)}</div>${list}</div><div class="sild-r">${detail}</div></div>`;
+}
+const silHead=(icon,t)=>`<h4 class="sild-h"><i aria-hidden="true">${icon}</i>${esc(t)}</h4>`;
+const silList=(items,icon,cls)=>`<ul class="sild-list${cls?" "+cls:""}">${items.map(x=>`<li><i aria-hidden="true">${icon}</i><span>${esc(x)}</span></li>`).join("")}</ul>`;
+const silPills=items=>`<div class="sild-pills">${items.map(x=>`<span class="sild-pill"><i aria-hidden="true">${ICO.doc}</i>${esc(x)}</span>`).join("")}</div>`;
+
 function viewRujukan(){
   const MUW="https://drive.google.com/drive/folders/1oK3s-Bx27PlpKL5WWEN21fgZnO8SR_1N";
   const KD="https://drive.google.com/drive/folders/1OUXFp4Y7JaYMYk-EZIYWuA2dNKZ9DJWV";
   const mainNav=`<div class="rjtabs"><button class="rjtab${rujMain==="krit"?" on":""}" data-rujmain="krit">Kriteria</button><button class="rjtab${rujMain==="sil"?" on":""}" data-rujmain="sil">Silibus Usrah</button><button class="rjtab${rujMain==="borang"?" on":""}" data-rujmain="borang">Borang</button></div>`;
+  /* The six steps are deliberately unwritten — the real flow has not been agreed
+     yet, and a placeholder that says so is honest where invented steps would be
+     read as doctrine. Fill STEPS in and the layout below needs no change. */
+  const STEPS=["","","","","",""];
+  const ADAB=["Datang awal & bersedia","Jaga kerahsiaan ahli","Ajak, bukan arah","Doakan ahli usrah"];
+  const hero=`<section class="rjhero">
+    <p class="rjhero-eb">Panduan penggerak</p>
+    <h2 class="rjhero-h">Kendalikan Perjumpaan &amp; Usrah</h2>
+    <p class="rjhero-p">Setiap perjumpaan ialah ruang tarbiah, bukan mesyuarat. Ikut aliran ringkas ini supaya usrah anda mesra, teratur dan memberi kesan &mdash; ajak, bukan arah.</p>
+    <div class="rjhero-g">${STEPS.map((s,i)=>`<div class="rjstep${s?"":" todo"}"><span class="rjstep-n">${i+1}</span><span class="rjstep-t">${s?esc(s):"Langkah "+(i+1)}</span><span class="rjstep-d">${s?"":"(akan diisi kemudian)"}</span></div>`).join("")}</div>
+    <div class="rjhero-f"><span class="rjhero-fl">Adab:</span>${ADAB.map(a=>`<span class="rjadab"><i aria-hidden="true">${ICO.tick}</i>${esc(a)}</span>`).join("")}</div>
+  </section>`;
   if(rujMain==="krit"){
     const journey=`<div class="rjbox"><div class="rjh">Perjalanan Kemenjadian · Mutabaah → Muhib → Muayyid</div><div class="journey">
       <div class="jstage js1"><div class="s">★</div><div class="nm">Mutabaah</div><div class="nt">Mad'u dalam usrah followup</div></div>
@@ -980,12 +1082,12 @@ function viewRujukan(){
     const ciri=[["Muayyasyah","c1"],["Komitmen","c2"],["Kerja Berpasukan","c3"],["Ciri Kesolehan","c4"],["Kefahaman Dakwah","c5"]];
     const kritMAY=`<div class="rjbox"><div class="rjh">Kriteria Muhib → Muayyid</div><div class="bpmy-badge">⭐ Lulus jika skor BPMy ≥ 50%</div><div class="ciri">${ciri.map(c=>`<div class="ci ci-${c[1]}"><span class="cin">★</span>${c[0]}</div>`).join("")}</div><div class="hint" style="margin-top:8px">Nilai 5 ciri ini bagi setiap muhib melalui borang BPMy dalam tab <b>Pencalonan Muayyid</b>.</div></div>`;
     const def=`<div class="rjbox rjdef"><div class="rjh">Definisi Tarsyih</div><p style="margin:0;font-size:13.5px;line-height:1.6"><b>Tarsyih</b> ialah proses <b>pencalonan / syor kenaikan</b> seorang mad'u ke peringkat tarbiah seterusnya (Mutabaah \u2192 Muhib atau Muhib \u2192 Muayyid) setelah memenuhi kriteria yang ditetapkan. Penggerak Dakwah menilai kesediaan mad'u dan mencalonkannya untuk dinaikkan pada tempoh tarsyih yang ditetapkan.</p></div>`;
-    return mainNav+def+journey+kritMUT+kritMAY;
+    return hero+mainNav+def+journey+kritMUT+kritMAY;
   }
   if(rujMain==="borang"){
     const BP="https://drive.google.com/drive/folders/1gAw4pGwQuf-JH90K7uZaC4rJsbSod5o-?usp=drive_link";
     const BM="https://forms.gle/55HFkyr4yn8UQ76J9";
-    return mainNav+`<div class="rjbox"><div class="rjh">Borang</div>
+    return hero+mainNav+`<div class="rjbox"><div class="rjh">Borang</div>
       <div class="sil"><div class="sil-l"><div class="sil-t">Perpindahan</div><div class="sil-s">Borang Perpindahan</div></div><a class="sil-btn" href="${BP}" target="_blank" rel="noopener">Buka ›</a></div>
       <div class="sil"><div class="sil-l"><div class="sil-t">Pencalonan</div><div class="sil-s">Borang Pencalonan Muhib</div></div><a class="sil-btn" href="${BM}" target="_blank" rel="noopener">Buka ›</a></div></div>`;
   }
@@ -1003,15 +1105,40 @@ function viewRujukan(){
       {t:"Objektif 02 · Hakikat Siro'",pts:["Realiti umat = asas pertembungan Haq (Allah) vs Batil (Syaitan)","Sejarah pertembungan berterusan sehingga kiamat","Kerangka dari sumber → sistem & produk (skala Malaysia & dunia)","Fahami realiti sekarang atas hakikat sebenar"],sub:{h:"7 Hakikat Siro'",items:["Siro' bermula Adam sehingga Kiamat","Siro' sekarang: NWO vs OBI","Akar (Pemikiran) melahirkan Sistem & Produk","Sistem Produk vs Sistem Produk","Pemenang Siro' pegang kuasa & bentuk tamadun","Setiap perjuangan perlukan QS","Pokok Thogut tak berguna & mati (14:26)"]},rajah:{h:"Rajah: Garis Masa NWO vs OBI",items:["Adam vs Syaiton","Ibrahim vs Namrud","Musa vs Firaun","Muhammad vs Quraysh Kafir","Khilafah vs Gol. Kuffar","SEKARANG — NWO vs OBI","Nabi Isa vs Dajjal","Qiamat"]}},
       {t:"Objektif 03 · Projek OBI",pts:["Pokok Tauhid perlu dibesarkan dengan akar yang betul — bina paksi kuasa & ummah fadhilah","Fahami usaha-usaha untuk mencapai OBI","Fahami keperluan menjadi QS & BS dalam menjayakan Projek OBI"],sub:{h:"5 Usaha ke arah OBI (membesarkan Pokok Tauhid)",items:["Mempunyai Pemikiran Tajdid Peradaban Islam","Membina Kuasa Nasional dengan Akar Tauhid","Mempunyai Pendokong Perjuangan Tauhid","Membina UF (Ummah tinggi nilai diri & bertamadun)","Menghidupkan Biah Dakwah & Tarbiah"]}}
     ];
-    body=`<div class="rjbox"><div class="sil"><div class="sil-l"><div class="sil-t">Silibus MUH</div><div class="sil-s">Kalam Dakwah (KD)</div></div><a class="sil-btn" href="${KD}" target="_blank" rel="noopener">Buka bahan ›</a></div>${O.map((o,i)=>`<div class="kd-slide"><div class="kd-head kdh" data-rujkd="${i}">${esc(o.t)}<span>${rujKd===i?"▴":"▾"}</span></div>${rujKd===i?`<div class="kd-body"><ol class="kd-list">${o.pts.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${o.sub?`<div class="kd-sub"><h5>${esc(o.sub.h)}</h5><ol class="kd-list">${o.sub.items.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>`:""}${o.rajah?`<div class="kd-sub"><h5>${esc(o.rajah.h)}</h5><div class="rajah">${o.rajah.items.map(x=>`<span class="rajah-c">${esc(x)}</span>`).join("")}</div><div class="hint" style="margin-top:6px">Rajah penuh dalam slide (pautan di atas).</div></div>`:""}</div>`:""}</div>`).join("")}</div>`;
+    const o=O[rujKd]||O[0];
+    const det=`<p class="sild-eb">Kalam Dakwah &middot; Silibus MUH</p>
+      <h3 class="sild-t">${esc(o.t)}</h3>
+      <div class="sild-hr"></div>
+      ${silHead(ICO.scroll,"Kandungan")}${silList(o.pts,ICO.tick)}
+      ${o.sub?`<div class="sild-sub"><h5>${esc(o.sub.h)}</h5><ol class="sild-ol">${o.sub.items.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>`:""}
+      ${o.rajah?`<div class="sild-sub"><h5>${esc(o.rajah.h)}</h5>${silPills(o.rajah.items)}<div class="hint" style="margin-top:9px">Rajah penuh dalam slide (pautan di atas).</div></div>`:""}`;
+    body=`<div class="rjbox" style="padding:0;border:none;box-shadow:none;background:none;margin-bottom:10px"><div class="sil"><div class="sil-l"><div class="sil-t">Silibus MUH</div><div class="sil-s">Kalam Dakwah (KD)</div></div><a class="sil-btn" href="${KD}" target="_blank" rel="noopener">Buka bahan &rsaquo;</a></div></div>`
+      /* These entries carry their own numbering ("Objektif 02 · …"), so the
+         badge repeats that rather than a position that would contradict it. */
+      +silShell("Objektif KD",O.map(x=>x.t),Math.max(rujKd,0),"rujkd",det,
+        O.map(x=>{const m=/Objektif\s+(\d+)/.exec(x.t);return m?m[1].padStart(2,"0"):"KD";}));
   }
   else {
-    const chips=a=>`<div class="usr-chips">${a.map(x=>`<span class="usr-chip">${esc(x)}</span>`).join("")}</div>`;
-    const ul=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
-    const rows=USRAH.map((u,i)=>{const open=rujUsr===i;return `<div class="usr"><div class="usr-h" data-usr="${i}"><div class="usr-n">U${i+1}</div><div class="usr-t">${esc(u.tajuk)}</div><span class="chev">${open?"▴":"▾"}</span></div>${open?`<div class="usr-b"><div class="usr-sec"><h5>Kandungan penyampaian</h5>${ul(u.kandungan)}</div><div class="usr-sec"><h5>Dalil</h5>${chips(u.dalil)}</div><div class="usr-sec"><h5>Aktiviti / penugasan</h5>${ul(u.aktiviti)}</div><div class="usr-sec"><h5>Bahan disentuh</h5>${chips(u.bahan)}</div><div class="usr-sec"><h5>10 Muwasafat</h5>${chips(u.muw)}</div><div class="usr-sec"><h5>12 Paksi</h5>${chips(u.paksi)}</div></div>`:""}</div>`;}).join("");
-    body=`<div class="rjbox"><div class="rjh">Silibus Usrah MHB · panduan PD</div><div class="hint" style="margin-bottom:10px">Tekan setiap usrah untuk lihat kandungan, dalil, aktiviti & bahan. Sumber: Taskforce JPSI PEMBINA Malaysia.</div>${rows}</div>`;
+    /* Muwasafat is dropped here: it duplicates the whole "10 Muwasafat" tab.
+       Paksi takes the second box so the pair keeps its shape and the data that
+       has no other home on the screen still shows. */
+    const u=USRAH[rujUsr]||USRAH[0];
+    const nn=String(Math.max(rujUsr,0)+1).padStart(2,"0");
+    const det=`<p class="sild-eb">Sesi ${nn} &middot; Silibus Usrah</p>
+      <h3 class="sild-t">${esc(u.tajuk)}</h3>
+      <div class="sild-hr"></div>
+      ${silHead(ICO.scroll,"Kandungan")}${silList(u.kandungan,ICO.tick)}
+      <div class="sild-2">
+        <div class="sild-box dalil"><span class="sild-bh"><i aria-hidden="true">${ICO.book}</i>Dalil</span>${u.dalil.map(x=>`<p>${esc(x)}</p>`).join("")}</div>
+        ${(u.paksi&&u.paksi.length)?`<div class="sild-box paksi"><span class="sild-bh"><i aria-hidden="true">${ICO.award}</i>12 Paksi</span>${u.paksi.map(x=>`<p>${esc(x)}</p>`).join("")}</div>`:""}
+      </div>
+      <div class="sild-sec">${silHead(ICO.hand,"Aktiviti cadangan")}${silList(u.aktiviti,ICO.arrow,"arr")}</div>
+      <div class="sild-hr"></div>
+      <div class="sild-fh">Bahan sokongan</div>${silPills(u.bahan)}`;
+    body=`<div class="hint" style="margin-bottom:10px">Silibus Usrah MHB &middot; panduan PD. Sumber: Taskforce JPSI PEMBINA Malaysia.</div>`
+      +silShell("Silibus usrah",USRAH.map(x=>x.tajuk),Math.max(rujUsr,0),"usr",det);
   }
-  return mainNav+subNav+body;
+  return hero+mainNav+subNav+body;
 }
 
 function setView(v){view=v;document.querySelectorAll(".navtab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render();}
@@ -1254,7 +1381,7 @@ function filteredPeople(allStages){let list=S.people.slice();
   if(!allStages&&stage!=="all")list=list.filter(p=>p.stage===stage);
   /* Search spans name, IPT (full name and short label) and the derived ID, which
      is what the placeholder promises. */
-  if(q)list=list.filter(p=>[p.nama,p.universiti,iptLabel(p.universiti),maduCode(p)].some(v=>String(v||"").toLowerCase().includes(q)));
+  if(q)list=list.filter(p=>[p.nama,p.universiti,iptLabel(p.universiti)].some(v=>String(v||"").toLowerCase().includes(q)));
   if(F.perlu)list=list.filter(p=>eligible(p));
   if(F.pd){if(F.pd==="__none__")list=list.filter(p=>!p.pd1&&!p.pd2);else list=list.filter(p=>p.pd1===F.pd||p.pd2===F.pd);}
   if(F.minat)list=list.filter(p=>(p.minatUsrah||"Belum")===F.minat);
@@ -1274,15 +1401,25 @@ function kanbanBoard(){
     const col=list.filter(p=>p.stage===st.id);
     const cards=col.map(p=>{
       const s=statusOf(p),ok=eligible(p);
-      const meta=[iptLabel(p.universiti)||"Tiada IPT",[p.pd1,p.pd2].filter(Boolean).join(", ")||"Tiada PD"].join(" · ");
+      /* Muayyid is the end of the tarsyih path, so its card drops three things
+         the earlier stages need. Its mas'ulah are not drawn from the PD list
+         Mutabaah and Muhib use, so a PD line would name the wrong people or
+         read "Tiada PD" against someone who is not missing one. Usrah sessions
+         are no longer what is being tracked. And statusOf() has nothing to say
+         about a muayyid beyond "Muayyid", which the MAY chip already says.
+         rowKeahlian() has held the first two rules for a while; this brings the
+         board into line with it. */
+      const may=p.stage==="muayyid";
+      const meta=may?(iptLabel(p.universiti)||"Tiada IPT")
+        :[iptLabel(p.universiti)||"Tiada IPT",[p.pd1,p.pd2].filter(Boolean).join(", ")||"Tiada PD"].join(" · ");
       let lab="";if(p.stage==="mutabaah")lab="Naik ke Muhib →";else if(p.stage==="muhib")lab="Naik ke Muayyid →";
       return `<div class="kb-card${ok?" is-elig":""}">
         <button type="button" class="kb-main" data-sel="${p.id}" aria-label="Buka ${esc(p.nama||"ahli")}">
-          <span class="kb-top">${stageBadge(p.stage)}${s.t?`<span class="badge b-${esc(s.k||"n")}">${esc(s.t)}</span>`:""}</span>
+          <span class="kb-top">${stageBadge(p.stage)}${(!may&&s.t)?`<span class="badge b-${esc(s.k||"n")}">${esc(s.t)}</span>`:""}</span>
           <span class="kb-n">${esc(p.nama||"(nama)")}</span>
           <span class="kb-m">${esc(meta)}</span>
         </button>
-        <div class="kb-f"><span class="kb-s">${sesCount(p)} sesi</span>${(ok&&lab)?`<button class="promote ready mini" data-promote="${p.id}">${lab}</button>`:""}</div>
+        ${may?"":`<div class="kb-f"><span class="kb-s">${sesCount(p)} sesi</span>${(ok&&lab)?`<button class="promote ready mini" data-promote="${p.id}">${lab}</button>`:""}</div>`}
       </div>`;}).join("");
     return `<div class="kb-col">
       <div class="kb-h"><span class="kb-d" style="background:${DOT[st.id]}"></span><span class="kb-l">${esc(st.label)}</span><span class="kb-c">${col.length}</span></div>
@@ -1320,7 +1457,7 @@ function viewKeahlian(){
       <p class="dirhead-s">${esc(sub)}</p>
     </div>
     <div class="dirhead-a">
-      <div class="search sm"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><input id="search" value="${esc(q)}" placeholder="Cari nama, IPT atau ID" aria-label="Cari nama, IPT atau ID mad'u"></div>
+      <div class="search sm"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><input id="search" value="${esc(q)}" placeholder="Cari nama atau IPT" aria-label="Cari nama, IPT atau ID mad'u"></div>
       <button class="bellb${F.perlu?" on":""}" data-perlu="1" aria-pressed="${!!F.perlu}" aria-label="Tapis: perlu tindakan (${perluN})" title="Perlu tindakan (${perluN})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
         ${perluN?`<span class="bellb-c">${perluN}</span>`:""}
@@ -1372,7 +1509,7 @@ function stagePill(p){return `<span class="kstage kstage-${esc(p.stage)}"><i></i
 function ktable(list){
   const ar=k=>sortKey===k?`<span class="kt-ar on">${sortDir==="asc"?"\u2191":"\u2193"}</span>`:`<span class="kt-ar">\u21c5</span>`;
   const rows=list.map(p=>`<tr data-sel="${p.id}" role="button" tabindex="0" aria-label="Buka ${esc(p.nama||"ahli")}">
-      <td class="kt-id"><span class="kt-av rav-${p.stage}">${initials(p.nama)}</span><span class="kt-idm"><span class="kt-name">${esc(p.nama||"(nama baharu)")}</span><span class="kt-code">${esc(maduCode(p))}</span></span></td>
+      <td class="kt-id"><span class="kt-av rav-${p.stage}">${initials(p.nama)}</span><span class="kt-idm"><span class="kt-name">${esc(p.nama||"(nama baharu)")}</span></span></td>
       <td>${iptCell(p)}</td>
       <td>${pdCell(p)}</td>
       <td>${stagePill(p)}</td>
@@ -1393,7 +1530,7 @@ function kcards(list){return list.map(p=>`<div class="kc" data-sel="${p.id}" rol
     <div class="kc-av rav-${p.stage}">${initials(p.nama)}</div>
     <div class="kc-main">
       <div class="kc-top"><span class="kc-name">${esc(p.nama||"(nama baharu)")}</span>${stagePill(p)}</div>
-      <div class="kc-sub">${esc(maduCode(p))} \u00b7 ${p.universiti?esc(iptLabel(p.universiti)):"Tiada IPT"}${p.bidang?" \u00b7 "+esc(p.bidang):""}</div>
+      <div class="kc-sub">${p.universiti?esc(iptLabel(p.universiti)):"Tiada IPT"}${p.bidang?" \u00b7 "+esc(p.bidang):""}</div>
       <div class="kc-sub">${pdCell(p)}</div>
       ${progCell(p)}
       <div class="kc-act">${actCell(p)}</div>
@@ -1443,10 +1580,12 @@ const ICO={
   note:svg('<path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-6.4"/><path d="M2 6h2M2 10h2M2 14h2M2 18h2"/><path d="M19.6 3.4a1.9 1.9 0 0 1 2.7 2.7L16 12.4l-3.5.8.8-3.5z"/>'),
   pencil:svg('<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/>'),
   plus:svg('<path d="M12 5v14M5 12h14"/>'),
-  shield:svg('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>'),
   lock:svg('<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'),
   arrow:svg('<path d="M5 12h14M12 5l7 7-7 7"/>'),
   cal:svg('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'),
+  tick:svg('<path d="m4 12.5 5 5 11-11"/>'),
+  doc:svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/>'),
+  scroll:svg('<path d="M8 21h9a3 3 0 0 0 3-3V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v11"/><path d="M5 16H3v2a3 3 0 0 0 3 3"/><path d="M9 7h7M9 11h7"/>'),
   eye:svg('<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>'),
   eyeOff:svg('<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="m1 1 22 22"/>')
 };
@@ -1574,7 +1713,7 @@ function editorKeahlian(p){
   else if(p.stage==="muhib"){tabs=[["Pencalonan Muayyid",muhSection(p)],["Kehadiran",mutSection(p)],["Maklumat & PD",info],["Passing & Catatan",pc]];}
   else{tabs=[["Kehadiran",mutSection(p)],["Maklumat & PD",info],["Passing & Catatan",pc]];}
   tabs.push(["Garis Masa",timelineSection(p)]);   /* appended so existing tab indices are unchanged */
-  const t=Math.min(p._etab||1,tabs.length);
+  const t=Math.min(Math.max(eTab||1,1),tabs.length);
   const nav=`<div class="etabs">`+tabs.map((tb,i)=>`<button class="etab${(t===i+1)?" on":""}" data-etab="${p.id}|${i+1}">${tb[0]}</button>`).join("")+`</div>`;
   let lab="";if(p.stage==="mutabaah")lab="Naik ke Muhib →";else if(p.stage==="muhib")lab="Naik ke Muayyid →";
   const act=`<div class="actions">${lab?`<button class="promote${eligible(p)?" ready":""}" data-promote="${p.id}">${lab}</button>`:``}<button class="arch" data-arch="${p.id}">${p.arsip?"Nyah-arkib":"Arkib"}</button><button class="del" data-del="${p.id}">Buang</button></div>`;
@@ -1700,7 +1839,7 @@ function rosterNames(){const set=new Set([...(S.pds||[]),...(S.roster||[])]);ret
 function rosterChecklist(m){const hadir=m.hadir||[];const names=rosterNames();
   return `<div class="att">`+names.map(n=>`<button class="nchip${hadir.includes(n)?" on":""}" data-hadir="${m.id}|${encodeURIComponent(n)}">${esc(n)}</button>`).join("")+`<button class="nchip add" data-addhadir="${m.id}">＋ Tambah nama</button></div>${names.length?"":`<div class="hint">Belum ada nama. Tekan +Tambah nama; ia disimpan untuk mesyuarat akan datang.</div>`}`;}
 function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").length;
-  return `<div class="row${m._open?" open":""}"><div class="rhead" data-mtog="${m.id}"><div class="rav">${initials(m.tajuk)||"M"}</div>
+  return `<div class="row${isOpen(m.id)?" open":""}"><div class="rhead" data-mtog="${m.id}"><div class="rav">${initials(m.tajuk)||"M"}</div>
     <div class="rname">${esc(m.tajuk||"(tajuk mesyuarat)")}</div>
     <div class="rtags"><span class="tag st">${esc(m.tarikh||"—")}</span><span class="badge ${openN?"b-a":"b-g"}">${openN?openN+" terbuka":"selesai"}</span></div><span class="chev">▾</span></div>
     <div class="rbody">
@@ -1730,11 +1869,11 @@ function viewWasilah(){
   return toggle+`<div class="rows">${body}</div>`;
 }
 function calLegend(){const L=(c,t)=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:${c};display:inline-block"></span>${t}</span>`;return `<div class="hint" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:8px">${L("var(--blueb)","Akhawat")}${L("#1f8f80","Campur")}${L("var(--red)","Cuti umum")}${L("var(--purple)","Cuti semester")}${L("var(--amber)","Study week")}<span>\uD83C\uDF82 Hari lahir</span></div>`;}
-function holCard(h){const c=holColor(h.jenis);return `<div class="row hrow${h._open?" open":""}" style="border-left:5px solid ${c}"><div class="rhead" data-htog="${h.id}"><div class="hdate"><div class="hdd">${(h.start||"").slice(8,10)||"—"}</div><div class="hdm">${monShort(h.start)}</div></div><div class="rname${h.nama?"":" empty"}">${h.nama?esc(h.nama):"(tarikh penting)"}<div class="hsub" style="color:${c}">${esc(h.jenis)}${h.end&&h.end!==h.start?" · s/d "+esc(h.end):""}</div></div><span class="chev">▾</span></div><div class="rbody"><div class="g2">${fld("Nama",`<input data-hed="${h.id}" data-f="nama" value="${esc(h.nama)}">`)}${fld("Jenis",`<select data-hed="${h.id}" data-f="jenis">${H_TYPES.map(o=>`<option${o===h.jenis?" selected":""}>${o}</option>`).join("")}</select>`)}</div><div class="g2">${fld("Tarikh mula",`<input data-hed="${h.id}" data-f="start" type="date" value="${esc(h.start)}">`)}${fld("Tarikh tamat (pilihan)",`<input data-hed="${h.id}" data-f="end" type="date" value="${esc(h.end)}">`)}</div><div class="actions"><button class="del" data-delhol="${h.id}" style="flex:1">Buang</button></div></div></div>`;}
+function holCard(h){const c=holColor(h.jenis);return `<div class="row hrow${isOpen(h.id)?" open":""}" style="border-left:5px solid ${c}"><div class="rhead" data-htog="${h.id}"><div class="hdate"><div class="hdd">${(h.start||"").slice(8,10)||"—"}</div><div class="hdm">${monShort(h.start)}</div></div><div class="rname${h.nama?"":" empty"}">${h.nama?esc(h.nama):"(tarikh penting)"}<div class="hsub" style="color:${c}">${esc(h.jenis)}${h.end&&h.end!==h.start?" · s/d "+esc(h.end):""}</div></div><span class="chev">▾</span></div><div class="rbody"><div class="g2">${fld("Nama",`<input data-hed="${h.id}" data-f="nama" value="${esc(h.nama)}">`)}${fld("Jenis",`<select data-hed="${h.id}" data-f="jenis">${H_TYPES.map(o=>`<option${o===h.jenis?" selected":""}>${o}</option>`).join("")}</select>`)}</div><div class="g2">${fld("Tarikh mula",`<input data-hed="${h.id}" data-f="start" type="date" value="${esc(h.start)}">`)}${fld("Tarikh tamat (pilihan)",`<input data-hed="${h.id}" data-f="end" type="date" value="${esc(h.end)}">`)}</div><div class="actions"><button class="del" data-delhol="${h.id}" style="flex:1">Buang</button></div></div></div>`;}
 function monShort(iso){const MS=["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogos","Sep","Okt","Nov","Dis"];const m=+((iso||"").slice(5,7));return m?MS[m-1]:"";}
 function holColor(j){return j==="Study Week"?"var(--amber)":j==="Exam Week"?"var(--red)":j==="Semester Break"?"var(--purple)":j==="Mid Semester Break"?"var(--blueb)":j==="Minggu Orientasi"?"var(--green)":j==="Cuti Umum"?"var(--red)":"var(--muted)";}
 function wasCard(w){const sb={"Sudah":"b-g","Belum":"b-n","Tangguh":"b-a"}[w.status]||"b-n";
-  return `<div class="row${w._open?" open":""}"><div class="rhead" data-wtog="${w.id}"><div class="wdate ${(w.peserta==="Campur")?"pc":"pa"}"><div class="wdd">${(w.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(w.tarikh)}</div></div>
+  return `<div class="row${isOpen(w.id)?" open":""}"><div class="rhead" data-wtog="${w.id}"><div class="wdate ${(w.peserta==="Campur")?"pc":"pa"}"><div class="wdd">${(w.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(w.tarikh)}</div></div>
     <div class="rname">${esc(w.nama||"(nama program)")}<div class="hsub">${esc(w.peserta||"Akhawat")} · ${esc(w.status)}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · s/d "+esc(w.tarikhTamat):""}</div></div><span class="chev">▾</span></div>
     <div class="rbody">
       <div class="g2">${fld("Nama program",`<input data-wed="${w.id}" data-f="nama" value="${esc(w.nama)}">`)}${fld("Bahan",`<input data-wed="${w.id}" data-f="bahan" value="${esc(w.bahan)}" placeholder="cth. OBI">`)}</div>
@@ -1804,7 +1943,7 @@ function claimCard(c){const sb={"Draf":"b-n","Dihantar":"b-b","Lulus":"b-g","Tol
     <div class="grp"><h3>Butiran tuntutan</h3>
      <div class="g2">${fld("Jumlah (RM)",CT(c.id,"amount",c.amount))}${fld("Cukai",CT(c.id,"cukai",c.cukai))}</div>
      ${fld("No. resit",CT(c.id,"resit",c.resit))}${fld("Keterangan",CTA(c.id,"desc",c.desc))}</div>`;
-  return `<div class="row${c._open?" open":""}"><div class="rhead" data-ctog="${c.id}"><div class="rav">${initials(c.reportName)||"T"}</div>
+  return `<div class="row${isOpen(c.id)?" open":""}"><div class="rhead" data-ctog="${c.id}"><div class="rav">${initials(c.reportName)||"T"}</div>
     <div class="rname">${esc((c.namaPemohon?c.namaPemohon+" - ":"")+(c.reportName||"(nama laporan)"))}</div>
     <div class="rtags">${money?`<span class="tag ses">RM ${esc(money)}</span>`:``}<span class="badge ${sb}">${esc(c.status)}</span></div><span class="chev">▾</span></div>
     <div class="rbody">
@@ -1827,7 +1966,7 @@ document.addEventListener("click",e=>{
   /* Dashboard drill-through: open the person in Direktori. */
   const gto=e.target.closest("[data-goto]");if(gto){const id=gto.dataset.goto;const _gp=get(id);selId=id;if(_gp&&_gp.stage)stage=_gp.stage;setView("keahlian");return;}
   const stg=e.target.closest("[data-stage]");if(stg){stage=stg.dataset.stage;if(stage!=="mutabaah"&&stage!=="all"){F.minat="";F.minSesi="";}render();return;}
-  const sel=e.target.closest("[data-sel]");if(sel){previousFocus=document.activeElement;selId=sel.dataset.sel;const _p=get(selId);if(_p){_p._etab=1;const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);return;}
+  const sel=e.target.closest("[data-sel]");if(sel){previousFocus=document.activeElement;selId=sel.dataset.sel;eTab=1;const _p=get(selId);if(_p){const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);return;}
   const scl=e.target.closest("[data-selclose]");if(scl){closeDrawer();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
   /* Bell: narrow the directory to whoever already meets their tarsyih syarat. */
@@ -1836,8 +1975,8 @@ document.addEventListener("click",e=>{
   const rjm=e.target.closest("[data-rujmain]");if(rjm){rujMain=rjm.dataset.rujmain;render();return;}
   const rjt=e.target.closest("[data-rujtab]");if(rjt){rujTab=rjt.dataset.rujtab;render();return;}
   const rmw=e.target.closest("[data-rujmuw]");if(rmw){const i=+rmw.dataset.rujmuw;rujMuw=(rujMuw===i?-1:i);render();return;}
-  const rkd=e.target.closest("[data-rujkd]");if(rkd){const i=+rkd.dataset.rujkd;rujKd=(rujKd===i?-1:i);render();return;}
-  const usx=e.target.closest("[data-usr]");if(usx){const i=+usx.dataset.usr;rujUsr=(rujUsr===i?-1:i);render();return;}
+  const rkd=e.target.closest("[data-rujkd]");if(rkd){rujKd=+rkd.dataset.rujkd;render();return;}
+  const usx=e.target.closest("[data-usr]");if(usx){rujUsr=+usx.dataset.usr;render();return;}
   const arc=e.target.closest("[data-arch]");if(arc){const p=get(arc.dataset.arch);if(p){p.arsip=!p.arsip;stamp(p);selId=null;save();render();toast(p.arsip?"Diarkib":"Dinyah-arkib");}return;}
   const mcn=e.target.closest("[data-memcal]");if(mcn){memCalDate.setMonth(memCalDate.getMonth()+(+mcn.dataset.memcal));render();return;}
   if(e.target.closest&&e.target.closest("#addPdBtn")){S.pdList.unshift({id:uid("pd_"),nama:"",ipt:"",_upd:Date.now()});save();render();return;}
@@ -1846,7 +1985,7 @@ document.addEventListener("click",e=>{
   const ulg=e.target.closest("[data-ulog]");if(ulg){uLogOpen=(uLogOpen===ulg.dataset.ulog?"":ulg.dataset.ulog);render();return;}
   const udl=e.target.closest("[data-udel]");if(udl){const uid=udl.dataset.udel;if(!confirm("Padam usrah ini? Kehadiran mad'u akan ditarik balik."))return;S.people.forEach(pp=>{if(pp.sessions){const b=pp.sessions.length;pp.sessions=pp.sessions.filter(s=>s._usrahId!==uid);if(pp.sessions.length!==b)stamp(pp);}});save();render();toast("Usrah dipadam");return;}
   if(e.target.closest&&e.target.closest("#saveUsrahBtn")){const ids=Object.keys(uForm.att).filter(k=>uForm.att[k]);if(!ids.length){toast("Tanda sekurang-kurangnya seorang");return;}const uid="u_"+Date.now();ids.forEach(id=>{const pp=get(id);if(pp){pp.sessions=pp.sessions||[];pp.sessions.push({id:"s_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),_usrahId:uid,jenis:uForm.jenis,tarikh:uForm.tarikh,oleh:uForm.pd,oleh2:"",nota:uForm.butiran});stamp(pp);}});uForm.att={};uForm.butiran="";save();render();toast(ids.length+" kehadiran direkod");return;}
-  const et=e.target.closest("[data-etab]");if(et){const[id,t]=et.dataset.etab.split("|");const p=get(id);if(p){p._etab=+t;render();}return;}
+  const et=e.target.closest("[data-etab]");if(et){const[id,t]=et.dataset.etab.split("|");if(get(id)){eTab=+t;render();}return;}
   const tgl=e.target.closest("[data-tgl]");if(tgl){const[id,f,v]=tgl.dataset.tgl.split("|");const p=get(id);if(p){p[f]=(v==="true"?true:(v==="false"?false:v));save();render();}return;}
   const sc=e.target.closest("[data-score]");if(sc){const[id,it,v]=sc.dataset.score.split("|");const p=get(id);if(p){p.bpmy=p.bpmy||{};p.bpmy[it]=+v;save();render();}return;}
   const as=e.target.closest("[data-addses]");if(as){const p=get(as.dataset.addses);if(p){p.sessions=p.sessions||[];p.sessions.push({id:uid("s_"),jenis:"Usrah",tarikh:today(),oleh:p.pd1||"",oleh2:p.pd2||"",nota:""});save();render();}return;}
@@ -1861,8 +2000,8 @@ document.addEventListener("click",e=>{
   const bx=e.target.closest("[data-bpmyxl]");if(bx){exportBPMy(get(bx.dataset.bpmyxl));return;}
   if($("#addBtn")&&e.target.closest("#addBtn")){const p=newPerson(stage==="all"?"mutabaah":stage);S.people.unshift(p);q="";selId=p.id;save();render();window.scrollTo({top:0,behavior:"smooth"});return;}
   // minit
-  const mtog=e.target.closest("[data-mtog]");if(mtog){const m=getM(mtog.dataset.mtog);if(m){m._open=!m._open;render();}return;}
-  if($("#addMeetBtn")&&e.target.closest("#addMeetBtn")){S.meetings.unshift(newMeeting());save();render();return;}
+  const mtog=e.target.closest("[data-mtog]");if(mtog){const m=getM(mtog.dataset.mtog);if(m){toggleOpen(m.id);render();}return;}
+  if($("#addMeetBtn")&&e.target.closest("#addMeetBtn")){S.meetings.unshift(addOpen(newMeeting()));save();render();return;}
   const ait=e.target.closest("[data-addit]");if(ait){const m=getM(ait.dataset.addit);if(m){m.items.push(newItem());save();render();}return;}
   const dit=e.target.closest("[data-delit]");if(dit){const[mid,iid]=dit.dataset.delit.split("|");const m=getM(mid);if(m){m.items=m.items.filter(x=>x.id!==iid);save();render();}return;}
   const dm=e.target.closest("[data-delmeet]");if(dm){const m=getM(dm.dataset.delmeet);if(m&&confirm("Buang mesyuarat?")){S._del[m.id]=Date.now();S.meetings=S.meetings.filter(x=>x.id!==m.id);save();render();}return;}
@@ -1871,23 +2010,23 @@ document.addEventListener("click",e=>{
   const ah=e.target.closest("[data-addhadir]");if(ah){const m=getM(ah.dataset.addhadir);if(m){const nm=titleCase((prompt("Tambah nama kehadiran:")||"").trim());if(nm){S.roster=S.roster||[];if(!S.roster.includes(nm)&&!(S.pds||[]).includes(nm))S.roster.push(nm);m.hadir=m.hadir||[];if(!m.hadir.includes(nm))m.hadir.push(nm);save();render();}}return;}
   // wasilah
   const wm=e.target.closest("[data-wmode]");if(wm){wasMode=wm.dataset.wmode;render();return;}
-  const wtog=e.target.closest("[data-wtog]");if(wtog){const w=getW(wtog.dataset.wtog);if(w){w._open=!w._open;if(wasMode==="cal")wasMode="list";render();}return;}
-  if($("#addWasBtn")&&e.target.closest("#addWasBtn")){S.wasilah.unshift(newWasilah());wasMode="list";save();render();return;}
+  const wtog=e.target.closest("[data-wtog]");if(wtog){const w=getW(wtog.dataset.wtog);if(w){toggleOpen(w.id);if(wasMode==="cal")wasMode="list";render();}return;}
+  if($("#addWasBtn")&&e.target.closest("#addWasBtn")){S.wasilah.unshift(addOpen(newWasilah()));wasMode="list";save();render();return;}
   const dw=e.target.closest("[data-delwas]");if(dw){const w=getW(dw.dataset.delwas);if(w&&confirm("Buang wasilah?")){S._del[w.id]=Date.now();S.wasilah=S.wasilah.filter(x=>x.id!==w.id);save();render();}return;}
   const cn=e.target.closest("[data-calnav]");if(cn){calDate=new Date(calDate.getFullYear(),calDate.getMonth()+ (+cn.dataset.calnav),1);render();return;}
-  const ht=e.target.closest("[data-htog]");if(ht){const x=getH(ht.dataset.htog);if(x){x._open=!x._open;render();}return;}
-  if($("#addHolBtn")&&e.target.closest("#addHolBtn")){S.holidays.unshift(newHoliday());holOpen=true;save();render();return;}
+  const ht=e.target.closest("[data-htog]");if(ht){const x=getH(ht.dataset.htog);if(x){toggleOpen(x.id);render();}return;}
+  if($("#addHolBtn")&&e.target.closest("#addHolBtn")){S.holidays.unshift(addOpen(newHoliday()));holOpen=true;save();render();return;}
   if(e.target.closest&&e.target.closest("#addAnyBtn")){e.stopPropagation();wasAddOpen=!wasAddOpen;render();return;}
-  const apg=e.target.closest("[data-addprog]");if(apg){S.wasilah.unshift(newWasilah());wasAddOpen=false;save();render();return;}
-  const atp=e.target.closest("[data-addtp]");if(atp){S.holidays.unshift(newHoliday());wasAddOpen=false;save();render();return;}
+  const apg=e.target.closest("[data-addprog]");if(apg){S.wasilah.unshift(addOpen(newWasilah()));wasAddOpen=false;save();render();return;}
+  const atp=e.target.closest("[data-addtp]");if(atp){S.holidays.unshift(addOpen(newHoliday()));wasAddOpen=false;save();render();return;}
   const cday=e.target.closest("[data-calday]");if(cday){selDate=cday.dataset.calday;render();return;}
-  const wop=e.target.closest("[data-wopen]");if(wop){const w=getW(wop.dataset.wopen);if(w){wasMode="list";w._open=true;render();}return;}
+  const wop=e.target.closest("[data-wopen]");if(wop){const w=getW(wop.dataset.wopen);if(w){wasMode="list";openRows.add(w.id);render();}return;}
   const holt=e.target.closest("[data-holtoggle]");if(holt){holOpen=!holOpen;render();return;}
   const wtg=e.target.closest("[data-wtgl]");if(wtg){const pr=wtg.dataset.wtgl.split("|");const w=getW(pr[0]);if(w){w[pr[1]]=(pr[2]==="true"?true:(pr[2]==="false"?false:pr[2]));if(pr[1]==="multi"&&pr[2]==="false")w.tarikhTamat="";stamp(w);save();render();}return;}
   const dhl=e.target.closest("[data-delhol]");if(dhl){const x=getH(dhl.dataset.delhol);if(x&&confirm("Buang tarikh ini?")){S._del[x.id]=Date.now();S.holidays=S.holidays.filter(y=>y.id!==x.id);save();render();}return;}
   // claims
-  const ctog=e.target.closest("[data-ctog]");if(ctog){const c=getC(ctog.dataset.ctog);if(c){c._open=!c._open;render();}return;}
-  if($("#addClaimBtn")&&e.target.closest("#addClaimBtn")){S.claims.unshift(newClaim());save();render();return;}
+  const ctog=e.target.closest("[data-ctog]");if(ctog){const c=getC(ctog.dataset.ctog);if(c){toggleOpen(c.id);render();}return;}
+  if($("#addClaimBtn")&&e.target.closest("#addClaimBtn")){S.claims.unshift(addOpen(newClaim()));save();render();return;}
   const dc=e.target.closest("[data-delclaim]");if(dc){const c=getC(dc.dataset.delclaim);if(c&&confirm("Buang tuntutan?")){S._del[c.id]=Date.now();S.claims=S.claims.filter(x=>x.id!==c.id);save();render();}return;}
   const ub=e.target.closest("[data-uplbtn]");if(ub){const [kind,id]=ub.dataset.uplbtn.split("|");pickAndUpload(kind,id);return;}
   const ra=e.target.closest("[data-rmatt]");if(ra){const [kind,id,idx]=ra.dataset.rmatt.split("|");if(kind==="person"){const p=get(id);if(p&&p.lampiran){p.lampiran.splice(+idx,1);save();render();}}else if(kind==="claim"){const c=getC(id);if(c&&c.files){c.files.splice(+idx,1);save();render();}}return;}
@@ -1951,7 +2090,7 @@ function importNames(file){
   const addRows=rows=>{ // rows: array of objects keyed by header (lowercased)
     const cands=[];
     rows.forEach(o=>{const nama=o.nama||o.name||o["nama penuh"]||"";if(!String(nama).trim())return;
-      const p=newPerson((String(o["status tarbiyyah"]||o.peringkat||o.stage||"mutabaah")).trim().toLowerCase());p._open=false;
+      const p=newPerson((String(o["status tarbiyyah"]||o.peringkat||o.stage||"mutabaah")).trim().toLowerCase());
       p.nama=titleCase(String(nama).trim());
       p.universiti=o.universiti||o["institut pengajian tinggi (ipt)"]||o.ipt||"";
       p.bidang=titleCase(o.bidang||o.kursus||o["bidang pengajian"]||"");
@@ -2011,8 +2150,8 @@ function exportBPMy(p){if(!p)return;const b=bpmy(p);
 
 /* ---- normalize + holidays ---- */
 function normalizeS(){S.people=S.people||[];S.meetings=S.meetings||[];S.wasilah=S.wasilah||[];S.claims=S.claims||[];S.universities=(S.universities&&S.universities.length)?S.universities:["UiTM Shah Alam","UiTM Puncak Perdana","MSU"];S.pds=S.pds||[];S.kolej=S.kolej||[];S.roster=S.roster||[];S.holidays=S.holidays||[];S._del=S._del||{};S.pdList=S.pdList||[];if(!S._pdSeeded){const have=new Set(S.pdList.map(x=>(x.nama||"").toLowerCase()));const nm=new Set(S.pds||[]);S.people.forEach(p=>{if(p.pd1)nm.add(p.pd1);if(p.pd2)nm.add(p.pd2);});nm.forEach(n=>{if(n&&!have.has(n.toLowerCase())){S.pdList.push({id:uid("pd_"),nama:n,ipt:"",_upd:1});have.add(n.toLowerCase());}});S._pdSeeded=true;}S.people.forEach(p=>{if(p&&p.ic){const b=icBirthday(p.ic);if(b&&!p.tarikhLahir){const dg=(p.ic||"").replace(/\D/g,"");const yy=+dg.slice(0,2);const yr=yy<30?2000+yy:1900+yy;p.tarikhLahir=yr+"-"+String(b.mm).padStart(2,"0")+"-"+String(b.dd).padStart(2,"0");}delete p.ic;}});seedHolidays();}
-function seedHolidays(){if(S._holSeeded)return;const seed=[["Tahun Baharu","2026-01-01"],["Hari Pekerja","2026-05-01"],["Hari Kebangsaan","2026-08-31"],["Hari Malaysia","2026-09-16"],["Keputeraan Sultan Selangor","2026-12-11"],["Krismas","2026-12-25"],["Tahun Baharu","2027-01-01"],["Hari Pekerja","2027-05-01"],["Hari Kebangsaan","2027-08-31"],["Hari Malaysia","2027-09-16"],["Keputeraan Sultan Selangor","2027-12-11"],["Krismas","2027-12-25"]];seed.forEach(([n,dd])=>S.holidays.push({id:"hs_"+dd+"_"+n.replace(/\s+/g,""),nama:n,jenis:"Cuti Umum",start:dd,end:"",_open:false,_upd:1}));S._holSeeded=true;}
-function newHoliday(){return{id:uid("h_"),nama:"",jenis:"Cuti Semester",start:today(),end:"",_open:true,_upd:Date.now()};}
+function seedHolidays(){if(S._holSeeded)return;const seed=[["Tahun Baharu","2026-01-01"],["Hari Pekerja","2026-05-01"],["Hari Kebangsaan","2026-08-31"],["Hari Malaysia","2026-09-16"],["Keputeraan Sultan Selangor","2026-12-11"],["Krismas","2026-12-25"],["Tahun Baharu","2027-01-01"],["Hari Pekerja","2027-05-01"],["Hari Kebangsaan","2027-08-31"],["Hari Malaysia","2027-09-16"],["Keputeraan Sultan Selangor","2027-12-11"],["Krismas","2027-12-25"]];seed.forEach(([n,dd])=>S.holidays.push({id:"hs_"+dd+"_"+n.replace(/\s+/g,""),nama:n,jenis:"Cuti Umum",start:dd,end:"",_upd:1}));S._holSeeded=true;}
+function newHoliday(){return{id:uid("h_"),nama:"",jenis:"Cuti Semester",start:today(),end:"",_upd:Date.now()};}
 function getH(id){return(S.holidays||[]).find(x=>x.id===id);}
 
 /* ---- sync + login ---- */
