@@ -21,14 +21,20 @@
   --biru-900:#101C42; --biru-800:#18296B; --biru-700:#1F3785;
   --biru-600:#28459D; --biru-500:#3D5AB8; --biru-400:#6480CE;
   --biru-300:#9AAEE3; --biru-200:#C6D2F1; --biru-100:#E4EAF9; --biru-050:#F0F4FD;
-  /* Cyan — secondary, from the logo */
+  /* Cyan — secondary, from the logo. The 800 step exists because cyan-700 on a
+     cyan-100 surface is only 3.87:1 — fine for a heading, short of the 4.5:1
+     small-text floor that tinted cards need. */
+  --cyan-800:#0C6486;
   --cyan-700:#1183AD; --cyan-600:#189CCC; --cyan-500:#2EBBEB;
   --cyan-400:#63CDF1; --cyan-300:#95DEF6; --cyan-200:#C2ECFA; --cyan-100:#E3F6FD;
   /* Dakwat (ink) + Kabus (muted) + Kertas (paper) */
   --dakwat-900:#0B1224; --dakwat-800:#14203A; --dakwat-700:#26334F;
   --kabus-600:#5C6B82; --kabus-500:#7C8AA0; --kabus-400:#A3AEC0;
   --kabus-300:#C7CEDA; --kabus-200:#DFE4EC; --kertas-100:#F5F7FB; --putih:#FFFFFF;
-  /* Emas — sparing gold accent */
+  /* Emas — sparing gold accent. Gold is the hue that fails contrast soonest:
+     emas-600 on emas-100 is 2.90:1, so a tinted gold card needs the 700 step
+     for any text it carries. */
+  --emas-700:#7A5E1F;
   --emas-600:#AC8836; --emas-500:#C8A24A; --emas-300:#E2C88C; --emas-100:#F7EFDC;
   /* Status hues */
   --hijau-600:#187A5B; --hijau-500:#1E9C72; --hijau-100:#E1F4EE;
@@ -64,10 +70,45 @@
   --font:      var(--font-body);
 }
 
+/* ---------- 2b. SHAPE & RHYTHM SCALE ----------
+   Radius, padding, elevation and type rhythm sampled from the PEMBINA
+   prototype. Colour still comes from the ramps above; this block only
+   governs how round, how roomy and how quiet each surface is. */
+:root{
+  --radius-xs:6px; --radius-sm:9px; --radius-md:12px;
+  --radius-card:16px; --radius-lg:20px; --radius-2xl:24px; --radius-pill:999px;
+
+  --pad-card:16px; --pad-card-lg:20px;
+
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --border-subtle:var(--kabus-200);
+  --border-strong:var(--kabus-300);
+  --surface-sunken:var(--kertas-100);
+  --surface-brand-soft:var(--biru-100);
+  --surface-secondary-soft:var(--cyan-100);
+  --surface-accent-soft:var(--emas-100);
+  --surface-brand-deep:var(--biru-900);
+
+  --shadow-xs:0 1px 2px rgba(20,32,58,.05);
+  --shadow-lg:0 20px 44px -12px rgba(20,32,58,.22),0 6px 14px rgba(20,32,58,.07);
+
+  --tracking-eyebrow:.1em;
+  --tracking-heading:-.02em;
+  --tracking-mono:.02em;
+
+  --dur-fast:120ms; --dur-base:200ms;
+  --ease-standard:cubic-bezier(.4,0,.2,1);
+  /* Decelerating curve for the rare deliberate gesture, as against the
+     symmetric standard curve every state change uses. */
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+
 /* Bring the display font to the app's own headers & nav (additive, safe) */
 .htxt h1, .navtab, .grp > h3 { font-family: var(--font-display); letter-spacing: -.01em; }
 
-/* ---------- 3. ORIGINAL COMPONENT RULES (verbatim) ---------- */
+/* ---------- 3. COMPONENT PRIMITIVES ----------
+   Colours unchanged; radius / padding / elevation retuned to the scale above. */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; overflow-x: hidden; }
 body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.4; -webkit-font-smoothing: antialiased; }
@@ -76,35 +117,37 @@ input, select, textarea { font-family: inherit; font-size: 15px; }
 h1, h2, h3 { margin: 0; }
 :focus-visible { outline: 3px solid var(--blueb); outline-offset: 2px; border-radius: 4px; }
 
-.add { background: var(--blue); color: #fff; border: none; border-radius: 11px; padding: 10px 16px; font-weight: 800; font-size: 14px; box-shadow: var(--shadow); white-space: nowrap; }
+.add { background: var(--blue); color: #fff; border: none; border-radius: var(--radius-md); padding: 10px 16px; font-weight: 700; font-size: 14px; box-shadow: var(--shadow-xs); white-space: nowrap; transition: background var(--dur-fast) var(--ease-standard); }
 .add:active { background: var(--blue-2); }
-.btn2 { background: #fff; border: 1px solid var(--line); border-radius: 11px; padding: 10px 14px; font-weight: 700; font-size: 13.5px; color: var(--ink); box-shadow: var(--shadow); }
-.del { border: 1px solid var(--red-s); background: #fff; color: var(--red); border-radius: 11px; padding: 12px 15px; font-weight: 700; font-size: 14px; }
-.addsub { width: 100%; border: 1px dashed var(--line); background: var(--paper); color: var(--blue); border-radius: 10px; padding: 10px; font-weight: 800; font-size: 13px; margin-top: 4px; }
+.btn2 { background: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px; font-weight: 600; font-size: 13.5px; color: var(--ink); box-shadow: var(--shadow-xs); }
+.del { border: 1px solid var(--red-s); background: #fff; color: var(--red); border-radius: var(--radius-md); padding: 12px 15px; font-weight: 600; font-size: 14px; }
+.addsub { width: 100%; border: 1px dashed var(--border-strong); background: var(--paper); color: var(--blue); border-radius: var(--radius-md); padding: 10px; font-weight: 600; font-size: 13px; margin-top: 4px; }
 
-.pill, .ipt-pill, .rjtab { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 22px; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; }
-.pill { flex: 0 0 auto; padding: 8px 14px; font-size: 13px; box-shadow: var(--shadow); }
-.pill .c, .ipt-pill .c { background: var(--paper); border-radius: 10px; padding: 1px 7px; font-size: 12px; font-weight: 800; }
+.pill, .ipt-pill, .rjtab { border: 1px solid var(--border-subtle); background: #fff; color: var(--muted); border-radius: var(--radius-pill); font-weight: 600; display: inline-flex; align-items: center; gap: 7px; transition: background var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard); }
+.pill { flex: 0 0 auto; padding: 8px 14px; font-size: 13px; box-shadow: var(--shadow-xs); }
+.pill .c, .ipt-pill .c { background: var(--surface-sunken); border-radius: var(--radius-pill); padding: 2px 8px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: var(--tracking-mono); }
 .pill.active, .ipt-pill.active, .rjtab.on { background: var(--blue); color: #fff; border-color: var(--blue); }
-.pill.active .c, .ipt-pill.active .c { background: var(--yellow); color: var(--blue-ink); }
-.ipt-pill { padding: 6px 11px; font-size: 12.5px; }
-.ipt-pill .c { border-radius: 9px; font-size: 11px; }
-.rjtab { padding: 9px 14px; font-size: 13px; }
+.pill.active .c, .ipt-pill.active .c { background: rgba(255, 255, 255, .2); color: #fff; }
+.ipt-pill { padding: 6px 12px; font-size: 12.5px; }
+.ipt-pill .c { font-size: 11px; }
+.rjtab { padding: 9px 15px; font-size: 13px; }
 
-.row { background: #fff; border: 1px solid var(--line); border-radius: 13px; box-shadow: var(--shadow); overflow: hidden; }
-.grp { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-.fld { margin-bottom: 11px; }
+.row { background: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); box-shadow: var(--shadow-xs); overflow: hidden; transition: box-shadow var(--dur-base) var(--ease-standard); }
+.row:hover { box-shadow: var(--shadow-sm); }
+.grp { border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: var(--pad-card); margin-bottom: 14px; }
+.fld { margin-bottom: 12px; }
 .fld:last-child { margin-bottom: 0; }
-.fld label { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-.fld input, .fld select, .fld textarea { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 10px 11px; background: #fff; color: var(--ink); }
+.fld label { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.fld input, .fld select, .fld textarea { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px 12px; background: #fff; color: var(--ink); transition: border-color var(--dur-fast) var(--ease-standard); }
+.fld input:focus, .fld select:focus, .fld textarea:focus { border-color: var(--blueb); }
 .fld textarea { resize: vertical; min-height: 44px; }
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .g2 > *, .g3 > * { min-width: 0; }
 input[type=date] { width: 100%; min-width: 0; }
 
-.toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
-.toggle button { border: none; background: #fff; padding: 8px 14px; font-weight: 700; font-size: 13px; color: var(--muted); }
+.toggle { display: inline-flex; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); overflow: hidden; }
+.toggle button { border: none; background: #fff; padding: 8px 15px; font-weight: 600; font-size: 13px; color: var(--muted); transition: background var(--dur-fast) var(--ease-standard); }
 .toggle button.on { background: var(--blue); color: #fff; }
 .toggle.g button.on { background: var(--green); }
 .toggle.r button.on { background: var(--red); }

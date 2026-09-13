@@ -21,6 +21,29 @@ colors:
   red: "#d3453f"
   red-soft: "#fbe6e5"
   purple: "#6b3fa0"
+  teal: "#1f8f80"
+  teal-soft: "#e3f5f1"
+  pink: "#c2367a"
+  pink-soft: "#fde8f1"
+  on-blue-label: "#bcd0f5"
+  on-blue-sub: "#cfe0ff"
+  on-blue-body: "#dbe6ff"
+  yellow-soft: "#fff3c9"
+  yellow-tint: "#fff7e0"
+  yellow-deep: "#ffeab4"
+  yellow-line: "#f2dda6"
+  cream: "#fffdf5"
+  blue-faint: "#7f95c4"
+  red-line: "#f5c6c2"
+  purple-soft: "#efe8f8"
+  kd-red: "#c0201f"
+  surface-raised: "#fcfdff"
+  ipt-1: "#147FB3"
+  ipt-2: "#2a9d8f"
+  ipt-3: "#7048b6"
+  ipt-4: "#d98324"
+  ipt-5: "#e07b39"
+  ipt-none: "#b8c2d6"
   shadow: "0 1px 2px rgba(9, 30, 66, .06), 0 6px 18px rgba(9, 30, 66, .07)"
 typography:
   display:
@@ -47,11 +70,42 @@ typography:
     fontWeight: 800
     lineHeight: 1.2
     letterSpacing: "0.04em"
+  scale:
+    micro: "9px"
+    eyebrow: "10px"
+    label: "10.5px"
+    caps: "11px"
+    helper: "11.5px"
+    meta: "12px"
+    secondary: "12.5px"
+    compact: "13px"
+    prose: "13.5px"
+    control: "14px"
+    card-title: "14.5px"
+    body: "15px"
+    panel-title: "16px"
+    numeral: "18px"
+    brand: "19px"
+    heading: "20px"
+    metric: "30px"
+    empty-glyph: "32px"
 rounded:
+  rule: "2px"
+  dot: "3px"
+  spine: "4px"
+  event: "5px"
+  tag: "7px"
+  xs: "8px"
   sm: "9px"
+  control: "10px"
   md: "11px"
+  panel: "12px"
   lg: "13px"
+  surface: "14px"
+  sheet: "18px"
+  badge: "20px"
   xl: "22px"
+  circle: "50%"
 spacing:
   xs: "4px"
   sm: "8px"
@@ -124,6 +178,8 @@ The palette is anchored in a deep blue brand presence with supporting neutral, g
 - **Amber** (#dd9021): caution and watch status, ideal for pending or attention-needed states.
 - **Red** (#d3453f): warning or blocking states; used for removals, errors, or negative conditions.
 - **Purple** (#6b3fa0): alternate roadmap or special marker color for non-core status distinctions.
+- **Teal** (#1f8f80) / **Teal Soft** (#e3f5f1): mixed-participant programmes and DF sessions, distinguished from the blue used for women-only activity.
+- **Pink** (#c2367a) / **Pink Soft** (#fde8f1): birthdays — the one calendar entry that is personal rather than operational, so it sits outside the status colors on purpose.
 
 ### Neutral
 - **Ink** (#0e1726): default foreground color for text and critical labels.
@@ -133,8 +189,36 @@ The palette is anchored in a deep blue brand presence with supporting neutral, g
 - **Card** (#ffffff): base surface for content cards, drawers, panels, and forms.
 - **Grey Soft** (#eef1f7): low-emphasis state backgrounds and calm neutral panels.
 
+### On-Blue Text Tints
+
+Deep blue surfaces — the product header, the BPMy summary panel, the active journey stage — need their own text ramp, because Ink and Muted are unreadable on them. Three steps cover every case, low to high contrast:
+
+- **On Blue Label** (#bcd0f5): uppercase micro-labels and eyebrow text on a blue surface.
+- **On Blue Sub** (#cfe0ff): supporting subtitles beneath a heading on blue.
+- **On Blue Body** (#dbe6ff): body rows and table cells on blue, with pure white reserved for the value being emphasized.
+
+### Soft Tints and Surfaces
+
+Every status color needs a soft counterpart to sit behind it, and the yellow brand signal needs a wider family than the others because it carries the Muayyid stage, the "now" marker on the phase timeline, and the reference callout:
+
+- **Yellow Soft** (#fff3c9): Muayyid avatar, programme tag, and the glow around the current phase node.
+- **Yellow Tint** (#fff7e0) / **Yellow Deep** (#ffeab4): the two stops of the Muayyid journey-stage gradient.
+- **Yellow Line** (#f2dda6): the border that pairs with those cream fills.
+- **Cream** (#fffdf5): the reference callout surface, warmer than Paper so a definition reads as an aside.
+- **Purple Soft** (#efe8f8): PD tag and the semester-break calendar chip.
+- **Red Line** (#f5c6c2): the border on an absence cell, where Red Soft alone is not legible enough.
+- **Blue Faint** (#7f95c4): Mutabaah avatar text — the quietest stage marker, since Mutabaah is the default state.
+- **Surface Raised** (#fcfdff): the body of an expanded row, a hair lighter than Card so the open panel reads as nested.
+- **KD Red** (#c0201f): reserved for Kalam Dakwah slide headers, which reproduce that deck's own brand red and are deliberately not the system's Red.
+
+### Categorical Palette
+
+Institutions get a stable identity color so a row can be scanned by its colour spine alone. This is a *data* palette, not a UI palette: the values carry no status meaning and must never be reused for state. The three local institutions are pinned (MSU → Purple, UiTM Shah Alam → #e07b39, UiTM Puncak Perdana → Green) and anything else hashes into the rotation — **IPT 1** (#147fb3), **IPT 2** (#2a9d8f), **IPT 3** (#7048b6), **IPT 4** (#d98324), Blue B, and Pink. **IPT None** (#b8c2d6) marks a record with no institution recorded. See `iptColor` in `lib/model.ts`.
+
 ### Named Rules
 **The Blue-First Rule.** The product's dominant accent is blue; the system only introduces green, amber, red, and purple to communicate status and category distinctions, never as a competing interface identity.
+
+**The Data-Palette Rule.** The categorical IPT colors are addressed only through `iptColor()`. They never appear as a hand-picked accent in a component, and no status is ever encoded with them.
 
 ## Typography
 
@@ -150,8 +234,37 @@ The interface uses a practical sans-serif stack tuned for dense operational read
 - **Body** (400, 15px, 1.4): default reading size for application content, forms, and metadata.
 - **Label** (800, 10.5px, 1.2, tracking 0.04em): small uppercase labels for fields and UI metadata.
 
+### Size Ramp
+
+The four roles above name the *intent*. Because this is a dense operational tool, the implemented ramp is finer than four steps — a records table, a calendar cell, a form label and a drawer heading genuinely need different sizes, and half-pixel steps in the 11–15px band are doing real work separating metadata from content. The full enumerated ramp:
+
+| Step | Size | Where it is used |
+| --- | --- | --- |
+| micro | 9px | calendar attendance tag inside a day cell |
+| eyebrow | 10px | product eyebrow, calendar month abbreviation, journey annotations |
+| label | 10.5px | field labels (the Label role) |
+| caps | 11px | badges, pill counts, group headers, section headings |
+| helper | 11.5px | hints, helper text, legends, secondary counts |
+| meta | 12px | avatar initials, panel headings, tertiary metadata |
+| secondary | 12.5px | name chips, descriptive body inside reference panels |
+| compact | 13px | filter selects, editor tabs, stage pills, dense body |
+| prose | 13.5px | reading body in reference panels, secondary buttons, toasts |
+| control | 14px | navigation tabs, primary and destructive buttons, menu rows |
+| card-title | 14.5px | accordion and criteria card titles |
+| body | 15px | default reading size, inputs, row names (the Body role) |
+| panel-title | 16px | drawer name, phase titles, journey stage names, calendar header |
+| numeral | 18px | large day numeral in a date block |
+| brand | 19px | the Kit PD wordmark in the header |
+| heading | 20px | sign-in heading (the Headline role) |
+| metric | 30px | the BPMy percentage in the summary panel |
+| empty-glyph | 32px | empty-state glyph |
+
+The Display role (`clamp(2rem, 5vw, 2.8rem)`) is reserved: nothing in the current product is large enough to need it.
+
 ### Named Rules
 **The Label-First Rule.** Small labels are treated as functional orientation aids, not decorative copy; they are uppercase, bold, and high-contrast for quick scanning.
+
+**The Dense-Band Rule.** Sizes between 11px and 15px carry almost the whole interface. Pick within that band by role — helper, metadata, body, control — rather than reaching for a new size; a step outside the ramp should be a deliberate addition to this table, not a one-off.
 
 ## Layout
 
@@ -181,12 +294,40 @@ Depth is subtle and low-noise. Instead of dramatic shadows, the interface uses s
 
 The visual language prefers soft, practical geometry. Corners are gently rounded, enough to humanize the interface without looking playful or decorative. The product avoids extreme radius values and instead uses modest radii that support tablet-style UIs and operational forms.
 
-- Small input corners: 9px
-- Standard control radius: 11px
-- Card surface radius: 13px
-- Larger emphasis pills and badges: 22px
+The four radii that carry the product's character:
+
+- Small input corners: 9px (`sm`)
+- Standard control radius: 11px (`md`)
+- Card surface radius: 13px (`lg`)
+- Larger emphasis pills and badges: 22px (`xl`)
+
+### Radius Ramp
+
+Rounding scales with the size of the thing being rounded, so the implemented ramp runs from 2px marks up to fully circular avatars. The full enumerated scale:
+
+| Token | Radius | Where it is used |
+| --- | --- | --- |
+| rule | 2px | the yellow accent bar that prefixes a section heading |
+| dot | 3px | status dots, legend swatches, IPT colour dots |
+| spine | 4px | the IPT colour spine on a row, and the focus ring |
+| event | 5px | calendar event chips inside a day cell |
+| tag | 7px | the stage tag (MUT / MUH / MAY) in a table row |
+| xs | 8px | calendar day cells, menu rows, small inline chips |
+| sm | 9px | form fields, inputs, textareas, avatar squares |
+| control | 10px | header buttons, filter selects, editor tabs, sub-rows |
+| md | 11px | primary, secondary and destructive buttons |
+| panel | 12px | grouped panels, popover menus, criteria cards, PD rows |
+| lg | 13px | content cards and rows — the primary information plane |
+| surface | 14px | larger surfaces: reference boxes, day detail, member cards |
+| sheet | 18px | the sign-in sheet, the largest single surface |
+| badge | 20px | tags, badges, name chips, duration pills |
+| xl | 22px | filter pills and toggle pills |
+| circle | 50% | avatars, numbered circles, timeline nodes |
 
 Borders are light and present only where they matter, usually around form fields, rows, and small groups. The app keeps its overall silhouette professional and administrative.
+
+### Named Rules
+**The Radius-Follows-Size Rule.** A radius is chosen from the size of the element, not for emphasis: marks take 2–5px, controls 8–11px, panels and cards 12–14px, and only pills and avatars round fully. Rounding is never used to make something look more important.
 
 ## Components
 
