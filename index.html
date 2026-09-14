@@ -119,17 +119,66 @@
   .kkt{font-weight:700;font-size:14.5px;letter-spacing:-.01em} .kkd{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}
   .arsiplink{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:4px}
   .arch{background:#fff;border:1px solid var(--border-subtle);color:var(--muted);border-radius:var(--radius-md);padding:0 14px;font-weight:600}
-  .pdrow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow-xs)}
-  .pdrow .iptblk{min-height:34px}
-  .pdname{flex:1;min-width:0;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:9px 11px;font-weight:600}
-  .pdipt{flex:0 0 auto;width:150px;max-width:40%;border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:9px 11px}
-  .pdcount{flex:0 0 auto;font-family:var(--font-mono);font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap}
-  .pddel{flex:0 0 auto;background:none;border:none;color:var(--red);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
+  /* ---------- Senarai Penggerak: one editable roster table ----------
+     The row is a grid, not a flex line, so the name, the IPT select and the
+     mad'u count stay in the same three columns the header names. */
+  .pdhead{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .pdhead-t{flex:1 1 260px;min-width:0}
+  .pdhead-eb{margin:0;font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--blue-2)}
+  .pdhead-s{margin:7px 0 0;font-size:13.5px;color:var(--muted);line-height:1.45}
+  .pdhead .add{flex:0 0 auto;border-radius:var(--radius-pill);padding:11px 19px}
+  .pdfilt{margin-bottom:12px}
+  .pdfilt .ipt-pill{padding:7px 13px;font-size:12.5px}
+  .pdfilt .ipt-pill .dot{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+  .pdcard{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);box-shadow:var(--shadow-xs);overflow:hidden}
+  .pdgrid-h,.pdrow{display:grid;grid-template-columns:minmax(0,1fr) 214px 116px 40px;align-items:center;gap:14px;padding:0 18px}
+  .pdgrid-h{height:42px;background:var(--surface-sunken);border-bottom:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
+  .pdrow{padding-top:11px;padding-bottom:11px;border-bottom:1px solid var(--border-subtle);transition:background var(--dur-fast) var(--ease-standard)}
+  .pdrow:last-child{border-bottom:none}
+  .pdrow:hover{background:var(--paper)}
+  .pdrow:focus-within{background:var(--surface-brand-soft)}
+  .pdid{display:flex;align-items:center;gap:13px;min-width:0}
+  .pdav{flex:0 0 auto;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:.02em}
+  .pdid-m{flex:1;min-width:0}
+  .pdname{width:100%;border:1px solid transparent;border-radius:var(--radius-sm);background:none;padding:5px 9px;font-family:inherit;font-size:14.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+  .pdname::placeholder{font-weight:600;color:var(--muted)}
+  .pdname:hover{border-color:var(--border-subtle);background:#fff}
+  .pdname:focus{outline:none;background:#fff;border-color:var(--blue);box-shadow:0 0 0 3px var(--surface-brand-soft)}
+  .pdcode{display:block;margin-top:2px;padding-left:10px;font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:var(--tracking-mono);color:var(--muted)}
+  .pdipt-w{position:relative;display:flex;align-items:center;min-width:0}
+  .pdipt-w i{position:absolute;left:11px;display:block;width:14px;height:14px;color:var(--muted);pointer-events:none}
+  .pdipt-w i svg{display:block;width:100%;height:100%}
+  .pdipt-w .ch{left:auto;right:10px}
+  .pdipt{width:100%;min-width:0;appearance:none;-webkit-appearance:none;border:1px solid var(--border-strong);border-radius:var(--radius-md);background:#fff;padding:9px 28px 9px 32px;font-family:inherit;font-size:13px;font-weight:500;color:var(--ink);cursor:pointer;text-overflow:ellipsis}
+  .pdipt:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--surface-brand-soft)}
+  /* Not ".empty" — that class is the global empty-state block, whose padding
+     would swell the select to five times its height. */
+  .pdipt.none{border-style:dashed;color:var(--muted)}
+  .pdcount{display:inline-flex;align-items:center;gap:6px;justify-self:start;background:var(--surface-brand-soft);color:var(--biru-700);border-radius:var(--radius-pill);padding:5px 11px;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:var(--tracking-mono);white-space:nowrap}
+  .pdcount i{display:block;width:12px;height:12px;flex:0 0 auto;opacity:.75} .pdcount i svg{display:block;width:100%;height:100%}
+  .pdcount.zero{background:var(--surface-sunken);color:var(--muted)}
+  .pddel{justify-self:center;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:none;border:1px solid var(--border-subtle);color:var(--muted);font-size:15px;line-height:1;cursor:pointer;padding:0;transition:background var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard)}
+  .pddel:hover{background:var(--red-s);border-color:var(--red);color:var(--red)}
   .syncpill{position:fixed;right:14px;bottom:14px;z-index:40;background:#fff;border:1px solid var(--border-subtle);box-shadow:var(--shadow-md);border-radius:var(--radius-pill);padding:7px 14px;font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--muted);display:none}
   .syncpill.on{color:var(--blue)}
   .row [data-sel],.kc,.ktbl tbody tr{cursor:pointer}
   .ktbl tbody tr:focus-visible{outline:3px solid var(--blueb);outline-offset:-3px}
-  @media(max-width:720px){ .pdipt{width:120px} .syncpill{bottom:auto;top:70px;right:10px;padding:5px 10px;font-size:11px} }
+  /* The three-column table folds into a stacked card: the header row has
+     nothing left to label once the columns are gone, so it goes. */
+  @media(max-width:720px){
+    .pdgrid-h{display:none}
+    .pdrow{grid-template-columns:minmax(0,1fr) 40px;gap:9px 12px;padding:13px 14px}
+    /* Placed explicitly: left to auto-placement the delete button lands after
+       the two full-width cells and leaves an empty band under every row. */
+    .pdrow .pdid{grid-area:1/1}
+    .pdrow .pddel{grid-area:1/2;align-self:start}
+    .pdrow .pdipt-w{grid-area:2/1/auto/-1}
+    .pdrow .pdcount{grid-area:3/1/auto/-1}
+    .pdfilt{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none} .pdfilt::-webkit-scrollbar{display:none}
+    .pdfilt .ipt-pill{flex:0 0 auto}
+    .pdhead .add{flex:1 1 100%}
+    .syncpill{bottom:auto;top:70px;right:10px;padding:5px 10px;font-size:11px}
+  }
   .ugrp{margin-bottom:14px} .ugrp-h{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:7px;display:flex;align-items:center} .ugrp-h .c{background:var(--surface-brand-soft);color:var(--biru-700);border-radius:var(--radius-pill);padding:2px 9px;font-family:var(--font-mono);font-size:11px;font-weight:600;margin-left:8px}
   .uchips{display:flex;flex-wrap:wrap;gap:6px}
   .uchip{border:1px solid var(--border-subtle);background:#fff;color:var(--ink);border-radius:var(--radius-pill);padding:7px 13px;font-weight:600;font-size:13px;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard)}
@@ -893,7 +942,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",butiran:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit="";
+let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",butiran:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt="";
 /* Which editor tab is open. This lives here, not on the person, because
    syncNow() and pullMerge() replace the whole of S with the server's copy every
    25 seconds — anything parked on a person record is overwritten by whatever
@@ -1143,14 +1192,81 @@ function viewRujukan(){
 
 function setView(v){view=v;document.querySelectorAll(".navtab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));render();}
 function getPd(id){return (S.pdList||[]).find(x=>x.id===id);}
+function maduOfPd(pd){return S.people.filter(p=>!p.arsip&&(p.pd1===pd.nama||p.pd2===pd.nama)).length;}
+
+/* A mad'u stores its PD by name, so renaming a PD on the roster would otherwise
+   orphan everyone assigned to them. Runs on blur, not per keystroke, so half-typed
+   names never reach a mad'u record or the sync payload. Archived mad'u are
+   included — they keep their history and may be un-archived later. */
+function renamePdRefs(from,to){
+  if(!from||!to||from===to)return 0;
+  let n=0;
+  S.people.forEach(p=>{let hit=false;
+    if(p.pd1===from){p.pd1=to;hit=true;}
+    if(p.pd2===from){p.pd2=to;hit=true;}
+    /* Renaming onto an existing PD merges the two, which can leave the same
+       person in both slots. Collapse that rather than list them twice. */
+    if(hit&&p.pd2===p.pd1)p.pd2="";
+    /* Every session keeps its own copy of who ran it — that copy, not pd1/pd2,
+       is what the "Kekerapan usrah / DF ikut PD" tally and the Log list read. */
+    (p.sessions||[]).forEach(s=>{let sh=false;
+      if(s.oleh===from){s.oleh=to;sh=true;}
+      if(s.oleh2===from){s.oleh2=to;sh=true;}
+      if(sh){if(s.oleh2===s.oleh)s.oleh2="";hit=true;}});
+    if(hit){stamp(p);n++;}});
+  /* The Log form may be holding this PD as its current selection. */
+  if(uForm&&uForm.pd===from)uForm.pd=to;
+  /* The legacy name array backs nothing on this page but still feeds
+     pdOptions(), so a stale entry there would resurrect the old name. */
+  if(Array.isArray(S.pds)){const i=S.pds.indexOf(from);if(i>=0){if(S.pds.includes(to))S.pds.splice(i,1);else S.pds[i]=to;}}
+  return n;
+}
 function viewPD(){
-  const list=(S.pdList||[]).slice().sort((a,b)=>(a.nama||"~").localeCompare(b.nama||"~"));
+  const all=(S.pdList||[]).slice().sort((a,b)=>(a.nama||"~").localeCompare(b.nama||"~"));
   const ipts=(S.universities||[]).slice();
-  const rows=list.map(pd=>{const n=S.people.filter(p=>!p.arsip&&(p.pd1===pd.nama||p.pd2===pd.nama)).length;
-    return `<div class="pdrow"><span class="iptblk" style="background:${iptColor(pd.ipt)}" title="${esc(pd.ipt||"Tiada IPT")}"></span><input class="pdname" data-pded="${pd.id}" data-f="nama" value="${esc(pd.nama)}" placeholder="Nama PD"><select class="pdipt" data-pded="${pd.id}" data-f="ipt"><option value="">— IPT —</option>${ipts.map(x=>`<option${pd.ipt===x?" selected":""}>${esc(x)}</option>`).join("")}</select><span class="pdcount">${n} mad'u</span><button class="pddel" data-pddel="${pd.id}" title="Buang" aria-label="Buang PD">×</button></div>`;}).join("");
-  return `<div class="bar"><h3 style="margin:0;font-size:16px">Penggerak Dakwah</h3><button class="add" id="addPdBtn" style="margin-left:auto">＋ Tambah PD</button></div>
-    <div class="hint" style="margin-bottom:10px">Senarai PD & IPT masing-masing. Nama ini muncul dalam dropdown PD di Direktori & Log.</div>
-    <div class="rows">${rows||`<div class="empty"><b>Belum ada PD</b><br>Tekan ＋ Tambah PD untuk mula.</div>`}</div>`;
+
+  /* Filter pills carry their own count, so an empty IPT is visible before it is
+     clicked. "(Tiada IPT)" only appears when there is actually one to fix. */
+  const nBlank=all.filter(pd=>!(pd.ipt||"").trim()).length;
+  const pills=[`<button class="ipt-pill${pdFilt===""?" active":""}" data-pdfilt="">Semua<span class="c">${all.length}</span></button>`]
+    .concat(ipts.map(x=>{const n=all.filter(pd=>pd.ipt===x).length;
+      return `<button class="ipt-pill${pdFilt===x?" active":""}" data-pdfilt="${esc(x)}"><span class="dot" style="background:${iptColor(x)}"></span><span class="lbl">${esc(iptLabel(x))}</span><span class="c">${n}</span></button>`;}))
+    .concat(nBlank?[`<button class="ipt-pill blank${pdFilt==="__blank__"?" active":""}" data-pdfilt="__blank__">Tiada IPT<span class="c">${nBlank}</span></button>`]:[])
+    .join("");
+
+  const list=pdFilt?all.filter(pd=>pdFilt==="__blank__"?!(pd.ipt||"").trim():pd.ipt===pdFilt):all;
+
+  /* PD-01 numbers the whole roster, not the filtered slice, so a penggerak keeps
+     the same code whichever pill is on. It is a row label, not stored data. */
+  const codeOf={};all.forEach((pd,i)=>{codeOf[pd.id]="PD-"+String(i+1).padStart(2,"0");});
+
+  const rows=list.map(pd=>{const n=maduOfPd(pd);const code=codeOf[pd.id];
+    return `<div class="pdrow">
+      <div class="pdid">
+        <span class="pdav" style="background:${iptColor(pd.ipt)}" title="${esc(pd.ipt||"Tiada IPT")}">${initials(pd.nama)}</span>
+        <span class="pdid-m"><input class="pdname" data-pded="${pd.id}" data-f="nama" data-was="${esc(pd.nama)}" value="${esc(pd.nama)}" placeholder="Nama PD" spellcheck="false" autocomplete="off" aria-label="Nama penggerak ${code}"><span class="pdcode">${code}</span></span>
+      </div>
+      <span class="pdipt-w"><i aria-hidden="true">${ICO.ipt}</i><select class="pdipt${pd.ipt?"":" none"}" data-pded="${pd.id}" data-f="ipt" aria-label="IPT tugasan ${code}"><option value="">— Pilih IPT —</option>${ipts.map(x=>`<option${pd.ipt===x?" selected":""}>${esc(x)}</option>`).join("")}</select><i class="ch" aria-hidden="true">${ICO.chev}</i></span>
+      <span class="pdcount${n?"":" zero"}"><i aria-hidden="true">${ICO.users}</i>${n} mad'u</span>
+      <button class="pddel" data-pddel="${pd.id}" title="Buang PD" aria-label="Buang penggerak ${code}">×</button>
+    </div>`;}).join("");
+
+  const empty=all.length
+    ? `<div class="empty"><b>Tiada PD di bawah tapisan ini</b><br>Tekan “Semua” untuk lihat senarai penuh.</div>`
+    : `<div class="empty"><b>Belum ada PD</b><br>Tekan ＋ Tambah PD untuk mula.</div>`;
+
+  return `<div class="pdhead">
+      <div class="pdhead-t">
+        <p class="pdhead-eb">Senarai penggerak</p>
+        <p class="pdhead-s">Setiap PD &amp; IPT masing-masing. Nama ini muncul dalam dropdown PD di Direktori &amp; Log.</p>
+      </div>
+      <button class="add" id="addPdBtn">＋ Tambah PD</button>
+    </div>
+    <div class="iptbar pdfilt" role="group" aria-label="Tapis ikut IPT">${pills}</div>
+    <div class="pdcard">
+      <div class="pdgrid-h" aria-hidden="true"><span>Penggerak</span><span>IPT tugasan</span><span>Mad'u</span><span></span></div>
+      ${rows||empty}
+    </div>`;
 }
 function eligibleMadu(){return S.people.filter(p=>!p.arsip&&(p.stage==="mutabaah"||p.stage==="muhib"));}
 function usrahGroups(){const g={};S.people.forEach(p=>{(p.sessions||[]).forEach(s=>{if(!s._usrahId)return;const k=s._usrahId;(g[k]=g[k]||{id:k,tarikh:s.tarikh,jenis:s.jenis,pd:s.oleh,butiran:s.nota,att:[]});g[k].att.push(p.nama||"(tanpa nama)");});});return Object.values(g);}
@@ -1365,6 +1481,13 @@ function TA(id,f,v,ph){return `<textarea id="${fieldId("ed",id,f)}" data-ed="${i
 function SELf(id,f,v,opts){return `<select id="${fieldId("ed",id,f)}" data-ed="${id}" data-f="${f}">`+opts.map(o=>`<option${o===v?" selected":""}>${esc(o)}</option>`).join("")+`</select>`;}
 function fld(l,inner){const match=inner.match(/\bid="([^"]+)"/);let control=inner;if(!match){if(/<(input|select|textarea)\b/.test(inner))control=inner.replace(/<(input|select|textarea)\b/,`<$1 aria-label="${esc(l)}"`);else if(inner.includes('class="toggle'))control=inner.replace('class="toggle"',`class="toggle" role="group" aria-label="${esc(l)}"`);}return `<div class="fld"><label${match?` for="${match[1]}"`:""}>${l}</label>${control}</div>`;}
 function attList(kind,id,arr){arr=arr||[];return `<div class="grp"><h3>Lampiran (fail di Drive)</h3>${arr.length?arr.map((a,i)=>`<div class="subrow rowflex"><a href="${esc(a.url)}" target="_blank" rel="noopener" style="flex:1;color:var(--blue-2);font-weight:600;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.name||"fail")}</a><button class="delmini" data-rmatt="${kind}|${id}|${i}">✕</button></div>`).join(""):`<div class="hint">Tiada lampiran lagi.</div>`}<button class="addsub" data-uplbtn="${kind}|${id}">＋ Muat naik fail</button>${SYNC.ok?"":`<div class="hint">Log masuk & sync dahulu untuk muat naik ke Drive.</div>`}</div>`;}
+/* PD 1 / PD 2 are sourced from pdOptions(), the same roster the Penggerak page
+   feeds and that Direktori, Pencalonan and Log already filter by — so all four
+   PD pickers finally agree. Note it is a superset of the Penggerak page: a name
+   still stored on a mad'u stays listed even if its PD record is gone, so an old
+   assignment is never silently dropped. */
+function selPd(id,f,v){const opts=pdOptions();const cur=(v&&!opts.includes(v))?`<option selected>${esc(v)}</option>`:"";
+  return `<select data-ed="${id}" data-f="${f}" data-list="__pd__"><option value="">— pilih —</option>${cur}${opts.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}<option value="__add__">＋ Tambah baharu…</option></select>`;}
 function selManaged(id,f,v,list){const opts=S[list]||[];const cur=(v&&!opts.includes(v))?`<option selected>${esc(v)}</option>`:"";return `<select data-ed="${id}" data-f="${f}" data-list="${list}"><option value="">— pilih —</option>${cur}${opts.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}<option value="__add__">＋ Tambah baharu…</option></select>`;}
 function stageSelect(id,v){return `<select data-ed="${id}" data-f="stage">`+STAGES.map(s=>`<option value="${s.id}"${s.id===v?" selected":""}>${s.label}</option>`).join("")+`</select>`;}
 
@@ -1580,6 +1703,8 @@ const ICO={
   note:svg('<path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-6.4"/><path d="M2 6h2M2 10h2M2 14h2M2 18h2"/><path d="M19.6 3.4a1.9 1.9 0 0 1 2.7 2.7L16 12.4l-3.5.8.8-3.5z"/>'),
   pencil:svg('<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/>'),
   plus:svg('<path d="M12 5v14M5 12h14"/>'),
+  ipt:svg('<path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/><path d="M10 21v-4h4v4"/>'),
+  chev:svg('<path d="m6 9 6 6 6-6"/>'),
   lock:svg('<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'),
   arrow:svg('<path d="M5 12h14M12 5l7 7-7 7"/>'),
   cal:svg('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'),
@@ -1647,7 +1772,7 @@ function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
     </div></div>`;}
 
 function secPD(p){const isMay=p.stage==="muayyid";return `<div class="grp"><h3>${isMay?"Peringkat & Tahun":"Penggerak Dakwah"}</h3>
-    ${isMay?"":`<div class="g2">${fld("PD 1",selManaged(p.id,"pd1",p.pd1,"pds"))}${fld("PD 2",selManaged(p.id,"pd2",p.pd2,"pds"))}</div>`}
+    ${isMay?"":`<div class="g2">${fld("PD 1",selPd(p.id,"pd1",p.pd1))}${fld("PD 2",selPd(p.id,"pd2",p.pd2))}</div>`}
     <div class="g2">${fld("Peringkat",stageSelect(p.id,p.stage))}${fld("Tahun PSPB",`<select data-ed="${p.id}" data-f="tahunPSPB"><option value=""${!p.tahunPSPB?" selected":""}>— Tahun PSPB —</option>${PSPB_YEARS.map(y=>`<option${String(p.tahunPSPB)===y?" selected":""}>${y}</option>`).join("")}</select>`)}</div>
   </div>`;}
 
@@ -1979,7 +2104,10 @@ document.addEventListener("click",e=>{
   const usx=e.target.closest("[data-usr]");if(usx){rujUsr=+usx.dataset.usr;render();return;}
   const arc=e.target.closest("[data-arch]");if(arc){const p=get(arc.dataset.arch);if(p){p.arsip=!p.arsip;stamp(p);selId=null;save();render();toast(p.arsip?"Diarkib":"Dinyah-arkib");}return;}
   const mcn=e.target.closest("[data-memcal]");if(mcn){memCalDate.setMonth(memCalDate.getMonth()+(+mcn.dataset.memcal));render();return;}
-  if(e.target.closest&&e.target.closest("#addPdBtn")){S.pdList.unshift({id:uid("pd_"),nama:"",ipt:"",_upd:Date.now()});save();render();return;}
+  const pdf=e.target.closest("[data-pdfilt]");if(pdf){pdFilt=pdf.dataset.pdfilt;render();return;}
+  /* Adding while one IPT is filtered pre-fills that IPT — otherwise the new row
+     would be created straight out of the view that created it. */
+  if(e.target.closest&&e.target.closest("#addPdBtn")){const pre=(pdFilt&&pdFilt!=="__blank__")?pdFilt:"";S.pdList.unshift({id:uid("pd_"),nama:"",ipt:pre,_upd:Date.now()});save();render();setTimeout(()=>{const f=document.querySelector('.pdname[data-pded="'+S.pdList[0].id+'"]');if(f)f.focus();},0);return;}
   const pdd=e.target.closest("[data-pddel]");if(pdd){const id=pdd.dataset.pddel;S._del[id]=Date.now();S.pdList=S.pdList.filter(x=>x.id!==id);save();render();return;}
   const ua=e.target.closest("[data-uatt]");if(ua){const id=ua.dataset.uatt;uForm.att[id]=!uForm.att[id];render();return;}
   const ulg=e.target.closest("[data-ulog]");if(ulg){uLogOpen=(uLogOpen===ulg.dataset.ulog?"":ulg.dataset.ulog);render();return;}
@@ -2039,7 +2167,11 @@ document.addEventListener("keydown",e=>{if(selId){const dw=document.querySelecto
        then the drawer itself. */
     if(noteEdit){noteEdit="";render();return;}
     closeDrawer();return;}if(e.key==="Tab"&&dw){const focusable=[...dw.querySelectorAll("button,[href],input,select,textarea,[tabindex]:not([tabindex=\"-1\"])")].filter(x=>!x.disabled);if(focusable.length){const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}}if((e.key==="Enter"||e.key===" ")){const a=document.activeElement;if(a&&a.matches&&a.matches("[data-sel]")){e.preventDefault();a.click();}}});
-document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(d.uf){uForm[d.uf]=t.value;if(t.tagName==="SELECT"||t.type==="date")render();return;}if(d.pded){const pd=getPd(d.pded);if(pd){pd[d.f]=t.value;pd._upd=Date.now();save();}return;}if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(d.uf){uForm[d.uf]=t.value;if(t.tagName==="SELECT"||t.type==="date")render();return;}if(d.pded){const pd=getPd(d.pded);if(pd){pd[d.f]=t.value;pd._upd=Date.now();save();
+    /* Name keeps its caret: repaint just the avatar. IPT re-tints the avatar and
+       moves the row between filter pills, so that one earns a full render. */
+    if(d.f==="ipt")render();
+    else{const av=t.closest(".pdrow").querySelector(".pdav");if(av)av.textContent=initials(t.value);}}return;}if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
   if(d.ed&&d.f){const p=get(d.ed);if(p){let v=t.value;if(d.f==="telefon"){v=fmtPhone(v);t.value=v;}else if(d.f==="poskod"){v=v.replace(/\D/g,"").slice(0,5);t.value=v;}if(d.f.indexOf("rmk_")===0){p.remarks=p.remarks||{};p.remarks[d.f.slice(4)]=v;}else p[d.f]=v;save();}return;}
   if(d.ses&&d.f){const[pid,sid]=d.ses.split("|");const p=get(pid);const s=p&&p.sessions.find(x=>x.id===sid);if(s){s[d.f]=t.value;save();}return;}
   if(d.med&&d.f){const m=getM(d.med);if(m){m[d.f]=t.value;save();}return;}
@@ -2049,7 +2181,24 @@ document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};if(d.uf){
   if(d.ced&&d.f){const c=getC(d.ced);if(c){c[d.f]=t.value;save();}return;}
 });
 document.addEventListener("change",e=>{const t=e.target,d=t.dataset||{};
+  /* Fires on blur, once the PD's new name is settled. data-was carries the name
+     as it stood when the row was drawn, since the input handler has already
+     overwritten pd.nama keystroke by keystroke. */
+  if(d.pded&&d.f==="nama"){const was=d.was||"",now=t.value;
+    if(was===now)return;
+    const n=renamePdRefs(was,now);save();
+    /* Deferred one tick so focus has landed on whatever the user tabbed to:
+       render() re-sorts and replaces the row, so focus is then handed back. */
+    setTimeout(()=>{const ad=(document.activeElement||{}).dataset||{};render();
+      if(ad.pded&&ad.f){const nx=document.querySelector('[data-pded="'+ad.pded+'"][data-f="'+ad.f+'"]');if(nx)nx.focus();}},0);
+    if(n)toast(n+" mad'u dikemas kini");
+    return;}
   if(d.ed&&d.f&&t.tagName==="SELECT"){const p=get(d.ed);if(!p)return;
+    /* A PD added from here becomes a record on the Penggerak page, not a loose
+       name in the legacy S.pds array, so the roster stays the one place PDs live. */
+    if(t.value==="__add__"&&d.list==="__pd__"){const name=titleCase((prompt("Tambah PD baharu:")||"").trim());
+      if(name){if(!(S.pdList||[]).some(x=>(x.nama||"").toLowerCase()===name.toLowerCase()))S.pdList.push({id:uid("pd_"),nama:name,ipt:"",_upd:Date.now()});p[d.f]=name;}
+      save();render();return;}
     if(t.value==="__add__"&&d.list){const lbl={universities:"IPT",pds:"PD",kolej:"kolej"}[d.list]||"item";const name=titleCase((prompt("Tambah "+lbl+" baharu:")||"").trim());if(name){if(!S[d.list].includes(name))S[d.list].push(name);S[d.list].sort();p[d.f]=name;}save();render();return;}
     p[d.f]=t.value;save();render();return;}
   if(d.ed&&d.f&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA")){const p=get(d.ed);if(p){let v=normVal(d.f,t.value);t.value=v;if(d.f.indexOf("rmk_")===0){p.remarks=p.remarks||{};p.remarks[d.f.slice(4)]=v;}else p[d.f]=v;save();
