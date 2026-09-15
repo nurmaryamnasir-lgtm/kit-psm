@@ -928,6 +928,9 @@
       <hr>
       <button data-act="importxl">⭱&nbsp; Muat senarai nama (Excel/CSV)</button>
       <button data-act="csv">⭳&nbsp; Export Direktori (CSV)</button>
+      <hr>
+      <button data-act="json">⭳&nbsp; Backup penuh (JSON)</button>
+      <button data-act="restore">⭱&nbsp; Pulih dari backup (JSON)</button>
     </div></div>
   <input type="file" id="fileImport" accept="application/json">
   <input type="file" id="fileXl" accept=".xlsx,.xls,.csv">
@@ -1068,7 +1071,7 @@ let sT,pT;function save(){stampActive();S._localSavedAt=new Date().toISOString()
 const SENSITIVE=["email","telefon","tarikhLahir","alamatCaw","alamatKg1","alamatKg2","poskod","kolej","ic"];
 function cachePayload(){const o={};for(const k in S)o[k]=S[k];if(S.people)o.people=S.people.map(p=>{const c={};for(const k in p)if(SENSITIVE.indexOf(k)<0)c[k]=p[k];return c;});o._redacted=true;o._cacheAt=Date.now();return o;}
 function persistLocal(){try{store.set(KEY,JSON.stringify(cachePayload()));}catch(e){}}
-window.addEventListener("beforeunload",()=>{try{localStorage.setItem(KEY,JSON.stringify(cachePayload()));}catch(e){}try{if(dirty&&SYNC.ok&&cfg.url&&SYNC.code&&navigator.sendBeacon){navigator.sendBeacon(cfg.url,new Blob([JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})],{type:"text/plain;charset=utf-8"}));}}catch(e){}});
+window.addEventListener("beforeunload",()=>{try{localStorage.setItem(KEY,JSON.stringify(cachePayload()));}catch(e){}try{if(dirty&&SYNC.ok&&SYNC.pulled&&cfg.url&&SYNC.code&&navigator.sendBeacon){navigator.sendBeacon(cfg.url,new Blob([JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})],{type:"text/plain;charset=utf-8"}));}}catch(e){}});
 
 const $=s=>document.querySelector(s);
 function el(t,c){const e=document.createElement(t);if(c)e.className=c;return e;}
@@ -2647,9 +2650,14 @@ function renderListOnly(){
 $("#menuBtn").addEventListener("click",e=>{e.stopPropagation();const pop=$("#menuPop"),open=pop.classList.toggle("show");$("#menuBtn").setAttribute("aria-expanded",String(open));});
 $("#menuPop").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;$("#menuPop").classList.remove("show");
   if(a==="csv")exportCSV();if(a==="importxl")$("#fileXl").click();
+  if(a==="json")exportJSON();if(a==="restore")$("#fileImport").click();
   if(a==="pull")pullNow();
   if(a==="logout")logout();});
-$("#fileImport").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);S=Object.assign({people:[],meetings:[],wasilah:[],claims:[]},d);normalizeS();save();render();toast("Data dimuat");}catch(err){toast("Fail tidak sah");}};r.readAsText(f);e.target.value="";});
+/* Restoring replaces the shared document for the whole team, not just this
+   device — save() pushes it to the backend on the usual debounce. Ask first. */
+$("#fileImport").addEventListener("change",e=>{const f=e.target.files[0];if(!f){e.target.value="";return;}
+  if(!confirm(`Pulih dari "${f.name}"?\n\nSemua data semasa akan diganti — untuk semua penggerak, bukan peranti ini sahaja.`)){e.target.value="";return;}
+  const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);S=Object.assign({people:[],meetings:[],wasilah:[],claims:[]},d);normalizeS();save();render();toast("Data dipulihkan");}catch(err){toast("Fail tidak sah");}};r.readAsText(f);e.target.value="";});
 $("#fileXl").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;importNames(f);e.target.value="";});
 $("#fileSant").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;importSantunan(f);e.target.value="";});
 
@@ -2760,7 +2768,12 @@ function parseCSV(txt){txt=txt.replace(/^\ufeff/,"");const lines=txt.split(/\r?\
 /* ---- export ---- */
 function dl(name,text,type){const b=new Blob([text],{type});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
 function cc(v){v=(v==null?"":String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
-function exportJSON(){dl(`KitPD-${today()}.json`,JSON.stringify(S,null,2),"application/json");toast("JSON dimuat turun");}
+/* A full backup, contact details included — so it is only offered once this tab
+   has the server's document. The local cache is redacted by design (SENSITIVE),
+   and a backup taken from it would quietly omit email, phone and address, then
+   wipe them on restore. Better no file than a file that looks complete. */
+function exportJSON(){if(!SYNC.pulled){toast("Log masuk dahulu — backup luar talian tidak lengkap");return;}
+  dl(`KitPD-${today()}.json`,JSON.stringify(S,null,2),"application/json");toast("Backup dimuat turun");}
 function exportCSV(){const head=["Nama","Peringkat","Tahun PSPB","Status ahli","Tarikh lahir","Email","Status","IPT","Kolej","Bidang","Tahap","Tahun masuk IPT","Telefon","PD1","PD2","Poskod","Negeri","Tajmik","Sesi","Minat usrah","Minat AJK","BPMy %","Keadaan"];
   const rows=S.people.map(p=>[p.nama,stageLabel(p.stage),p.tahunPSPB,p.statusAhli,p.tarikhLahir,p.email,p.kerja,p.universiti,p.kolej,p.bidang,p.tahap,p.tahunMasuk,p.telefon,p.pd1,p.pd2,p.poskod,p.negeri,p.tajmik,sesCount(p),p.minatUsrah,p.minatAJK,p.stage==="muhib"?Math.round(bpmy(p).pct*100):"",statusOf(p).t].map(cc).join(","));
   dl(`KitPD-Direktori-${today()}.csv`,"\ufeff"+[head.join(","),...rows].join("\n"),"text/csv");toast("CSV dimuat turun");}
@@ -2822,7 +2835,15 @@ const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbwrMS4lqkxOyeRjbk
 let cfg={url:APPS_SCRIPT_URL,name:""};const CFGKEY="kitpd_cfg";
 function loadCfg(){try{const v=localStorage.getItem(CFGKEY);if(v){const o=JSON.parse(v);if(o.url)cfg.url=o.url;if(o.name)cfg.name=o.name;}}catch(e){} if(!cfg.url)cfg.url=APPS_SCRIPT_URL;}
 function saveCfg(){try{localStorage.setItem(CFGKEY,JSON.stringify({url:cfg.url,name:cfg.name}));}catch(e){}}
-let SYNC={ok:false,code:"",busy:false}; let dirty=false; let pollT=null; let lastSyncAt=0;
+/* `pulled` is the gate on every write to the backend. The shared document is
+   last-write-wins, and the copy this tab starts with is the redacted local cache
+   — which is empty on a browser that has never opened the app, on a fresh origin
+   after a deploy, and after the seven-day cache expiry. Pushing that empty copy
+   overwrites the whole team's data. So: nothing is ever uploaded until this tab
+   has adopted the server's document at least once. */
+let SYNC={ok:false,code:"",busy:false,pulled:false}; let dirty=false; let pollT=null; let lastSyncAt=0;
+/* Adopt the server's document as the truth for this tab. */
+function adoptRemote(raw,savedAt){try{S=JSON.parse(raw);}catch(e){return false;}normalizeS();S._localSavedAt=savedAt||"";SYNC.pulled=true;persistLocal();return true;}
 function setSyncUI(saving){const el=document.getElementById("syncPill");if(!el)return;if(!SYNC.ok){el.style.display="none";return;}el.style.display="block";if(saving){el.textContent="Menyegerak…";el.classList.add("on");}else{el.classList.remove("on");el.textContent=lastSyncAt?("✓ Segerak "+new Date(lastSyncAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})):"";}}
 function stamp(o){if(o)o._upd=Date.now();}
 function recFromDataset(d){d=d||{};
@@ -2852,12 +2873,12 @@ function isEditing(){const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAR
 async function apiGet(code){const u=cfg.url+(cfg.url.indexOf("?")>-1?"&":"?")+"action=get&code="+encodeURIComponent(code);const r=await fetch(u);return await r.json();}
 async function apiSave(){const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})});return await r.json();}
 function sig(x){try{const o=Object.assign({},x);delete o._localSavedAt;return JSON.stringify(o);}catch(e){return Math.random()+"";}}
-async function syncNow(){if(!SYNC.ok||!cfg.url||!SYNC.code||SYNC.busy)return;SYNC.busy=true;setSyncUI(true);try{const r=await apiSave();if(r&&r.ok){dirty=false;lastSyncAt=Date.now();if(r.data&&!isEditing()){try{const before=sig(S);S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();if(sig(S)!==before)render();}catch(e){}}}}catch(e){}SYNC.busy=false;setSyncUI(false);}
+async function syncNow(){if(!SYNC.ok||!SYNC.pulled||!cfg.url||!SYNC.code||SYNC.busy)return;SYNC.busy=true;setSyncUI(true);try{const r=await apiSave();if(r&&r.ok){dirty=false;lastSyncAt=Date.now();if(r.data&&!isEditing()){const before=sig(S);if(adoptRemote(r.data,r.savedAt)&&sig(S)!==before)render();}}}catch(e){}SYNC.busy=false;setSyncUI(false);}
 function pushSync(){syncNow();}
-async function pullMerge(){if(!SYNC.ok||dirty||SYNC.busy||isEditing())return;setSyncUI(true);try{const r=await apiGet(SYNC.code);if(r&&r.ok&&r.data){const before=sig(S);S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();lastSyncAt=Date.now();if(sig(S)!==before)render();}}catch(e){}setSyncUI(false);}
+async function pullMerge(){if(!SYNC.ok||dirty||SYNC.busy||isEditing())return;setSyncUI(true);try{const r=await apiGet(SYNC.code);if(r&&r.ok&&r.data){const before=sig(S);if(adoptRemote(r.data,r.savedAt)){lastSyncAt=Date.now();if(sig(S)!==before)render();}}}catch(e){}setSyncUI(false);}
 function startPolling(){if(pollT)clearInterval(pollT);pollT=setInterval(pullMerge,25000);}
-async function pullNow(){if(!SYNC.ok){toast("Log masuk dahulu");return;}try{const r=await apiGet(SYNC.code);if(r&&r.ok){if(r.data){S=JSON.parse(r.data);normalizeS();S._localSavedAt=(r.savedAt||"");persistLocal();}render();toast("Data terkini ditarik");}else toast("Gagal menarik data");}catch(e){toast("Tidak dapat menyambung");}}
-function logout(){SYNC={ok:false,code:"",busy:false};dirty=false;if(pollT)clearInterval(pollT);try{localStorage.removeItem(KEY);}catch(e){}S={};normalizeS();render();gateShow();toast("Telah log keluar");}
+async function pullNow(){if(!SYNC.ok){toast("Log masuk dahulu");return;}try{const r=await apiGet(SYNC.code);if(r&&r.ok){if(r.data)adoptRemote(r.data,r.savedAt);render();toast("Data terkini ditarik");}else toast("Gagal menarik data");}catch(e){toast("Tidak dapat menyambung");}}
+function logout(){SYNC={ok:false,code:"",busy:false,pulled:false};dirty=false;if(pollT)clearInterval(pollT);try{localStorage.removeItem(KEY);}catch(e){}S={};normalizeS();render();gateShow();toast("Telah log keluar");}
 function gateShow(){const g=$("#gate");g.style.display="flex";const u=$("#gUrl");if(u)u.value=cfg.url||"";$("#gName").value=cfg.name||"";$("#gErr").textContent="";setTimeout(()=>$("#gName")?.focus(),0);}
 function gateHide(){$("#gate").style.display="none";}
 function bindGate(){const s=$("#gSave");if(s)s.addEventListener("click",()=>{cfg.url=$("#gUrl").value.trim()||APPS_SCRIPT_URL;saveCfg();toast("URL disimpan");});const o=$("#gOffline");if(o)o.addEventListener("click",()=>{gateHide();toast("Mod luar talian");});$("#gLogin").addEventListener("click",doLogin);
@@ -2874,7 +2895,14 @@ async function doLogin(){const name=$("#gName").value.trim(),code=$("#gCode").va
   if(!name){$("#gErr").textContent="Masukkan nama anda.";return;}
   if(!code){$("#gErr").textContent="Masukkan kod akses.";return;}
   const btn=$("#gLogin");btn.textContent="Menyambung…";
-  try{const res=await apiGet(code);if(res&&res.ok){SYNC.ok=true;SYNC.code=code;await syncNow();startPolling();gateHide();render();toast("Log masuk berjaya");}
+  /* Sign-in READS the shared document; it must never write. The old order here
+     validated the code, then called syncNow(), whose first act is to upload the
+     local copy — so opening the app on a device with a cold cache and signing in
+     published an empty document over everyone's data. The response to this very
+     request already carries the server's copy, so adopt it and push nothing. */
+  try{const res=await apiGet(code);if(res&&res.ok){SYNC.ok=true;SYNC.code=code;dirty=false;
+      if(res.data)adoptRemote(res.data,res.savedAt);else SYNC.pulled=true; /* genuinely empty record: this tab may seed it */
+      lastSyncAt=Date.now();startPolling();gateHide();render();setSyncUI(false);toast("Log masuk berjaya");}
     else{$("#gErr").textContent=(res&&res.error)?("Gagal: "+res.error):"Kod salah atau URL tidak sah.";}}
   catch(e){$("#gErr").textContent="Tidak dapat menyambung. Semak internet.";}
   btn.textContent="Log masuk";}
