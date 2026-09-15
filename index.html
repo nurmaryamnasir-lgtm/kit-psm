@@ -1206,15 +1206,15 @@ function viewRujukan(){
   const MUW="https://drive.google.com/drive/folders/1oK3s-Bx27PlpKL5WWEN21fgZnO8SR_1N";
   const KD="https://drive.google.com/drive/folders/1OUXFp4Y7JaYMYk-EZIYWuA2dNKZ9DJWV";
   const mainNav=`<div class="rjtabs"><button class="rjtab${rujMain==="krit"?" on":""}" data-rujmain="krit">Kriteria</button><button class="rjtab${rujMain==="sil"?" on":""}" data-rujmain="sil">Silibus Usrah</button><button class="rjtab${rujMain==="borang"?" on":""}" data-rujmain="borang">Borang</button></div>`;
-  /* The six things every usrah session needs. Titles only: no descriptions were
+  /* The six elemen every usrah session needs. Titles only: no descriptions were
      given, and inventing them here would read as doctrine. */
-  const STEPS=["Opening / ice breaking","Aktiviti menarik","Penyampaian ikut tajuk",
-    "Contoh / penceritaan / perumpamaan yang sesuai","Interaksi 2 hala","Penutup / rumusan"];
+  const STEPS=["Ice breaking","Aktiviti menarik","Penyampaian berkaitan",
+    "Perumpamaan / analogi / bagi contoh isu semasa","Interaksi (tanya pendapat yang lain)","Penutup (kesimpulan)"];
   const ADAB=["Datang awal & bersedia","Jaga kerahsiaan ahli","Ajak, bukan arah","Doakan ahli usrah"];
   const hero=`<section class="rjhero">
     <p class="rjhero-eb">Panduan penggerak</p>
     <h2 class="rjhero-h">Kendalikan Perjumpaan &amp; Usrah</h2>
-    <p class="rjhero-p">Setiap perjumpaan ialah ruang tarbiah, bukan mesyuarat. Enam perkara ini perlu ada dalam <b>setiap</b> sesi usrah supaya ia mesra, teratur dan memberi kesan &mdash; ajak, bukan arah.</p>
+    <p class="rjhero-p">Setiap perjumpaan ialah ruang tarbiah, bukan mesyuarat. Enam elemen ini perlu ada dalam <b>setiap</b> sesi usrah supaya ia mesra, teratur dan memberi kesan &mdash; ajak, bukan arah.</p>
     <div class="rjhero-g">${STEPS.map((s,i)=>`<div class="rjstep${s?"":" todo"}"><span class="rjstep-n">${i+1}</span><span class="rjstep-t">${s?esc(s):"Langkah "+(i+1)}</span>${s?"":`<span class="rjstep-d">(akan diisi kemudian)</span>`}</div>`).join("")}</div>
     <div class="rjhero-f"><span class="rjhero-fl">Adab:</span>${ADAB.map(a=>`<span class="rjadab"><i aria-hidden="true">${ICO.tick}</i>${esc(a)}</span>`).join("")}</div>
   </section>`;
