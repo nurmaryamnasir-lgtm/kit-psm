@@ -275,9 +275,9 @@
   
   
    .datechip.df{background:#e3f5f1;color:#1f8f80} .datechip.pg{background:#fff3c9;color:var(--amber)}
-  .memcal{margin-bottom:12px} .memday.us{background:var(--blue-s)} .memday.df{background:#e3f5f1} .memday.pg{background:#fff3c9}
+  .memcal{margin-bottom:12px} .memday.us{background:var(--blue-s)} .memday.df{background:#e3f5f1} .memday.pg{background:#fff3c9} .memday.tg{background:#efe8f8}
   .memtag{font-family:var(--font-mono);font-size:8.5px;font-weight:600;margin-top:3px;line-height:1.1}
-  .memday.us .memtag{color:var(--blueb)} .memday.df .memtag{color:#1f8f80} .memday.pg .memtag{color:var(--amber-600)}
+  .memday.us .memtag{color:var(--blueb)} .memday.df .memtag{color:#1f8f80} .memday.pg .memtag{color:var(--amber-600)} .memday.tg .memtag{color:var(--purple)}
   .memday.abs{background:#fdecea;border-color:#f5c6c2} .memday.abs .memtag{color:var(--red)}
   .memleg{display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)} .memleg span{display:flex;align-items:center;gap:5px}
   .memleg .lg{width:11px;height:11px;border-radius:3px;display:inline-block} .memleg .lg.us{background:var(--blue-s)} .memleg .lg.abs{background:#fdecea;border:1px solid #f5c6c2}
@@ -789,6 +789,7 @@
   .j-usrah{background:var(--surface-brand-soft);color:var(--biru-700)}
   .j-df{background:var(--cyan-100);color:var(--cyan-700)}
   .j-program{background:var(--surface-accent-soft);color:var(--emas-600)}
+  .j-tugasan{background:#efe8f8;color:var(--purple)}
   .j-lain{background:var(--surface-sunken);color:var(--kabus-600)}
   .caltgl{display:flex;align-items:center;gap:9px;width:100%;margin-top:11px;padding:10px 12px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:#fff;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard)}
   .caltgl:hover{background:var(--surface-sunken);color:var(--ink)}
@@ -1012,7 +1013,7 @@ const WEEK_LABEL="Minggu 09 · Sesi 2026/27";
 /* --------------------------------------------------------------------------- */
 
 const STAGES=[{id:"mutabaah",label:"Mutabaah"},{id:"muhib",label:"Muhib"},{id:"muayyid",label:"Muayyid"}];
-const SES_JENIS=["Usrah","DF","Program"];
+const SES_JENIS=["Usrah","DF","Program","Tugasan"];
 const NEGERI=["Johor","Kedah","Kelantan","Melaka","Negeri Sembilan","Pahang","Perak","Perlis","Pulau Pinang","Sabah","Sarawak","Selangor","Terengganu","Kuala Lumpur","Labuan","Putrajaya"];
 const TAHAP_PENGAJIAN=["Diploma","Sarjana Muda"];
 const JANTINA=["Lelaki","Perempuan"]; const KERJA=["Belajar","Bekerja"]; const PSPB_YEARS=["2023","2024","2025","2026","2027","2028"];
@@ -1047,7 +1048,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",butiran:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=""; let santFilt=""; let santSel=null; let santQ="";
+let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=""; let santFilt=""; let santSel=null; let santQ="";
 /* Which editor tab is open. This lives here, not on the person, because
    syncNow() and pullMerge() replace the whole of S with the server's copy every
    25 seconds — anything parked on a person record is overwritten by whatever
@@ -1461,7 +1462,8 @@ function applyPdName(from,to){
      whole intake list. */
   (S.santunan||[]).forEach(x=>{if(x.pd===from){x.pd=to;stamp(x);n++;}});
   /* The Log form may be holding this PD as its current selection. */
-  if(uForm&&uForm.pd===from)uForm.pd=to;
+  if(uForm){if(uForm.pd===from)uForm.pd=to;if(uForm.pd2===from)uForm.pd2=to;
+    if(uForm.pd2&&uForm.pd2===uForm.pd)uForm.pd2="";}
   /* The legacy name array backs nothing on this page but still feeds
      pdOptions(), so a stale entry there would resurrect the old name. */
   if(Array.isArray(S.pds)){const i=S.pds.indexOf(from);if(i>=0){if(S.pds.includes(to))S.pds.splice(i,1);else S.pds[i]=to;}}
@@ -1536,18 +1538,24 @@ function viewPD(){
     </div>`;
 }
 function eligibleMadu(){return S.people.filter(p=>!p.arsip&&(p.stage==="mutabaah"||p.stage==="muhib"));}
-function usrahGroups(){const g={};S.people.forEach(p=>{(p.sessions||[]).forEach(s=>{if(!s._usrahId)return;const k=s._usrahId;(g[k]=g[k]||{id:k,tarikh:s.tarikh,jenis:s.jenis,pd:s.oleh,butiran:s.nota,att:[]});g[k].att.push({id:p.id,nama:p.nama||"(tanpa nama)"});});});return Object.values(g);}
+function usrahGroups(){const g={};S.people.forEach(p=>{(p.sessions||[]).forEach(s=>{if(!s._usrahId)return;const k=s._usrahId;(g[k]=g[k]||{id:k,tarikh:s.tarikh,jenis:s.jenis,pd:s.oleh,pd2:s.oleh2||"",butiran:s.nota,catatan:s.catatan||"",att:[]});g[k].att.push({id:p.id,nama:p.nama||"(tanpa nama)"});});});return Object.values(g);}
+/* A session may be run by two PDs. Both names read the same way everywhere:
+   joined for display, and either one matching makes a mad'u part of the pool. */
+function grPds(gr){return[gr.pd,gr.pd2].filter(Boolean);}
+function pdLabel(gr){const n=grPds(gr);return n.length?n.join(" & "):"(Tiada PD)";}
+function underPds(m,names){return !names.length||names.some(n=>m.pd1===n||m.pd2===n);}
 
 /* A logged usrah is not one record: every attendee holds their own session row
    tagged with the shared _usrahId. Editing the group means walking all of them,
    which is what these three do. */
 function usrahSessions(gid){const out=[];S.people.forEach(p=>(p.sessions||[]).forEach(s=>{if(s._usrahId===gid)out.push({p:p,s:s});}));return out;}
-const USRAH_FIELD={tarikh:"tarikh",jenis:"jenis",pd:"oleh",butiran:"nota"};
-const USRAH_LABEL={tarikh:"tarikh",jenis:"jenis",pd:"PD",butiran:"butiran"};
+const USRAH_FIELD={tarikh:"tarikh",jenis:"jenis",pd:"oleh",pd2:"oleh2",butiran:"nota",catatan:"catatan"};
+const USRAH_LABEL={tarikh:"tarikh",jenis:"jenis",pd:"PD 1",pd2:"PD 2",butiran:"butiran",catatan:"catatan"};
+/* The free-text fields are logged on blur by the change handler, not per keystroke. */
+const USRAH_TYPED={butiran:1,catatan:1};
 function editUsrah(gid,f,v){const k=USRAH_FIELD[f];if(!k)return;
   usrahSessions(gid).forEach(r=>{r.s[k]=v;stamp(r.p);});
-  /* Butiran is logged on blur by the change handler, not per keystroke. */
-  if(f!=="butiran")logAct("Kemas kini "+USRAH_LABEL[f]+" usrah kepada",v||"(kosong)");
+  if(!USRAH_TYPED[f])logAct("Kemas kini "+USRAH_LABEL[f]+" usrah kepada",v||"(kosong)");
   save();}
 /* Marking someone present writes them a session row copied from the group;
    unmarking removes theirs. The last attendee cannot be unmarked — that would
@@ -1558,13 +1566,14 @@ function toggleUsrahAtt(gid,pid){
     mine.p.sessions=mine.p.sessions.filter(x=>x._usrahId!==gid);stamp(mine.p);logAct("Tarik kehadiran usrah:",mine.p.nama);}
   else{const p=get(pid);if(!p)return;const t=rows[0]?rows[0].s:null;
     p.sessions=p.sessions||[];
-    p.sessions.push({id:uid("s_"),_usrahId:gid,jenis:t?t.jenis:"Usrah",tarikh:t?t.tarikh:today(),oleh:t?t.oleh:"",oleh2:"",nota:t?t.nota:""});stamp(p);logAct("Tanda hadir usrah:",p.nama);}
+    p.sessions.push({id:uid("s_"),_usrahId:gid,jenis:t?t.jenis:"Usrah",tarikh:t?t.tarikh:today(),oleh:t?t.oleh:"",oleh2:t?(t.oleh2||""):"",nota:t?t.nota:"",catatan:t?(t.catatan||""):""});stamp(p);logAct("Tanda hadir usrah:",p.nama);}
   save();}
 
 /* The expanded row is the create form again, bound to the stored record. */
 function usrahEditor(gr,pds,madu){
   const on=new Set(gr.att.map(a=>a.id));
-  const pool=madu.filter(m=>!gr.pd||m.pd1===gr.pd||m.pd2===gr.pd);
+  const names=grPds(gr);
+  const pool=madu.filter(m=>underPds(m,names));
   const seen=new Set(pool.map(m=>m.id));
   /* Anyone already in the record stays listed even once they are out of the
      eligible pool — promoted, reassigned or archived. Their attendance happened. */
@@ -1572,8 +1581,9 @@ function usrahEditor(gr,pds,madu){
     `<button class="uchip${on.has(m.id)?" on":""}" data-ugatt="${esc(gr.id)}|${esc(m.id)}" aria-pressed="${on.has(m.id)}">${esc(m.nama||"(nama)")}</button>`).join("");
   return `<div class="urow-b">
     <div class="g2">${fld("Tarikh",`<input data-uged="${esc(gr.id)}" data-f="tarikh" type="date" value="${esc(gr.tarikh||"")}">`)}${fld("Jenis",`<select data-uged="${esc(gr.id)}" data-f="jenis">${SES_JENIS.map(x=>`<option${gr.jenis===x?" selected":""}>${x}</option>`).join("")}</select>`)}</div>
-    ${fld("Penggerak Dakwah (PD)",`<select data-uged="${esc(gr.id)}" data-f="pd"><option value="">— Pilih PD —</option>${pdOptsFor(gr.pd).map(x=>`<option${gr.pd===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}
+    <div class="g2">${fld("Penggerak Dakwah (PD 1)",`<select data-uged="${esc(gr.id)}" data-f="pd"><option value="">— Pilih PD —</option>${pdOptsFor(gr.pd).filter(x=>x===gr.pd||x!==gr.pd2).map(x=>`<option${gr.pd===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}${fld("PD 2 (pilihan)",`<select data-uged="${esc(gr.id)}" data-f="pd2"><option value="">— Tiada —</option>${pdOptsFor(gr.pd2).filter(x=>x===gr.pd2||x!==gr.pd).map(x=>`<option${gr.pd2===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}</div>
     ${fld("Butiran (pilihan)",`<input data-uged="${esc(gr.id)}" data-f="butiran" value="${esc(gr.butiran||"")}" placeholder="Tajuk / tema usrah">`)}
+    ${fld("Catatan (pilihan)",`<textarea data-uged="${esc(gr.id)}" data-f="catatan" rows="3" placeholder="Apa yang berlaku, perkara dibincang, tindakan susulan…">${esc(gr.catatan||"")}</textarea>`)}
     <div class="hint" style="margin:8px 0 6px">Tanda mad'u yang <b>hadir</b> &middot; ${gr.att.length} hadir</div>
     ${chips?`<div class="uchips">${chips}</div>`:`<div class="hint">Tiada mad'u di bawah PD ini.</div>`}
     <button class="del" data-udel="${esc(gr.id)}" style="margin-top:12px;width:100%">Padam usrah ini</button>
@@ -1582,22 +1592,25 @@ function viewUsrah(){
   const MM=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
   const pds=pdOptions();const madu=eligibleMadu();
   let checklist;
-  if(uForm.pd){const mem=madu.filter(m=>m.pd1===uForm.pd||m.pd2===uForm.pd);
+  /* Either PD opens the checklist, and a two-PD session pools both their mad'u. */
+  const fNames=grPds({pd:uForm.pd,pd2:uForm.pd2});
+  if(fNames.length){const mem=madu.filter(m=>underPds(m,fNames));
     checklist=mem.length?`<div class="uchips">${mem.map(m=>`<button class="uchip${uForm.att[m.id]?" on":""}" data-uatt="${m.id}">${esc(m.nama||"(nama)")}</button>`).join("")}</div>`:`<div class="hint">Tiada mad'u di bawah PD ini.</div>`;}
   else checklist=`<div class="hint">Pilih Penggerak Dakwah dahulu untuk papar senarai mad'u.</div>`;
   const nSel=Object.values(uForm.att).filter(Boolean).length;
   const form=`<div class="grp"><h3>Log usrah / DF</h3>
     <div class="g2">${fld("Tarikh",`<input data-uf="tarikh" type="date" value="${esc(uForm.tarikh)}">`)}${fld("Jenis",`<select data-uf="jenis">${SES_JENIS.map(x=>`<option${uForm.jenis===x?" selected":""}>${x}</option>`).join("")}</select>`)}</div>
-    ${fld("Penggerak Dakwah (PD)",`<select data-uf="pd"><option value="">— Pilih PD —</option>${pds.map(x=>`<option${uForm.pd===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}
-    ${uForm.pd?`<div class="hint" style="margin:8px 0 6px">Tanda mad'u yang <b>hadir</b> (setiap tanda = 1 sesi automatik).</div>`:""}
+    <div class="g2">${fld("Penggerak Dakwah (PD 1)",`<select data-uf="pd"><option value="">— Pilih PD —</option>${pds.filter(x=>x===uForm.pd||x!==uForm.pd2).map(x=>`<option${uForm.pd===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}${fld("PD 2 (pilihan)",`<select data-uf="pd2"><option value="">— Tiada —</option>${pds.filter(x=>x===uForm.pd2||x!==uForm.pd).map(x=>`<option${uForm.pd2===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}</div>
+    ${fNames.length?`<div class="hint" style="margin:8px 0 6px">Tanda mad'u yang <b>hadir</b> (setiap tanda = 1 sesi automatik).</div>`:""}
     ${checklist}
     ${fld("Butiran (pilihan)",`<input data-uf="butiran" value="${esc(uForm.butiran)}" placeholder="Tajuk / tema usrah">`)}
+    ${fld("Catatan (pilihan)",`<textarea data-uf="catatan" rows="3" placeholder="Apa yang berlaku, perkara dibincang, tindakan susulan…">${esc(uForm.catatan)}</textarea>`)}
     <button class="add" id="saveUsrahBtn" style="width:100%;margin-top:12px"${nSel?"":" disabled"}>Simpan usrah · ${nSel} hadir</button>
   </div>`;
   const groups=usrahGroups().sort((a,b)=>(b.tarikh||"").localeCompare(a.tarikh||""));
   let past="";
   if(groups.length){const byM={};groups.forEach(gr=>{const mk=(gr.tarikh||"").slice(0,7)||"zzzz";(byM[mk]=byM[mk]||[]).push(gr);});
-    past=Object.keys(byM).sort((a,b)=>b.localeCompare(a)).map(mk=>{const lbl=mk==="zzzz"?"Tiada tarikh":(MM[(+mk.slice(5,7))-1]+" "+mk.slice(0,4));return `<div class="grouphdr">${lbl}<span class="gc">${byM[mk].length}</span></div>`+byM[mk].map(gr=>`<div class="urow"><div class="urow-h" data-ulog="${gr.id}"><div class="wdate pa"><div class="wdd">${(gr.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(gr.tarikh)}</div></div><div class="rname">${esc(gr.jenis)}${gr.butiran?" · "+esc(gr.butiran):""}<div class="hsub">${esc(gr.pd||"(Tiada PD)")} · ${gr.att.length} hadir</div></div><span class="chev">${uLogOpen===gr.id?"▴":"▾"}</span></div>${uLogOpen===gr.id?usrahEditor(gr,pds,madu):""}</div>`).join("");}).join("");
+    past=Object.keys(byM).sort((a,b)=>b.localeCompare(a)).map(mk=>{const lbl=mk==="zzzz"?"Tiada tarikh":(MM[(+mk.slice(5,7))-1]+" "+mk.slice(0,4));return `<div class="grouphdr">${lbl}<span class="gc">${byM[mk].length}</span></div>`+byM[mk].map(gr=>`<div class="urow"><div class="urow-h" data-ulog="${gr.id}"><div class="wdate pa"><div class="wdd">${(gr.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(gr.tarikh)}</div></div><div class="rname">${esc(gr.jenis)}${gr.butiran?" · "+esc(gr.butiran):""}<div class="hsub">${esc(pdLabel(gr))} · ${gr.att.length} hadir</div></div><span class="chev">${uLogOpen===gr.id?"▴":"▾"}</span></div>${uLogOpen===gr.id?usrahEditor(gr,pds,madu):""}</div>`).join("");}).join("");
   }else past=`<div class="empty"><b>Belum ada usrah direkod</b><br>Log usrah pertama di atas.</div>`;
   return form+`<div class="grp"><h3>Usrah direkod</h3>${past}</div>`;
 }
@@ -1737,7 +1750,7 @@ function viewPapan(){
   const future=dated.filter(g=>g.tarikh>=td).sort((a,b)=>a.tarikh.localeCompare(b.tarikh));
   const ahead=future.length>0;
   const shown=(ahead?future:dated.slice().sort((a,b)=>b.tarikh.localeCompare(a.tarikh))).slice(0,5);
-  const sesRows=shown.map(g=>`<div class="pp-row"><span class="pp-date"><span class="pp-dd">${esc((g.tarikh||"").slice(8,10))}</span><span class="pp-dm">${esc(monShort(g.tarikh))}</span></span><span class="pp-rm"><span class="pp-rn">${esc(g.jenis||"Sesi")}${g.butiran?" · "+esc(g.butiran):""}</span><span class="pp-rs">${esc(g.pd||"(Tiada PD)")} · ${g.att.length} hadir</span></span></div>`).join("");
+  const sesRows=shown.map(g=>`<div class="pp-row"><span class="pp-date"><span class="pp-dd">${esc((g.tarikh||"").slice(8,10))}</span><span class="pp-dm">${esc(monShort(g.tarikh))}</span></span><span class="pp-rm"><span class="pp-rn">${esc(g.jenis||"Sesi")}${g.butiran?" · "+esc(g.butiran):""}</span><span class="pp-rs">${esc(pdLabel(g))} · ${g.att.length} hadir</span></span></div>`).join("");
 
   const pills=years.length?`<div class="iptbar pspbbar" role="group" aria-label="Tapis ikut sesi PSPB">
     <button class="ipt-pill${papanPSPB===""?" active":""}" data-pspb="">Semua sesi<span class="c">${allp.length}</span></button>
@@ -2179,7 +2192,7 @@ function timelineSection(p){
   ses.forEach(s=>{
     const j=s.jenis||"Usrah";
     const label=j==="DF"?"Dakwah Fardiah (DF)":(j==="Usrah"?"Usrah":(j==="Program"?"Program":j));
-    const who=s.oleh||s.pd||"";const what=s.nota||s.butiran||"";
+    const who=[s.oleh||s.pd||"",s.oleh2||""].filter(Boolean).join(" & ");const what=s.nota||s.butiran||"";
     const sub=[what,who?"PD "+who:""].filter(Boolean).join(" · ");
     add(s.tarikh,dmy(s.tarikh),label,sub,j==="DF"?"cyan":(j==="Program"?"accent":"brand"),j==="DF"?"◆":(j==="Program"?"▲":"●"));
     if(last&&s===last)ev[ev.length-1].now=true;
@@ -2229,9 +2242,9 @@ function memCalendar(p){
   const byDay={};(p.sessions||[]).forEach(s=>{if(!s.tarikh)return;(byDay[s.tarikh]=byDay[s.tarikh]||[]).push(s);});
   // absences: usrah/DF held by this mad'u's PD but not attended
   const mine=new Set((p.sessions||[]).map(s=>s._usrahId).filter(Boolean));
-  const absent={};usrahGroups().forEach(g=>{if(!g.tarikh)return;if(g.jenis!=="Usrah")return;const myPD=g.pd&&(g.pd===p.pd1||g.pd===p.pd2);if(myPD&&!mine.has(g.id)&&!byDay[g.tarikh]){absent[g.tarikh]=(absent[g.tarikh]||0)+1;}});
+  const absent={};usrahGroups().forEach(g=>{if(!g.tarikh)return;if(g.jenis!=="Usrah")return;const myPD=grPds(g).some(n=>n===p.pd1||n===p.pd2);if(myPD&&!mine.has(g.id)&&!byDay[g.tarikh]){absent[g.tarikh]=(absent[g.tarikh]||0)+1;}});
   const first=new Date(y,mo,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
-  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toISOString().slice(0,10);const out=d.getMonth()!==mo;const ss=byDay[iso]||[];const ab=absent[iso];const cls=ss.length?(ss[0].jenis==="DF"?"df":(ss[0].jenis==="Program"?"pg":"us")):(ab?"abs":"");
+  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toISOString().slice(0,10);const out=d.getMonth()!==mo;const ss=byDay[iso]||[];const ab=absent[iso];const cls=ss.length?({DF:"df",Program:"pg",Tugasan:"tg"}[ss[0].jenis]||"us"):(ab?"abs":"");
     const tag=ss.length?(ss.length>1?ss.length+" sesi":esc(ss[0].jenis)):(ab?"Absen":"");
     const tt=ss.length?ss.map(x=>esc(x.jenis)+(x.oleh?" · "+esc(x.oleh):"")).join(", "):(ab?"Tidak hadir usrah PD":"");
     cells+=`<div class="cald memday ${cls}${out?" out":""}" title="${tt}"><div class="dn">${d.getDate()}</div>${tag?`<div class="memtag">${tag}</div>`:""}</div>`;}
@@ -2239,7 +2252,7 @@ function memCalendar(p){
   return `<div class="memcal"><div class="caltop"><button class="btn2" data-memcal="-1" aria-label="Bulan sebelum">‹</button><h3>${MM[mo]} ${y}</h3><button class="btn2" data-memcal="1" aria-label="Bulan seterusnya">›</button></div><div class="cal">${dows.map(x=>`<div class="calh">${x}</div>`).join("")}${cells}</div><div class="memleg"><span><i class="lg us"></i>Hadir</span><span><i class="lg abs"></i>Tidak hadir${nAbs?" ("+nAbs+")":""}</span></div></div>`;
 }
 /* Session-type pill class. Display only. */
-function jenisKey(j){return {Usrah:"usrah",DF:"df",Program:"program"}[j]||"lain";}
+function jenisKey(j){return {Usrah:"usrah",DF:"df",Program:"program",Tugasan:"tugasan"}[j]||"lain";}
 
 /* The coordinator's note sits at the foot of the attendance log because that is
    where the judgement gets made — right after reading how often someone turned
@@ -2295,6 +2308,7 @@ function mutSection(p){
         <div class="g2">${fld("Jenis",SELf2(p.id,s.id,"jenis",s.jenis,SES_JENIS))}${fld("Tarikh",Ts(p.id,s.id,"tarikh",s.tarikh,"date"))}</div>
         <div class="g2">${fld("PD 1",SESpd(p.id,s.id,"oleh",s.oleh))}${fld("PD 2",SESpd(p.id,s.id,"oleh2",s.oleh2))}</div>
         <div class="rowflex"><div style="flex:1">${fld("Butiran (pilihan)",Ts(p.id,s.id,"nota",s.nota,"nota"))}</div><button class="delmini" data-delses="${p.id}|${s.id}">✕</button></div>
+        ${fld("Catatan (pilihan)",`<textarea data-ses="${esc(p.id)}|${esc(s.id)}" data-f="catatan" rows="3" placeholder="Apa yang berlaku, perkara dibincang, tindakan susulan…">${esc(s.catatan||"")}</textarea>`)}
       </div>`:""}
     </div>`;}).join("");
   const notaBox=catatanBox(p);
@@ -2502,11 +2516,11 @@ document.addEventListener("click",e=>{
   const uga=e.target.closest("[data-ugatt]");if(uga){const[gid,pid]=uga.dataset.ugatt.split("|");toggleUsrahAtt(gid,pid);render();return;}
   const ulg=e.target.closest("[data-ulog]");if(ulg){uLogOpen=(uLogOpen===ulg.dataset.ulog?"":ulg.dataset.ulog);render();return;}
   const udl=e.target.closest("[data-udel]");if(udl){const uid=udl.dataset.udel;if(!confirm("Padam usrah ini? Kehadiran mad'u akan ditarik balik."))return;S.people.forEach(pp=>{if(pp.sessions){const b=pp.sessions.length;pp.sessions=pp.sessions.filter(s=>s._usrahId!==uid);if(pp.sessions.length!==b)stamp(pp);}});logAct("Padam usrah","");save();render();toast("Usrah dipadam");return;}
-  if(e.target.closest&&e.target.closest("#saveUsrahBtn")){const ids=Object.keys(uForm.att).filter(k=>uForm.att[k]);if(!ids.length){toast("Tanda sekurang-kurangnya seorang");return;}const uid="u_"+Date.now();ids.forEach(id=>{const pp=get(id);if(pp){pp.sessions=pp.sessions||[];pp.sessions.push({id:"s_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),_usrahId:uid,jenis:uForm.jenis,tarikh:uForm.tarikh,oleh:uForm.pd,oleh2:"",nota:uForm.butiran});stamp(pp);}});logAct("Rekod "+uForm.jenis,(uForm.butiran||uForm.tarikh)+" · "+ids.length+" hadir");uForm.att={};uForm.butiran="";save();render();toast(ids.length+" kehadiran direkod");return;}
+  if(e.target.closest&&e.target.closest("#saveUsrahBtn")){const ids=Object.keys(uForm.att).filter(k=>uForm.att[k]);if(!ids.length){toast("Tanda sekurang-kurangnya seorang");return;}const uid="u_"+Date.now();ids.forEach(id=>{const pp=get(id);if(pp){pp.sessions=pp.sessions||[];pp.sessions.push({id:"s_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),_usrahId:uid,jenis:uForm.jenis,tarikh:uForm.tarikh,oleh:uForm.pd,oleh2:uForm.pd2,nota:uForm.butiran,catatan:uForm.catatan});stamp(pp);}});logAct("Rekod "+uForm.jenis,(uForm.butiran||uForm.tarikh)+" · "+ids.length+" hadir");uForm.att={};uForm.butiran="";uForm.catatan="";save();render();toast(ids.length+" kehadiran direkod");return;}
   const et=e.target.closest("[data-etab]");if(et){const[id,t]=et.dataset.etab.split("|");if(get(id)){eTab=+t;render();}return;}
   const tgl=e.target.closest("[data-tgl]");if(tgl){const[id,f,v]=tgl.dataset.tgl.split("|");const p=get(id);if(p){p[f]=(v==="true"?true:(v==="false"?false:v));save();render();}return;}
   const sc=e.target.closest("[data-score]");if(sc){const[id,it,v]=sc.dataset.score.split("|");const p=get(id);if(p){p.bpmy=p.bpmy||{};p.bpmy[it]=+v;save();render();}return;}
-  const as=e.target.closest("[data-addses]");if(as){const p=get(as.dataset.addses);if(p){p.sessions=p.sessions||[];p.sessions.push({id:uid("s_"),jenis:"Usrah",tarikh:today(),oleh:p.pd1||"",oleh2:p.pd2||"",nota:""});save();render();}return;}
+  const as=e.target.closest("[data-addses]");if(as){const p=get(as.dataset.addses);if(p){p.sessions=p.sessions||[];p.sessions.push({id:uid("s_"),jenis:"Usrah",tarikh:today(),oleh:p.pd1||"",oleh2:p.pd2||"",nota:"",catatan:""});save();render();}return;}
   const st=e.target.closest("[data-sestgl]");if(st){const k=st.dataset.sestgl;sesOpen=(sesOpen===k)?"":k;render();return;}
   const ct=e.target.closest("[data-caltgl]");if(ct){memCalOpen=!memCalOpen;render();return;}
   const ne=e.target.closest("[data-noteedit]");if(ne){noteEdit=ne.dataset.noteedit;render();focusNote();return;}
@@ -2610,9 +2624,9 @@ document.addEventListener("change",e=>{const t=e.target,d=t.dataset||{};
   /* Fires on blur, once the PD's new name is settled. data-was carries the name
      as it stood when the row was drawn, since the input handler has already
      overwritten pd.nama keystroke by keystroke. */
-  /* Butiran logs here rather than in editUsrah: `change` fires once, on blur, and
-     only when the text actually changed — one entry instead of one per keystroke. */
-  if(d.uged&&d.f==="butiran"){logAct("Kemas kini butiran usrah kepada",t.value||"(kosong)");save();return;}
+  /* Butiran and catatan log here rather than in editUsrah: `change` fires once, on
+     blur, and only when the text actually changed — one entry, not one per keystroke. */
+  if(d.uged&&USRAH_TYPED[d.f]){logAct("Kemas kini "+USRAH_LABEL[d.f]+" usrah kepada",t.value||"(kosong)");save();return;}
   if(d.pded&&d.f==="nama"){const was=d.was||"",now=t.value;
     if(was===now)return;
     const n=renamePdRefs(was,now);logAct("Tukar nama PD",(was||"(tanpa nama)")+" \u2192 "+(now||"(tanpa nama)"));save();
