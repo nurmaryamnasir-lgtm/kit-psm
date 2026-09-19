@@ -86,8 +86,18 @@
   .nchip.add{border-style:dashed;color:var(--blue)}
   .tag.red{background:var(--red-s);color:var(--red)}
   .iptbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-  .ipt-pill .c{background:var(--surface-sunken);border-radius:var(--radius-pill);padding:2px 8px;font-family:var(--font-mono);font-size:11px;font-weight:600}
-  .ipt-pill.active{background:var(--blue);color:#fff;border-color:var(--blue)} .ipt-pill.active .c{background:rgba(255,255,255,.2);color:#fff}
+  /* Base for every filter pill. The .active and .c variants below (and the
+     .pdfilt / .snfilt / .iptside overrides further down) all assume this chip
+     shape, so it has to land before them. */
+  .pill,.ipt-pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border-subtle);background:#fff;color:var(--ink);border-radius:var(--radius-pill);padding:8px 14px;font-family:inherit;font-size:13px;font-weight:600;line-height:1.2;white-space:nowrap;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard),border-color var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard)}
+  .pill:hover,.ipt-pill:hover{background:var(--surface-sunken)}
+  .pill .c,.ipt-pill .c{background:var(--surface-sunken);border-radius:var(--radius-pill);padding:2px 8px;font-family:var(--font-mono);font-size:11px;font-weight:600}
+  .pill.active,.ipt-pill.active{background:var(--blue);color:#fff;border-color:var(--blue)} .pill.active .c,.ipt-pill.active .c{background:rgba(255,255,255,.2);color:#fff}
+  /* INTEC is counted apart from the three stages, so its pill is dashed: the
+     same treatment "Tiada IPT" gets for standing outside the normal set. */
+  .pill.pill-asing{border-style:dashed;color:var(--teal-700,#0f766e)}
+  .pill.pill-asing.active{background:#0f766e;color:#fff;border-color:#0f766e}
+  .pill.pill-asing.active .c{background:rgba(255,255,255,.2);color:#fff}
   .ipt-pill.blank{border-style:dashed;color:var(--red)} .ipt-pill.blank.active{background:var(--red);color:#fff;border-color:var(--red)}
   .grouphdr{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:700;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted);margin:20px 2px 10px}
   .grouphdr .gc{background:var(--surface-sunken);border-radius:var(--radius-pill);padding:2px 8px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--muted)}
@@ -691,6 +701,10 @@
   .kpi.t-may .kpi-k,.kpi.t-may .kpi-s{color:var(--emas-700)}.kpi.t-may .kpi-v{color:var(--dakwat-800)}
   .kpi.t-elig{background:var(--blue);border-color:transparent;box-shadow:var(--shadow-md)}
   .kpi.t-elig .kpi-k,.kpi.t-elig .kpi-s{color:var(--biru-200)}.kpi.t-elig .kpi-v{color:var(--putih)}
+  /* INTEC sits outside the KPI, so its tile is dashed rather than filled — it
+     reads as a note beside the targets, not as another number inside them. */
+  .kpi.t-asing{background:var(--surface-sunken);border-style:dashed;border-color:var(--border-strong);box-shadow:none}
+  .kpi.t-asing .kpi-k,.kpi.t-asing .kpi-s{color:var(--muted)}.kpi.t-asing .kpi-v{color:var(--ink)}
   .pp-2{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;align-items:start}
   .pp-card{display:flex;flex-direction:column;gap:14px;padding:var(--pad-card-lg);border:1px solid var(--border-subtle);border-radius:var(--radius-card);background:#fff;box-shadow:var(--shadow-xs)}
   .pp-h{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:700;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
@@ -1013,6 +1027,16 @@ const WEEK_LABEL="Minggu 09 · Sesi 2026/27";
 /* --------------------------------------------------------------------------- */
 
 const STAGES=[{id:"mutabaah",label:"Mutabaah"},{id:"muhib",label:"Muhib"},{id:"muayyid",label:"Muayyid"}];
+/* INTEC is an IPT like any other in the Direktori, but its mad'u sit outside the
+   branch KPI and outside the Mutabaah/Muhib/Muayyid worklists — they are tracked
+   as their own count. Every roster-wide total funnels through maduPool() so the
+   dashboard, Pencalonan and Direktori cannot drift apart on this rule. */
+const IPT_ASING="INTEC";
+const ASING_PILL="__asing__";
+function isAsing(p){return (p&&p.universiti||"").trim()===IPT_ASING;}
+/* The KPI/stage population: active mad'u, INTEC excluded. */
+function maduPool(){return S.people.filter(p=>!p.arsip&&!isAsing(p));}
+function maduAsing(){return S.people.filter(p=>!p.arsip&&isAsing(p));}
 const SES_JENIS=["Usrah","DF","Program","Tugasan"];
 const NEGERI=["Johor","Kedah","Kelantan","Melaka","Negeri Sembilan","Pahang","Perak","Perlis","Pulau Pinang","Sabah","Sarawak","Selangor","Terengganu","Kuala Lumpur","Labuan","Putrajaya"];
 const TAHAP_PENGAJIAN=["Diploma","Sarjana Muda"];
@@ -1633,7 +1657,9 @@ function wajibZero(p){const sc=p.bpmy||{};const out=[];
 const CAT_SHORT={c1:"Muayyasyah",c2:"Komitmen",c3:"Kerja",c4:"Kesolehan",c5:"Dakwah"};
 
 function viewPencalonan(){
-  const ppl=S.people.filter(p=>!p.arsip);
+  /* INTEC mad'u are not on the tarsyih ladder tracked here — see maduPool(). */
+  const ppl=maduPool();
+  const asingN=maduAsing().length;
   const nStage=id=>ppl.filter(p=>p.stage===id).length;
   const eligAll=ppl.filter(p=>eligible(p));
 
@@ -1655,7 +1681,7 @@ function viewPencalonan(){
   const bar=`<div class="pcl-bar">
     <select data-flt="pd" aria-label="Tapis ikut PD">${pdOpt}</select>
     <button type="button" class="etgl${onlyElig?" on":""}" data-onlyelig="1" aria-pressed="${onlyElig}"><span class="dot"></span>Hanya yang layak</button>
-    <span class="pcl-n">${eligAll.length} daripada ${ppl.length} layak</span>
+    <span class="pcl-n">${eligAll.length} daripada ${ppl.length} layak${asingN?` &middot; ${asingN} INTEC di luar kiraan`:""}</span>
   </div>`;
 
   const pick=st=>ppl.filter(p=>p.stage===st&&pdMatch(p)&&(!onlyElig||eligible(p)));
@@ -1703,7 +1729,7 @@ function viewPencalonan(){
 /* =============== PAPAN PEMUKA (read-only; everything computed from S.people) =============== */
 /* Sessions actually present in the roster, newest first. Listing every year in
    PSPB_YEARS would pad the filter with pills that select nothing. */
-function pspbYears(){const set=new Set();S.people.forEach(p=>{if(!p.arsip&&p.tahunPSPB)set.add(String(p.tahunPSPB));});return[...set].sort((a,b)=>b.localeCompare(a));}
+function pspbYears(){const set=new Set();maduPool().forEach(p=>{if(p.tahunPSPB)set.add(String(p.tahunPSPB));});return[...set].sort((a,b)=>b.localeCompare(a));}
 
 /* The branch targets for the coming PSPB. "Ahli" is the whole roster for a
    session; "Muhib" counts muhib and above, because a muayyid has already passed
@@ -1711,11 +1737,15 @@ function pspbYears(){const set=new Set();S.people.forEach(p=>{if(!p.arsip&&p.tah
 const KPI_TARGET={ahli:97,muhib:24};
 
 function viewPapan(){
-  const allp=S.people.filter(p=>!p.arsip);
+  /* INTEC is out of the pool on purpose: it has its own tile below and its own
+     line under the KPI card, so nothing on this page silently absorbs it. */
+  const allp=maduPool();
+  const asing=maduAsing();
   const years=pspbYears();
   /* Self-heal: the selected session can empty out while it is selected. */
   if(papanPSPB&&years.indexOf(papanPSPB)<0)papanPSPB="";
   const ppl=papanPSPB?allp.filter(p=>String(p.tahunPSPB||"")===papanPSPB):allp;
+  const asingN=(papanPSPB?asing.filter(p=>String(p.tahunPSPB||"")===papanPSPB):asing).length;
   const total=ppl.length;
   const nStage=id=>ppl.filter(p=>p.stage===id).length;
   const elig=ppl.filter(p=>eligible(p));
@@ -1727,7 +1757,8 @@ function viewPapan(){
     {k:"Muhib",v:nStage("muhib"),s:"Simpatisan berkomitmen",t:"t-muh",i:"hand"},
     {k:"Muayyid",v:nStage("muayyid"),s:"Peringkat tertinggi",t:"t-may",i:"award"},
     {k:"Layak tarsyih",v:elig.length,s:"Cukup syarat naik peringkat",t:"t-elig",i:"check"}
-  ].map(x=>`<div class="kpi ${x.t}"><div class="kpi-k"><span>${esc(x.k)}</span><span class="kpi-i" aria-hidden="true">${ICO[x.i]}</span></div><div class="kpi-v">${x.v}</div><div class="kpi-s">${esc(x.s)}</div></div>`).join("");
+  ].concat(asingN?[{k:"Mad'u INTEC",v:asingN,s:"Kiraan berasingan · di luar KPI",t:"t-asing",i:"users"}]:[])
+   .map(x=>`<div class="kpi ${x.t}"><div class="kpi-k"><span>${esc(x.k)}</span><span class="kpi-i" aria-hidden="true">${ICO[x.i]}</span></div><div class="kpi-v">${x.v}</div><div class="kpi-s">${esc(x.s)}</div></div>`).join("");
 
   const fnlRow=(label,n,colour,title)=>{const pct=total?Math.round(n/total*100):0;
     return `<div class="fnl-r"${title?` title="${esc(title)}"`:""}><div class="fnl-t"><span class="fnl-d" style="background:${colour}"></span><span class="fnl-l">${esc(label)}</span><span class="fnl-n">${n}</span><span class="fnl-p">${pct}%</span></div><div class="fnl-bar"><i style="width:${pct}%;background:${colour}"></i></div></div>`;};
@@ -1774,13 +1805,14 @@ function viewPapan(){
       ${meter("Ahli",total,KPI_TARGET.ahli)}
       ${meter("Muhib",nMuhib,KPI_TARGET.muhib,"Muhib dan ke atas — seorang muayyid sudah melepasi peringkat muhib.")}
     </div>
+    ${asingN?`<div class="kpim-n" style="margin-top:10px"><b>${asingN}</b> mad'u INTEC dikira berasingan dan tidak termasuk dalam sasaran di atas.</div>`:""}
   </div>`;
 
   return `<div class="pp">
     <div class="pp-hi">
       <span class="pp-eyebrow">${esc(WEEK_LABEL)}</span>
       <span class="pp-greet">Assalamualaikum, ${esc(coordName())}</span>
-      <span class="pp-sub">${total} mad'u dalam bimbingan${papanPSPB?" · sesi PSPB "+esc(papanPSPB):""} · ${elig.length} layak tarsyih</span>
+      <span class="pp-sub">${total} mad'u dalam bimbingan${papanPSPB?" · sesi PSPB "+esc(papanPSPB):""} · ${elig.length} layak tarsyih${asingN?" · "+asingN+" INTEC (berasingan)":""}</span>
     </div>
     ${pills}
     <div class="pp-kpis">${kpis}</div>
@@ -1804,7 +1836,8 @@ function viewPapan(){
 
 /* Live counts on the sidebar. Reads the same data the views read. */
 function renderNav(){
-  const act=S.people.filter(p=>!p.arsip);
+  /* INTEC is out here too, so the badge matches the "Semua" pill it links to. */
+  const act=maduPool();
   const n={papan:act.filter(p=>eligible(p)).length,
     pencalonan:act.filter(p=>eligible(p)).length,
     keahlian:act.length,
@@ -1879,13 +1912,19 @@ function pdOrphans(){
   return Object.keys(m).sort().map(nm=>({nama:nm,n:m[nm]}));}
 function iptOptions(){const set=new Set(S.universities||[]);S.people.forEach(p=>{if(p.universiti)set.add(p.universiti);});return[...set].sort();}
 function iptLabel(u){u=(u||"").trim();return {"UiTM Puncak Perdana":"UiTM PP","UiTM Shah Alam":"UiTM SA"}[u]||u;}
-function iptColor(u){u=(u||"").trim();if(!u)return "#b8c2d6";const fixed={"MSU":"#6b3fa0","UiTM Shah Alam":"#e07b39","UiTM Puncak Perdana":"#1f9d55"};if(fixed[u])return fixed[u];const pal=["#147FB3","#c2367a","#3f74d6","#2a9d8f","#7048b6","#d98324"];let s=0;for(let i=0;i<u.length;i++)s=(s+u.charCodeAt(i))%99991;return pal[s%pal.length];}
+function iptColor(u){u=(u||"").trim();if(!u)return "#b8c2d6";const fixed={"MSU":"#6b3fa0","UiTM Shah Alam":"#e07b39","UiTM Puncak Perdana":"#1f9d55","INTEC":"#0f766e"};if(fixed[u])return fixed[u];const pal=["#147FB3","#c2367a","#3f74d6","#2a9d8f","#7048b6","#d98324"];let s=0;for(let i=0;i<u.length;i++)s=(s+u.charCodeAt(i))%99991;return pal[s%pal.length];}
 /* allStages=true skips only the MUT/MUH/MAY pill filter (Kanban shows all three
    columns). Every other rule — arsip, search, PD, IPT, minat, AJK, sesi, tahun —
    is unchanged, so list and board always agree. Existing callers pass nothing. */
 function filteredPeople(allStages){let list=S.people.slice();
   if(showArsip)list=list.filter(p=>p.arsip);else list=list.filter(p=>!p.arsip);
-  if(!allStages&&stage!=="all")list=list.filter(p=>p.stage===stage);
+  /* INTEC is its own count, so it is hidden from the stage pills and from
+     "Semua" — it surfaces only when asked for, by its own pill or by picking
+     INTEC in the IPT filter. Kanban (allStages) obeys the same rule, so the
+     board never shows a mad'u the pill counts say is not there. */
+  const wantAsing=(stage===ASING_PILL||F.ipt===IPT_ASING);
+  list=list.filter(p=>isAsing(p)===wantAsing);
+  if(!allStages&&stage!=="all"&&stage!==ASING_PILL)list=list.filter(p=>p.stage===stage);
   /* Search spans name, IPT (full name and short label) and the derived ID, which
      is what the placeholder promises. */
   if(q)list=list.filter(p=>[p.nama,p.universiti,iptLabel(p.universiti)].some(v=>String(v||"").toLowerCase().includes(q)));
@@ -1936,14 +1975,21 @@ function kanbanBoard(){
 
 function viewKeahlian(){
   const arsipN=S.people.filter(p=>p.arsip).length;
-  const act=S.people.filter(p=>!p.arsip);
+  const act=maduPool();
+  const asingN=maduAsing().length;
   const byStage=s=>act.filter(p=>p.stage===s).length;
 
-  /* Stage pills lead with "Semua" so the directory opens on the whole roster. */
+  /* Stage pills lead with "Semua" so the directory opens on the whole roster.
+     INTEC closes the row as a separate pill, outside the three stages: its count
+     is never folded into "Semua" or into Mutabaah/Muhib/Muayyid. */
   const ST=[{id:"all",label:"Semua"},{id:"mutabaah",label:"Mutabaah"},{id:"muhib",label:"Muhib"},{id:"muayyid",label:"Muayyid"}];
-  const pills=ST.map(s=>{const n=s.id==="all"?act.length:byStage(s.id);return `<button class="pill${stage===s.id?" active":""}" data-stage="${s.id}">${s.label}<span class="c">${n}</span></button>`;}).join("");
+  const stagePills=ST.map(s=>{const n=s.id==="all"?act.length:byStage(s.id);return `<button class="pill${stage===s.id?" active":""}" data-stage="${s.id}">${s.label}<span class="c">${n}</span></button>`;}).join("");
+  /* Not a stage filter but a population switch, so it stays on screen in Kanban
+     too — otherwise the board could sit on INTEC with nothing saying so. */
+  const asingPill=asingN?`<button class="pill pill-asing${stage===ASING_PILL?" active":""}" data-stage="${stage===ASING_PILL?"all":ASING_PILL}" aria-pressed="${stage===ASING_PILL}" title="Mad'u ${esc(IPT_ASING)} — kiraan berasingan, di luar KPI dan senarai peringkat">${esc(IPT_ASING)}<span class="c">${asingN}</span></button>`:"";
+  const pills=stagePills+asingPill;
 
-  const showMut=(stage==="all"||stage==="mutabaah");
+  const showMut=(stage==="all"||stage==="mutabaah"||stage===ASING_PILL);
   const pdOpt=`<option value="">Semua PD</option><option value="__none__"${F.pd==="__none__"?" selected":""}>(Tiada PD)</option>`+pdOptions().map(x=>`<option${F.pd===x?" selected":""}>${esc(x)}</option>`).join("");
   const iptOpt=`<option value="">Semua IPT</option>`+iptOptions().map(x=>`<option value="${esc(x)}"${F.ipt===x?" selected":""}>${esc(iptLabel(x))}</option>`).join("")+`<option value="__blank__"${F.ipt==="__blank__"?" selected":""}>(Tiada IPT)</option>`;
 
@@ -1956,7 +2002,9 @@ function viewKeahlian(){
 
   const sub=showArsip
     ? `${act.length} aktif · memaparkan arkib (${arsipN})`
-    : `${act.length} mad'u dalam bimbingan · ${byStage("mutabaah")} mutabaah · ${byStage("muhib")} muhib · ${byStage("muayyid")} muayyid`;
+    : (stage===ASING_PILL
+      ? `${asingN} mad'u INTEC · kiraan berasingan, tidak termasuk dalam KPI atau senarai mutabaah/muhib/muayyid`
+      : `${act.length} mad'u dalam bimbingan · ${byStage("mutabaah")} mutabaah · ${byStage("muhib")} muhib · ${byStage("muayyid")} muayyid${asingN?" · "+asingN+" INTEC (berasingan)":""}`);
 
   const head=`<div class="dirhead">
     <div class="dirhead-t">
@@ -1974,7 +2022,7 @@ function viewKeahlian(){
   </div>`;
 
   const filters=`<div class="dirfilt">
-    <div class="dirfilt-p">${isKb?"":pills}<span class="dirfilt-sp"></span>${modeTgl}</div>
+    <div class="dirfilt-p">${isKb?asingPill:pills}<span class="dirfilt-sp"></span>${modeTgl}</div>
     <div class="dirfilt-s">
       <select data-flt="ipt" aria-label="Tapis ikut IPT">${iptOpt}</select>
       <select data-flt="pd" aria-label="Tapis ikut PD">${pdOpt}</select>
@@ -2481,7 +2529,13 @@ document.addEventListener("click",e=>{
   const oe=e.target.closest("[data-onlyelig]");if(oe){onlyElig=!onlyElig;render();return;}
   /* Dashboard drill-through: open the person in Direktori. */
   const gto=e.target.closest("[data-goto]");if(gto){const id=gto.dataset.goto;const _gp=get(id);selId=id;if(_gp&&_gp.stage)stage=_gp.stage;setView("keahlian");return;}
-  const stg=e.target.closest("[data-stage]");if(stg){stage=stg.dataset.stage;if(stage!=="mutabaah"&&stage!=="all"){F.minat="";F.minSesi="";}render();return;}
+  /* The INTEC pill and the IPT filter would otherwise fight each other: leaving
+     the pill with F.ipt still on INTEC keeps the list INTEC-only, and entering it
+     with another IPT picked shows nothing. Clearing F.ipt on both crossings keeps
+     the pill the single switch for "show me INTEC". */
+  const stg=e.target.closest("[data-stage]");if(stg){const was=stage;stage=stg.dataset.stage;
+    if(stage===ASING_PILL||was===ASING_PILL||F.ipt===IPT_ASING)F.ipt="";
+    if(stage!=="mutabaah"&&stage!=="all"&&stage!==ASING_PILL){F.minat="";F.minSesi="";}render();return;}
   const sel=e.target.closest("[data-sel]");if(sel){previousFocus=document.activeElement;selId=sel.dataset.sel;eTab=1;const _p=get(selId);if(_p){const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);return;}
   const scl=e.target.closest("[data-selclose]");if(scl){closeDrawer();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
@@ -2530,7 +2584,10 @@ document.addEventListener("click",e=>{
   const pr=e.target.closest("[data-promote]");if(pr){promote(get(pr.dataset.promote));return;}
   const del=e.target.closest("[data-del]");if(del){const p=get(del.dataset.del);if(p&&confirm(`Buang "${p.nama||"rekod"}"?`)){S._del[p.id]=Date.now();S.people=S.people.filter(x=>x.id!==p.id);if(selId===p.id)selId=null;logAct("Buang mad'u",p.nama);save();render();toast("Dibuang");}return;}
   const bx=e.target.closest("[data-bpmyxl]");if(bx){exportBPMy(get(bx.dataset.bpmyxl));return;}
-  if($("#addBtn")&&e.target.closest("#addBtn")){const p=newPerson(stage==="all"?"mutabaah":stage);S.people.unshift(p);q="";selId=p.id;logAct("Tambah mad'u baharu","");save();render();window.scrollTo({top:0,behavior:"smooth"});return;}
+  /* Adding while the INTEC pill is on pre-fills INTEC — otherwise the new row
+     would be created into a list it is immediately filtered out of. */
+  if($("#addBtn")&&e.target.closest("#addBtn")){const asing=stage===ASING_PILL;
+    const p=newPerson((stage==="all"||asing)?"mutabaah":stage);if(asing)p.universiti=IPT_ASING;S.people.unshift(p);q="";selId=p.id;logAct("Tambah mad'u baharu","");save();render();window.scrollTo({top:0,behavior:"smooth"});return;}
   // minit
   const mtog=e.target.closest("[data-mtog]");if(mtog){const m=getM(mtog.dataset.mtog);if(m){toggleOpen(m.id);render();}return;}
   if($("#addMeetBtn")&&e.target.closest("#addMeetBtn")){S.meetings.unshift(addOpen(newMeeting()));logAct("Tambah mesyuarat","");save();render();return;}
@@ -2643,7 +2700,15 @@ document.addEventListener("change",e=>{const t=e.target,d=t.dataset||{};
       if(name){if(!(S.pdList||[]).some(x=>(x.nama||"").toLowerCase()===name.toLowerCase()))S.pdList.push({id:uid("pd_"),nama:name,ipt:"",_upd:Date.now()});p[d.f]=name;logAct("Tambah PD baharu",name);}
       save();render();return;}
     if(t.value==="__add__"&&d.list){const lbl={universities:"IPT",pds:"PD",kolej:"kolej"}[d.list]||"item";const name=titleCase((prompt("Tambah "+lbl+" baharu:")||"").trim());if(name){if(!S[d.list].includes(name))S[d.list].push(name);S[d.list].sort();p[d.f]=name;}save();render();return;}
-    p[d.f]=t.value;save();render();return;}
+    p[d.f]=t.value;
+    /* Setting a mad'u to INTEC moves them out of the stage lists and into the
+       separate count, so follow them: without this the row they just edited
+       silently disappears from the list they are looking at. */
+    if(d.f==="universiti"&&!showArsip){
+      if(isAsing(p)&&stage!==ASING_PILL){stage=ASING_PILL;F.ipt="";toast("Dipindah ke senarai "+IPT_ASING+" · kiraan berasingan");}
+      else if(!isAsing(p)&&stage===ASING_PILL){stage="all";F.ipt="";}
+    }
+    save();render();return;}
   if(d.ed&&d.f&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA")){const p=get(d.ed);if(p){let v=normVal(d.f,t.value);t.value=v;if(d.f.indexOf("rmk_")===0){p.remarks=p.remarks||{};p.remarks[d.f.slice(4)]=v;}else p[d.f]=v;save();
     if(d.f==="nama"){const row=t.closest(".row");if(row){const rn=row.querySelector(".rname");if(rn){rn.textContent=v||"(nama baharu)";rn.classList.toggle("empty",!v);}const av=row.querySelector(".rav");if(av)av.textContent=initials(v);}}}return;}
   if(d.ses&&d.f&&t.tagName==="SELECT"){const[pid,sid]=d.ses.split("|");const p=get(pid);const s=p&&p.sessions.find(x=>x.id===sid);if(s){s[d.f]=t.value;save();render();}return;}
@@ -2653,7 +2718,12 @@ document.addEventListener("change",e=>{const t=e.target,d=t.dataset||{};
   if(d.sumstat){const[mid,iid]=d.sumstat.split("|");const m=getM(mid);const it=m&&m.items.find(x=>x.id===iid);if(it){it.status=t.value;stamp(m);save();render();}return;}
   if(d.hed&&d.f){const x=getH(d.hed);if(x){x[d.f]=(d.f==="nama"?titleCase(t.value):t.value);t.value=x[d.f];stamp(x);save();if(t.type!=="date")render();}return;}
   if(d.ced&&d.f&&(t.tagName==="SELECT"||t.type==="date")){const c=getC(d.ced);if(c){c[d.f]=t.value;save();render();}return;}
-  const flt=t.closest?t.closest("[data-flt]"):null;if(flt){F[flt.dataset.flt]=t.value;render();return;}
+  /* Picking INTEC in the IPT filter means the same thing as pressing the INTEC
+     pill, so it lands there: one highlighted control, one population. */
+  const flt=t.closest?t.closest("[data-flt]"):null;if(flt){const k=flt.dataset.flt;
+    if(k==="ipt"&&t.value===IPT_ASING){stage=ASING_PILL;F.ipt="";render();return;}
+    if(k==="ipt"&&stage===ASING_PILL&&t.value!==IPT_ASING)stage="all";
+    F[k]=t.value;render();return;}
 });
 document.addEventListener("input",e=>{if(e.target.id==="search"){q=e.target.value.trim().toLowerCase();renderListOnly();}});
 /* Repaints just the results so the search box keeps focus — list or board. */
@@ -2807,7 +2877,7 @@ function exportBPMy(p){if(!p)return;const b=bpmy(p);
   XLSX.writeFile(wb,`BPMy-${(p.nama||"Nama").replace(/\s+/g,"_")}-${today()}.xlsx`);toast("BPMy Excel dimuat turun");}
 
 /* ---- normalize + holidays ---- */
-function normalizeS(){S.people=S.people||[];S.meetings=S.meetings||[];S.wasilah=S.wasilah||[];S.claims=S.claims||[];S.universities=(S.universities&&S.universities.length)?S.universities:["UiTM Shah Alam","UiTM Puncak Perdana","MSU"];S.pds=S.pds||[];S.kolej=S.kolej||[];S.roster=S.roster||[];S.holidays=S.holidays||[];S._del=S._del||{};S.pdList=S.pdList||[];S.log=S.log||[];S.santunan=S.santunan||[];S.santunan.forEach(x=>{const r=SANTUNAN_RENAMED[x.status];if(r)x.status=r;});if(!S._pdSeeded){const have=new Set(S.pdList.map(x=>(x.nama||"").toLowerCase()));const nm=new Set(S.pds||[]);S.people.forEach(p=>{if(p.pd1)nm.add(p.pd1);if(p.pd2)nm.add(p.pd2);});nm.forEach(n=>{if(n&&!have.has(n.toLowerCase())){S.pdList.push({id:uid("pd_"),nama:n,ipt:"",_upd:1});have.add(n.toLowerCase());}});S._pdSeeded=true;}S.people.forEach(p=>{if(p&&p.ic){const b=icBirthday(p.ic);if(b&&!p.tarikhLahir){const dg=(p.ic||"").replace(/\D/g,"");const yy=+dg.slice(0,2);const yr=yy<30?2000+yy:1900+yy;p.tarikhLahir=yr+"-"+String(b.mm).padStart(2,"0")+"-"+String(b.dd).padStart(2,"0");}delete p.ic;}});seedHolidays();}
+function normalizeS(){S.people=S.people||[];S.meetings=S.meetings||[];S.wasilah=S.wasilah||[];S.claims=S.claims||[];S.universities=(S.universities&&S.universities.length)?S.universities:["UiTM Shah Alam","UiTM Puncak Perdana","MSU","INTEC"];if(!S.universities.includes(IPT_ASING)){S.universities.push(IPT_ASING);S.universities.sort();}S.pds=S.pds||[];S.kolej=S.kolej||[];S.roster=S.roster||[];S.holidays=S.holidays||[];S._del=S._del||{};S.pdList=S.pdList||[];S.log=S.log||[];S.santunan=S.santunan||[];S.santunan.forEach(x=>{const r=SANTUNAN_RENAMED[x.status];if(r)x.status=r;});if(!S._pdSeeded){const have=new Set(S.pdList.map(x=>(x.nama||"").toLowerCase()));const nm=new Set(S.pds||[]);S.people.forEach(p=>{if(p.pd1)nm.add(p.pd1);if(p.pd2)nm.add(p.pd2);});nm.forEach(n=>{if(n&&!have.has(n.toLowerCase())){S.pdList.push({id:uid("pd_"),nama:n,ipt:"",_upd:1});have.add(n.toLowerCase());}});S._pdSeeded=true;}S.people.forEach(p=>{if(p&&p.ic){const b=icBirthday(p.ic);if(b&&!p.tarikhLahir){const dg=(p.ic||"").replace(/\D/g,"");const yy=+dg.slice(0,2);const yr=yy<30?2000+yy:1900+yy;p.tarikhLahir=yr+"-"+String(b.mm).padStart(2,"0")+"-"+String(b.dd).padStart(2,"0");}delete p.ic;}});seedHolidays();}
 function seedHolidays(){if(S._holSeeded)return;const seed=[["Tahun Baharu","2026-01-01"],["Hari Pekerja","2026-05-01"],["Hari Kebangsaan","2026-08-31"],["Hari Malaysia","2026-09-16"],["Keputeraan Sultan Selangor","2026-12-11"],["Krismas","2026-12-25"],["Tahun Baharu","2027-01-01"],["Hari Pekerja","2027-05-01"],["Hari Kebangsaan","2027-08-31"],["Hari Malaysia","2027-09-16"],["Keputeraan Sultan Selangor","2027-12-11"],["Krismas","2027-12-25"]];seed.forEach(([n,dd])=>S.holidays.push({id:"hs_"+dd+"_"+n.replace(/\s+/g,""),nama:n,jenis:"Cuti Umum",start:dd,end:"",_upd:1}));S._holSeeded=true;}
 /* ---- Santunan ----
    The holding list before the Direktori: names collected at a program or event,
