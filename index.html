@@ -942,6 +942,7 @@
       <button data-act="logout">Log keluar</button>
       <hr>
       <button data-act="importxl">⭱&nbsp; Muat senarai nama (Excel/CSV)</button>
+      <button data-act="importhadir">⭱&nbsp; Muat naik kehadiran program</button>
       <button data-act="csv">⭳&nbsp; Export Direktori (CSV)</button>
       <hr>
       <button data-act="json">⭳&nbsp; Backup penuh (JSON)</button>
@@ -950,6 +951,7 @@
   <input type="file" id="fileImport" accept="application/json">
   <input type="file" id="fileXl" accept=".xlsx,.xls,.csv">
   <input type="file" id="fileSant" accept=".xlsx,.xls,.csv">
+  <input type="file" id="fileHadir" accept=".xlsx,.xls,.csv">
 </div></header>
 
 <div class="shell">
@@ -1636,7 +1638,11 @@ function viewUsrah(){
   if(groups.length){const byM={};groups.forEach(gr=>{const mk=(gr.tarikh||"").slice(0,7)||"zzzz";(byM[mk]=byM[mk]||[]).push(gr);});
     past=Object.keys(byM).sort((a,b)=>b.localeCompare(a)).map(mk=>{const lbl=mk==="zzzz"?"Tiada tarikh":(MM[(+mk.slice(5,7))-1]+" "+mk.slice(0,4));return `<div class="grouphdr">${lbl}<span class="gc">${byM[mk].length}</span></div>`+byM[mk].map(gr=>`<div class="urow"><div class="urow-h" data-ulog="${gr.id}"><div class="wdate pa"><div class="wdd">${(gr.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(gr.tarikh)}</div></div><div class="rname">${esc(gr.jenis)}${gr.butiran?" · "+esc(gr.butiran):""}<div class="hsub">${esc(pdLabel(gr))} · ${gr.att.length} hadir</div></div><span class="chev">${uLogOpen===gr.id?"▴":"▾"}</span></div>${uLogOpen===gr.id?usrahEditor(gr,pds,madu):""}</div>`).join("");}).join("");
   }else past=`<div class="empty"><b>Belum ada usrah direkod</b><br>Log usrah pertama di atas.</div>`;
-  return form+`<div class="grp"><h3>Usrah direkod</h3>${past}</div>`;
+  const naik=`<div class="grp"><h3>Muat naik kehadiran program</h3>
+    <div class="hint">Muat naik senarai nama dari kehadiran program (Excel/CSV, lajur <b>Nama</b> wajib). Setiap nama dapat satu rekod kehadiran dengan <b>tarikh</b> dan <b>nama program</b>. Nama yang belum ada dalam Direktori dimasukkan ke senarai <b>Mutabaah</b>.</div>
+    <button class="add" id="hadirXlBtn" style="width:100%;margin-top:12px">⭱&nbsp; Pilih fail Excel/CSV</button>
+  </div>`;
+  return form+naik+`<div class="grp"><h3>Usrah direkod</h3>${past}</div>`;
 }
 /* =============== PENCALONAN (read-only board; links into the existing editor) =============== */
 
@@ -2017,6 +2023,7 @@ function viewKeahlian(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
         ${perluN?`<span class="bellb-c">${perluN}</span>`:""}
       </button>
+      <button class="bellb" id="dirXlBtn" aria-label="Muat naik senarai nama (Excel/CSV)" title="Muat naik senarai nama — masuk sebagai Mutabaah">${ICO.upload}</button>
       <button class="add" id="addBtn">＋ Tambah mad'u</button>
     </div>
   </div>`;
@@ -2557,6 +2564,8 @@ document.addEventListener("click",e=>{
   if(e.target.closest&&e.target.closest("[data-snclose]")){santSel=null;render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
   if(e.target.closest&&e.target.closest("#addSnBtn")){const sn=newSantunan();S.santunan=(S.santunan||[]);S.santunan.unshift(sn);santSel=sn.id;santFilt="";logAct("Tambah nama santunan","");save();render();return;}
   if(e.target.closest&&e.target.closest("#snXlBtn")){$("#fileSant").click();return;}
+  if(e.target.closest&&e.target.closest("#hadirXlBtn")){$("#fileHadir").click();return;}
+  if(e.target.closest&&e.target.closest("#dirXlBtn")){$("#fileXl").click();return;}
   const snd=e.target.closest("[data-sndel]");if(snd){const sn=getSn(snd.dataset.sndel);
     if(sn&&confirm(`Buang "${sn.nama||"nama ini"}" dari santunan?`)){S._del[sn.id]=Date.now();S.santunan=S.santunan.filter(x=>x.id!==sn.id);if(santSel===sn.id)santSel=null;logAct("Buang nama santunan",sn.nama);save();render();toast("Dibuang");}return;}
   const sny=e.target.closest("[data-snyt]");if(sny){const[id,f,v]=sny.dataset.snyt.split("|");const sn=getSn(id);
@@ -2733,7 +2742,7 @@ function renderListOnly(){
 
 $("#menuBtn").addEventListener("click",e=>{e.stopPropagation();const pop=$("#menuPop"),open=pop.classList.toggle("show");$("#menuBtn").setAttribute("aria-expanded",String(open));});
 $("#menuPop").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;$("#menuPop").classList.remove("show");
-  if(a==="csv")exportCSV();if(a==="importxl")$("#fileXl").click();
+  if(a==="csv")exportCSV();if(a==="importxl")$("#fileXl").click();if(a==="importhadir")$("#fileHadir").click();
   if(a==="json")exportJSON();if(a==="restore")$("#fileImport").click();
   if(a==="pull")pullNow();
   if(a==="logout")logout();});
@@ -2744,6 +2753,7 @@ $("#fileImport").addEventListener("change",e=>{const f=e.target.files[0];if(!f){
   const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);S=Object.assign({people:[],meetings:[],wasilah:[],claims:[]},d);normalizeS();save();render();toast("Data dipulihkan");}catch(err){toast("Fail tidak sah");}};r.readAsText(f);e.target.value="";});
 $("#fileXl").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;importNames(f);e.target.value="";});
 $("#fileSant").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;importSantunan(f);e.target.value="";});
+$("#fileHadir").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;importKehadiran(f);e.target.value="";});
 
 function promote(p){if(!p)return;if(!eligible(p)){if(!confirm("Belum layak. Teruskan?"))return;}
   p.tarsyih=p.tarsyih||[];const by=((cfg&&cfg.name)||"").trim()||"\u2014";const dt=today();
@@ -2753,14 +2763,72 @@ function promote(p){if(!p)return;if(!eligible(p)){if(!confirm("Belum layak. Teru
   stamp(p);logAct("Naik peringkat ke "+stageLabel(p.stage)+":",p.nama);save();stage=p.stage;render();toast("Naik ke "+stageLabel(p.stage));}
 
 /* ---- import names ---- */
+
+/* IPT and phone rarely arrive under the header this app expects: the sheet is
+   whatever form ran at the event. These two sniff the whole row instead, so a
+   column called "Kampus", "Uni", "No WA" — or none at all — still lands. */
+
+/* Long names first: the replacement is what the short form is compared against. */
+const IPT_ALIAS=[[/universiti teknologi mara/g,"uitm"],[/universiti islam antarabangsa|international islamic university/g,"uia"],[/universiti kebangsaan malaysia/g,"ukm"],[/universiti putra malaysia/g,"upm"],[/universiti sains malaysia/g,"usm"],[/universiti teknologi malaysia/g,"utm"],[/universiti pertahanan nasional malaysia/g,"upnm"],[/university of malaya|universiti malaya/g,"um"],[/management (and )?science university/g,"msu"],[/universiti selangor/g,"unisel"],[/universiti tenaga nasional/g,"uniten"],[/multimedia university/g,"mmu"],[/universiti kuala lumpur/g,"unikl"]];
+const IPT_HINT=/(^| )(uitm|uia|iium|ukm|upm|usm|utm|um|msu|unisel|uniten|mmu|unikl|intec|upnm|ums|unimas|utp|apu|tarumt|kuis|ipg|universiti|university|kolej|college|politeknik|polytechnic|institut|akademi)( |$)/;
+const EDU_DOMAIN={uitm:"UiTM",iium:"UIA",ukm:"UKM",upm:"UPM",usm:"USM",utm:"UTM",um:"UM",msu:"MSU",unisel:"UNISEL",uniten:"UNITEN",mmu:"MMU",unikl:"UniKL",upnm:"UPNM",ums:"UMS",unimas:"UNIMAS",utp:"UTP"};
+
+function iptKey(v){let s=String(v==null?"":v).toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+  IPT_ALIAS.forEach(a=>{s=s.replace(a[0],a[1]);});
+  return s.replace(/\s+/g," ").trim();}
+
+/* Reuse the spelling already in S.universities rather than forking the list
+   into three near-identical entries. Matching is whole-word, so "UM" does not
+   swallow "UiTM Shah Alam". An ambiguous key — bare "UiTM" against both Shah
+   Alam and Puncak Perdana — is left alone instead of guessed at. */
+function canonIPT(v){
+  const k=iptKey(v);if(!k)return "";
+  const pad=s=>" "+s+" ";
+  const hits=(S.universities||[]).filter(u=>{const uk=iptKey(u);return uk&&(uk===k||pad(k).includes(pad(uk))||pad(uk).includes(pad(k)));});
+  return hits.length===1?hits[0]:titleCase(String(v).trim());
+}
+
+function detectIPT(o,explicit){
+  if(String(explicit||"").trim())return canonIPT(explicit);
+  for(const k in o){const v=String(o[k]==null?"":o[k]).trim();
+    if(!v||v.length>80||v.includes("@")||/nama|name/.test(k))continue;
+    if(IPT_HINT.test(iptKey(v)))return canonIPT(v);}
+  /* Last resort: a campus email address says which IPT without a column for it.
+     The institution is the label just before ".edu" — "student.uitm.edu.my"
+     is UiTM, not "student". */
+  for(const k in o){const m=String(o[k]==null?"":o[k]).toLowerCase().match(/@([a-z0-9.-]+)\.edu(\.[a-z]{2})?\b/);
+    if(m){const root=m[1].split(".").pop();return canonIPT(EDU_DOMAIN[root]||root.toUpperCase());}}
+  return "";
+}
+
+/* A Malaysian mobile, however the sheet mangled it: +60 prefixed, spaced,
+   dashed, or stored as a number so the leading zero was eaten. */
+function normPhone(v){
+  let d=String(v==null?"":v).replace(/\D/g,"");
+  if(!d)return "";
+  if(d.startsWith("60"))d="0"+d.slice(2);
+  else if(/^1\d{8,9}$/.test(d))d="0"+d;
+  return /^01\d{7,9}$/.test(d)?fmtPhone(d):"";
+}
+function detectPhone(o,explicit){
+  const e=normPhone(explicit);if(e)return e;
+  for(const k in o){
+    if(/\bic\b|kad pengenalan|matrik|matric|pelajar|poskod|tahun/.test(k))continue;
+    const q=normPhone(o[k]);if(q)return q;}
+  return "";
+}
+
 function importNames(file){
   const ext=(file.name.split(".").pop()||"").toLowerCase();
   const addRows=rows=>{ // rows: array of objects keyed by header (lowercased)
     const cands=[];
     rows.forEach(o=>{const nama=o.nama||o.name||o["nama penuh"]||"";if(!String(nama).trim())return;
-      const p=newPerson((String(o["status tarbiyyah"]||o.peringkat||o.stage||"mutabaah")).trim().toLowerCase());
+      /* Every uploaded name enters at Mutabaah. An upload is an intake list, and
+         a peringkat column in someone else's sheet is not authority to place a
+         mad'u further up the ladder — that is what tarsyih is for. */
+      const p=newPerson("mutabaah");
       p.nama=titleCase(String(nama).trim());
-      p.universiti=o.universiti||o["institut pengajian tinggi (ipt)"]||o.ipt||"";
+      p.universiti=detectIPT(o,o.universiti||o["institut pengajian tinggi (ipt)"]||o.ipt||o.uni||o.kampus||"");
       p.bidang=titleCase(o.bidang||o.kursus||o["bidang pengajian"]||"");
       p.tahap=titleCase(o["tahap pengajian"]||o.tahap||"");
       p.tahunMasuk=String(o["tahun kemasukan ke ipt"]||o["tahun kemasukan"]||o.tahunmasuk||"");
@@ -2769,19 +2837,19 @@ function importNames(file){
       p.email=String(o.email||o.emel||"").trim().toLowerCase();
       p.negeri=o.negeri||"";
       p.pd1=o.pd||o.pd1||o["nama murobbi"]||o.murobbi||"";p.pd2=o.pd2||"";
-      p.telefon=fmtPhone(o.telefon||o["no. telefon"]||o["no telefon"]||o.phone||"");
+      p.telefon=detectPhone(o,o.telefon||o["no. telefon"]||o["no telefon"]||o.phone||o.whatsapp||o["no wa"]||"");
       p.tahunPSPB=String(o.tahun||o["tahun pspb"]||o.tahunpspb||"2026");
       p.minatAJK=/^ya/i.test(String(o["berminat untuk menjadi ajk pembina?"]||o["minat ajk"]||o.minatajk||""))?"Ya":"Tidak";
       p.minatUsrah=/^ya/i.test(String(o["berminat untuk menyertai usrah?"]||o["minat usrah"]||o.minatusrah||""))?"Ya":"Belum";
-      if(!STAGES.find(s=>s.id===p.stage))p.stage="mutabaah";
       cands.push(p);});
     if(!cands.length){toast("Tiada nama sah dijumpai dalam fail");return;}
     const nrm=s=>(s||"").trim().toLowerCase();
     const existing=new Set(S.people.filter(x=>!x.arsip).map(x=>nrm(x.nama)));const seen=new Set();const fresh=[],dups=[];
     cands.forEach(p=>{const key=nrm(p.nama);if(existing.has(key)||seen.has(key))dups.push(p);else{fresh.push(p);seen.add(key);}});
-    if(!confirm("Import "+cands.length+" baris:\n\u2022 "+fresh.length+" nama baharu\n\u2022 "+dups.length+" kemungkinan duplikat (nama sama) \u2014 akan dilangkau\n\nTeruskan tambah "+fresh.length+" nama baharu?"))return;
+    const nIpt=fresh.filter(p=>p.universiti).length, nTel=fresh.filter(p=>p.telefon).length;
+    if(!confirm("Import "+cands.length+" baris:\n\u2022 "+fresh.length+" nama baharu \u2014 semua masuk peringkat Mutabaah\n\u2022 "+dups.length+" kemungkinan duplikat (nama sama) \u2014 akan dilangkau\n\nDikesan automatik: "+nIpt+" IPT \u00b7 "+nTel+" no. telefon\n\nTeruskan tambah "+fresh.length+" nama baharu?"))return;
     fresh.forEach(p=>{if(p.pd1&&!S.pds.includes(p.pd1))S.pds.push(p.pd1);if(p.pd2&&!S.pds.includes(p.pd2))S.pds.push(p.pd2);if(p.universiti&&!S.universities.includes(p.universiti))S.universities.push(p.universiti);S.people.push(p);});
-    S.pds.sort();S.universities.sort();logAct("Import "+fresh.length+" nama dari fail",file.name);save();render();toast(fresh.length+" nama ditambah"+(dups.length?" \u00b7 "+dups.length+" duplikat dilangkau":""));
+    S.pds.sort();S.universities.sort();logAct("Import "+fresh.length+" nama (Mutabaah) dari fail",file.name);save();stage="mutabaah";render();toast(fresh.length+" nama ditambah ke Mutabaah"+(dups.length?" \u00b7 "+dups.length+" duplikat dilangkau":""));
   };
   readSheet(file,addRows);
 }
@@ -2844,6 +2912,79 @@ function importSantunan(file){
     toast(fresh.length+" nama ditambah"+(dups.length?" \u00b7 "+dups.length+" dilangkau":""));
   });
 }
+/* Sign-in sheets spell dates three ways: ISO, dd/mm/yyyy, or an Excel serial
+   (a day count from 1899-12-30, which is what sheet_to_json hands back for a
+   real date cell). Anything else is rejected rather than guessed at. */
+function isoDate(v){
+  if(v==null)return "";
+  if(v instanceof Date)return isNaN(v)?"":new Date(v.getTime()-v.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  const s=String(v).trim();if(!s)return "";
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+  const dmy=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+  if(dmy)return dmy[3]+"-"+dmy[2].padStart(2,"0")+"-"+dmy[1].padStart(2,"0");
+  /* 5-6 digits only: a bare "2026" in a date column is a year, not a serial. */
+  if(/^\d{5,6}$/.test(s))return new Date(Date.UTC(1899,11,30)+(+s)*86400000).toISOString().slice(0,10);
+  return "";
+}
+
+/* Attendance from a program sign-in sheet. A name already in the Direktori just
+   gains a session; a name that is not becomes a new mad'u at Mutabaah, because
+   turning up to a program is how someone enters the funnel in the first place.
+   The whole upload shares one _usrahId, so it reads as a single program under
+   "Usrah direkod" and can be edited \u2014 or deleted \u2014 as one record. The PD is
+   left blank on purpose: the sheet rarely knows it, and it is one dropdown
+   away in that record. */
+function importKehadiran(file){
+  readSheet(file,rows=>{
+    const pick=(o,keys)=>{for(const k of keys){if(o[k]!=null&&String(o[k]).trim())return String(o[k]).trim();}return "";};
+    const cands=[];
+    rows.forEach(o=>{
+      const nama=pick(o,["nama","name","nama penuh","nama peserta"]);if(!nama)return;
+      cands.push({nama:titleCase(nama),
+        program:pick(o,["program","nama program","acara","program/acara","event","aktiviti"]),
+        tarikh:pick(o,["tarikh","tarikh program","tarikh kehadiran","date"]),
+        universiti:pick(o,["universiti","institut pengajian tinggi (ipt)","ipt","kampus"]),
+        telefon:pick(o,["telefon","no. telefon","no telefon","phone","whatsapp"]),
+        email:pick(o,["email","emel"]),
+        bidang:pick(o,["bidang","kursus","bidang pengajian","course"]),
+        tahap:pick(o,["tahap","tahap pengajian","peringkat pengajian"]),
+        pd:pick(o,["pd","pd1","murobbi","nama murobbi"])});});
+    if(!cands.length){toast("Tiada nama sah dijumpai dalam fail");return;}
+
+    const prog=(prompt("Nama program / acara untuk kehadiran ini:",(cands.find(c=>c.program)||{}).program||uForm.butiran||"")||"").trim();
+    if(!prog){toast("Kehadiran perlu nama program");return;}
+    const dSheet=cands.map(c=>isoDate(c.tarikh)).find(Boolean);
+    const dt=isoDate(prompt("Tarikh program (YYYY-MM-DD):",dSheet||uForm.tarikh||today())||"");
+    if(!dt){toast("Tarikh tidak sah \u2014 guna format YYYY-MM-DD");return;}
+
+    const nrm=s=>(s||"").trim().toLowerCase().replace(/\s+/g," ");
+    const dir={};S.people.forEach(p=>{if(p.arsip)return;const k=nrm(p.nama);if(k&&!dir[k])dir[k]=p;});
+    const seen=new Set();const fresh=[],known=[],dups=[];
+    cands.forEach(c=>{const k=nrm(c.nama);if(!k||seen.has(k))return;seen.add(k);
+      const p=dir[k];
+      if(!p)fresh.push(c);
+      else if((p.sessions||[]).some(s=>s.tarikh===dt&&nrm(s.nota)===nrm(prog)))dups.push(c);
+      else known.push({c:c,p:p});});
+    const n=fresh.length+known.length;
+    if(!n){toast("Semua nama sudah ada kehadiran untuk program ini");return;}
+    if(!confirm("Program: "+prog+"\nTarikh: "+dt+"\n\n\u2022 "+known.length+" nama sedia ada \u2014 tambah kehadiran\n\u2022 "+fresh.length+" nama baharu \u2014 masuk senarai Mutabaah + kehadiran\n\u2022 "+dups.length+" sudah ada kehadiran program ini \u2014 akan dilangkau\n\nTeruskan?"))return;
+
+    const gid="u_"+Date.now();
+    const mkSes=()=>({id:uid("s_"),_usrahId:gid,jenis:"Program",tarikh:dt,oleh:"",oleh2:"",nota:prog,catatan:""});
+    fresh.forEach(c=>{const p=newPerson("mutabaah");
+      p.nama=c.nama;p.universiti=c.universiti;p.telefon=fmtPhone(c.telefon);
+      p.email=c.email.toLowerCase();p.bidang=titleCase(c.bidang);p.tahap=titleCase(c.tahap);p.pd1=c.pd;
+      if(c.pd&&!S.pds.includes(c.pd))S.pds.push(c.pd);
+      if(p.universiti&&!S.universities.includes(p.universiti))S.universities.push(p.universiti);
+      p.sessions=[mkSes()];S.people.push(p);});
+    known.forEach(r=>{r.p.sessions=r.p.sessions||[];r.p.sessions.push(mkSes());stamp(r.p);});
+    S.pds.sort();S.universities.sort();
+    logAct("Muat naik kehadiran "+prog,dt+" \u00b7 "+n+" hadir"+(fresh.length?" \u00b7 "+fresh.length+" mad'u baharu":""));
+    save();render();
+    toast(n+" kehadiran direkod"+(fresh.length?" \u00b7 "+fresh.length+" nama baharu ke Mutabaah":""));
+  });
+}
+
 function parseCSV(txt){txt=txt.replace(/^\ufeff/,"");const lines=txt.split(/\r?\n/).filter(l=>l.trim());if(!lines.length)return[];
   const split=l=>{const out=[];let cur="",q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){cur+='"';i++;}else q=!q;}else if(ch===","&&!q){out.push(cur);cur="";}else cur+=ch;}out.push(cur);return out;};
   const head=split(lines[0]).map(h=>h.trim().toLowerCase());
