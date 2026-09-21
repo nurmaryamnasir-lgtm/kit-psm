@@ -2574,7 +2574,13 @@ document.addEventListener("click",e=>{
   /* Adding while one IPT is filtered pre-fills that IPT — otherwise the new row
      would be created straight out of the view that created it. */
   if(e.target.closest&&e.target.closest("#addPdBtn")){const pre=(pdFilt&&pdFilt!=="__blank__")?pdFilt:"";S.pdList.unshift({id:uid("pd_"),nama:"",ipt:pre,_upd:Date.now()});logAct("Tambah PD baharu","");save();render();setTimeout(()=>{const f=document.querySelector('.pdname[data-pded="'+S.pdList[0].id+'"]');if(f)f.focus();},0);return;}
-  const pdd=e.target.closest("[data-pddel]");if(pdd){const id=pdd.dataset.pddel;const _g=getPd(id);logAct("Buang PD",_g&&_g.nama);S._del[id]=Date.now();S.pdList=S.pdList.filter(x=>x.id!==id);save();render();return;}
+  /* The ✕ sits on the same row as the name field, so a slip here deletes from
+     the one store PD names come from. Name the penggerak, and say who is left
+     without one. A row still blank has nothing to lose, so it goes unasked. */
+  const pdd=e.target.closest("[data-pddel]");if(pdd){const id=pdd.dataset.pddel;const _g=getPd(id);
+    if(_g&&(_g.nama||"").trim()){const n=maduOfPd(_g);
+      if(!confirm(`Buang penggerak "${_g.nama}"?`+(n?`\n\n${n} mad'u masih ditugaskan kepadanya.`:"")))return;}
+    logAct("Buang PD",_g&&_g.nama);S._del[id]=Date.now();S.pdList=S.pdList.filter(x=>x.id!==id);save();render();return;}
   const ua=e.target.closest("[data-uatt]");if(ua){const id=ua.dataset.uatt;uForm.att[id]=!uForm.att[id];render();return;}
   const uga=e.target.closest("[data-ugatt]");if(uga){const[gid,pid]=uga.dataset.ugatt.split("|");toggleUsrahAtt(gid,pid);render();return;}
   const ulg=e.target.closest("[data-ulog]");if(ulg){uLogOpen=(uLogOpen===ulg.dataset.ulog?"":ulg.dataset.ulog);render();return;}
@@ -2589,7 +2595,10 @@ document.addEventListener("click",e=>{
   const ne=e.target.closest("[data-noteedit]");if(ne){noteEdit=ne.dataset.noteedit;render();focusNote();return;}
   if(e.target.closest("[data-notedone]")){noteEdit="";render();return;}
   const km=e.target.closest("[data-kmode]");if(km){kMode=km.dataset.kmode;render();return;}
-  const ds=e.target.closest("[data-delses]");if(ds){const[pid,sid]=ds.dataset.delses.split("|");const p=get(pid);if(p){p.sessions=p.sessions.filter(x=>x.id!==sid);save();render();}return;}
+  const ds=e.target.closest("[data-delses]");if(ds){const[pid,sid]=ds.dataset.delses.split("|");const p=get(pid);
+    if(p){const s=(p.sessions||[]).find(x=>x.id===sid);const lbl=s?[s.jenis,s.tarikh].filter(Boolean).join(" · "):"";
+      if(!confirm(lbl?`Buang rekod "${lbl}"?`:"Buang rekod ini?"))return;
+      p.sessions=p.sessions.filter(x=>x.id!==sid);save();render();}return;}
   const pr=e.target.closest("[data-promote]");if(pr){promote(get(pr.dataset.promote));return;}
   const del=e.target.closest("[data-del]");if(del){const p=get(del.dataset.del);if(p&&confirm(`Buang "${p.nama||"rekod"}"?`)){S._del[p.id]=Date.now();S.people=S.people.filter(x=>x.id!==p.id);if(selId===p.id)selId=null;logAct("Buang mad'u",p.nama);save();render();toast("Dibuang");}return;}
   const bx=e.target.closest("[data-bpmyxl]");if(bx){exportBPMy(get(bx.dataset.bpmyxl));return;}
@@ -2601,7 +2610,10 @@ document.addEventListener("click",e=>{
   const mtog=e.target.closest("[data-mtog]");if(mtog){const m=getM(mtog.dataset.mtog);if(m){toggleOpen(m.id);render();}return;}
   if($("#addMeetBtn")&&e.target.closest("#addMeetBtn")){S.meetings.unshift(addOpen(newMeeting()));logAct("Tambah mesyuarat","");save();render();return;}
   const ait=e.target.closest("[data-addit]");if(ait){const m=getM(ait.dataset.addit);if(m){m.items.push(newItem());save();render();}return;}
-  const dit=e.target.closest("[data-delit]");if(dit){const[mid,iid]=dit.dataset.delit.split("|");const m=getM(mid);if(m){m.items=m.items.filter(x=>x.id!==iid);save();render();}return;}
+  const dit=e.target.closest("[data-delit]");if(dit){const[mid,iid]=dit.dataset.delit.split("|");const m=getM(mid);
+    if(m){const it=(m.items||[]).find(x=>x.id===iid);const t=it?(it.tugasan||"").trim():"";
+      if(t&&!confirm(`Buang tindakan "${t}"?`))return;
+      m.items=m.items.filter(x=>x.id!==iid);save();render();}return;}
   const dm=e.target.closest("[data-delmeet]");if(dm){const m=getM(dm.dataset.delmeet);if(m&&confirm("Buang mesyuarat?")){logAct("Buang mesyuarat",m.tajuk);S._del[m.id]=Date.now();S.meetings=S.meetings.filter(x=>x.id!==m.id);save();render();}return;}
   const dn=e.target.closest("[data-done]");if(dn){const[mid,iid]=dn.dataset.done.split("|");const m=getM(mid);const it=m&&m.items.find(x=>x.id===iid);if(it){it.status="Selesai";save();render();toast("Selesai");}return;}
   const hd=e.target.closest("[data-hadir]");if(hd){const[mid,en]=hd.dataset.hadir.split("|");const nm=decodeURIComponent(en);const m=getM(mid);if(m){m.hadir=m.hadir||[];const i=m.hadir.indexOf(nm);if(i>=0)m.hadir.splice(i,1);else m.hadir.push(nm);save();render();}return;}
@@ -2627,7 +2639,13 @@ document.addEventListener("click",e=>{
   if($("#addClaimBtn")&&e.target.closest("#addClaimBtn")){S.claims.unshift(addOpen(newClaim()));logAct("Tambah tuntutan","");save();render();return;}
   const dc=e.target.closest("[data-delclaim]");if(dc){const c=getC(dc.dataset.delclaim);if(c&&confirm("Buang tuntutan?")){logAct("Buang tuntutan",c.reportName);S._del[c.id]=Date.now();S.claims=S.claims.filter(x=>x.id!==c.id);save();render();}return;}
   const ub=e.target.closest("[data-uplbtn]");if(ub){const [kind,id]=ub.dataset.uplbtn.split("|");pickAndUpload(kind,id);return;}
-  const ra=e.target.closest("[data-rmatt]");if(ra){const [kind,id,idx]=ra.dataset.rmatt.split("|");if(kind==="person"){const p=get(id);if(p&&p.lampiran){p.lampiran.splice(+idx,1);save();render();}}else if(kind==="claim"){const c=getC(id);if(c&&c.files){c.files.splice(+idx,1);save();render();}}return;}
+  /* Removing an attachment drops the link from this record only — the file
+     itself stays in Drive — so the prompt says as much rather than reading
+     like the upload is gone for good. */
+  const ra=e.target.closest("[data-rmatt]");if(ra){const [kind,id,idx]=ra.dataset.rmatt.split("|");
+    const h=kind==="person"?get(id):(kind==="claim"?getC(id):null);const arr=h&&(kind==="person"?h.lampiran:h.files);
+    if(arr&&arr[+idx]){if(!confirm(`Buang pautan "${arr[+idx].name||"fail"}" dari rekod ini?\n\nFail asal kekal di Drive.`))return;
+      arr.splice(+idx,1);save();render();}return;}
   if(!e.target.closest(".menu"))$("#menuPop").classList.remove("show");
   if(wasAddOpen&&!(e.target.closest&&e.target.closest(".wadd"))){wasAddOpen=false;render();}
 });
