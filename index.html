@@ -445,15 +445,23 @@
   .ktbl tbody tr{cursor:pointer;transition:background var(--dur-fast) var(--ease-standard)} .ktbl tbody tr:hover{background:var(--surface-sunken)} .ktbl tbody tr:last-child td{border-bottom:none}
   .ktname{font-weight:700;letter-spacing:-.01em} .ktbl th.sortable{cursor:pointer;user-select:none;white-space:nowrap} .ktbl th.sortable:hover{color:var(--blue)}
   .kt-ar{font-family:var(--font-mono);font-size:10px;margin-left:5px;color:var(--kabus-400)} .kt-ar.on{color:var(--blue)}
-  /* Identity cell: avatar + name over the record's short ID. */
+  /* Identity cell: avatar + name + keahlian mark. The <td> stays a table cell so
+     its bottom border shares the row's baseline with every other column; the
+     flex row lives on .kt-idw inside it. */
   .kt-id{min-width:190px}
-  .kt-id,.kt-ipt{display:flex;align-items:center;gap:11px}
+  .kt-idw,.kt-ipt{display:flex;align-items:center;gap:11px}
   .kt-av{flex:0 0 auto;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-size:12.5px;font-weight:700;letter-spacing:.02em}
   .kt-idm{display:flex;flex-direction:column;gap:2px;min-width:0}
   .kt-name{font-weight:700;font-size:14.5px;letter-spacing:-.01em;line-height:1.25}
   .kt-ipt{gap:7px;font-weight:500}
   .kt-sub{display:block;font-size:12px;color:var(--muted);line-height:1.35;margin-top:3px}
   .kt-dim{color:var(--kabus-400)} .kt-warn{color:var(--merah-600);font-weight:700}
+  /* Keahlian mark. Pushed to the far edge of the identity cell so the column of
+     marks can be read straight down without the names getting in the way. */
+  .kt-idw .ahli{margin-left:auto}
+  .ahli{flex:0 0 auto;display:inline-grid;place-items:center;width:18px;height:18px;color:var(--kabus-400);vertical-align:middle}
+  .ahli svg{width:100%;height:100%}
+  .ahli-y{color:var(--hijau-600)}
   /* Column sizing: let the name and next-action columns breathe, pin the rest. */
   .ktbl th:nth-child(2),.ktbl td:nth-child(2){min-width:165px}
   .ktbl th:nth-child(3),.ktbl td:nth-child(3){min-width:105px}
@@ -726,6 +734,7 @@
   .pp-rm{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
   .pp-rn{font-size:13.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .pp-rs{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pp-rs-bad{color:var(--merah-600);font-weight:700}
   .pp-date{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--radius-md);background:var(--surface-brand-soft)}
   .pp-dd{font-family:var(--font-display);font-size:16px;font-weight:800;line-height:1;color:var(--biru-700)}
   .pp-dm{font-family:var(--font-mono);font-size:8.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--biru-600);margin-top:3px}
@@ -862,21 +871,6 @@
   .nact-green{background:var(--green-s)} .nact-green .nact-e,.nact-green .nact-d{color:var(--hijau-600)}
   .nact-red{background:var(--red-s)} .nact-red .nact-e,.nact-red .nact-d{color:var(--merah-600)}
   .nact-done{background:var(--surface-accent-soft)} .nact-done .nact-e,.nact-done .nact-d{color:var(--emas-600)}
-
-  /* ---------- Perjalanan pencalonan (drawer rail) ---------- */
-  .jr-wrap{margin-bottom:20px}
-  .jr-h{font-family:var(--font-display);font-size:17px;font-weight:800;letter-spacing:var(--tracking-heading);margin:0 0 12px}
-  .jr{display:flex;flex-direction:column}
-  .jr-i{display:flex;align-items:flex-start;gap:14px;position:relative;padding-bottom:16px}
-  /* The connector hangs off each step and is cut on the last one. */
-  .jr-i::before{content:"";position:absolute;left:17px;top:36px;bottom:0;width:2px;background:var(--border-strong)}
-  .jr-i.last::before{display:none}
-  .jr-dot{position:relative;z-index:1;flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--putih)}
-  .jr-dot svg{width:17px;height:17px}
-  .jr-brand{background:var(--blue)} .jr-cyan{background:var(--cyan-500)} .jr-gold{background:var(--emas-500)} .jr-muted{background:var(--kabus-400)}
-  .jr-b{display:flex;flex-direction:column;gap:2px;min-width:0;padding-top:4px}
-  .jr-l{font-size:15px;font-weight:600;color:var(--ink);line-height:1.3}
-  .jr-d{font-family:var(--font-mono);font-size:12.5px;font-weight:500;color:var(--muted)}
 
   .gm{display:flex;flex-direction:column;margin-top:4px}
   .gm-i{display:flex;gap:12px}
@@ -1042,7 +1036,42 @@ function maduAsing(){return S.people.filter(p=>!p.arsip&&isAsing(p));}
 const SES_JENIS=["Usrah","DF","Program","Tugasan"];
 const NEGERI=["Johor","Kedah","Kelantan","Melaka","Negeri Sembilan","Pahang","Perak","Perlis","Pulau Pinang","Sabah","Sarawak","Selangor","Terengganu","Kuala Lumpur","Labuan","Putrajaya"];
 const TAHAP_PENGAJIAN=["Diploma","Sarjana Muda"];
+
+/* Programme catalogue, keyed IPT → tahap pengajian. An entry is either a bare
+   field of study or "KOD|Bidang" where the IPT publishes a programme code.
+   Sources: the iCEPS/UiTM programme sheets for Shah Alam and Puncak Perdana, the
+   MSU intake course list, and the INTEC diploma list. Names are the published
+   programme minus its "Diploma in" / "Bachelor of" wrapper, because the tahap is
+   already chosen next door — what is stored is the bidang, not the whole title.
+   A pairing with no list here (INTEC at degree level, or an IPT added by hand)
+   falls back to free text rather than to a wrong list. SI260-262 sit under both
+   UiTM campuses on purpose: Shah Alam owns them, Puncak Perdana teaches them. */
+const KURSUS={
+  "UiTM Shah Alam":{
+    "Diploma":["AC110|Perakaunan","AM110|Pentadbiran Awam","BA111|Pengajian Perniagaan","BA117|Pengajian Perniagaan (Pengangkutan)","BA132|Pengurusan Teknologi Pejabat","BA141|Pengajian Insurans","HM111|Pengurusan Pelancongan","CDIM110|Pengurusan Maklumat","IC110|Muamalat","SR111|Pengurusan Sukan dan Rekreasi","SR113|Pengajian Sukan"],
+    "Sarjana Muda":["AC220|Perakaunan","AD264|Teknologi Reka Bentuk Perindustrian","AD266|Teknologi Reka Bentuk Fesyen","AM238|Sains Pentadbiran","AS211|Biologi","AS213|Fizik","AS242|Kimia","AS249|Teknologi Alam Sekitar","AS266|Sains dan Teknologi Makanan","BE246|Pengurusan Binaan","CS230|Sains Komputer","CS240|Teknologi Maklumat","CS255|Sains Komputer (Rangkaian Komputer)","IC210|Muamalat","IC220|Pengurusan Industri Halal","LG242|Pengajian Bahasa Gunaan (Bahasa Arab untuk Komunikasi Profesional)","LW213|Pengajian Undang-Undang","MC241|Komunikasi Massa (Kewartawanan)","MC242|Komunikasi Massa (Perhubungan Awam)","MC244|Komunikasi Massa (Pengiklanan)","MC245|Komunikasi Massa (Penerbitan)","MC246|Komunikasi (Komunikasi Instruksional)","MC247|Komunikasi (Komunikasi Interpersonal)","MC248|Komunikasi (Pengurusan dan Dasar Interpersonal)","SI260|Sains Maklumat (Pengurusan Perpustakaan)","SI261|Sains Maklumat (Pengurusan Rekod)","SI262|Sains Maklumat (Pengurusan Sistem Maklumat)","SR241|Pengurusan Sukan","SR243|Sains Sukan"]
+  },
+  "UiTM Puncak Perdana":{
+    "Diploma":["FF111|Filem","FF112|Penulisan Skrip","FF113|Teater","FF114|Pengurusan Seni","FF115|Animasi","SI110|Pengurusan Maklumat","SI144|Informatik Perpustakaan"],
+    "Sarjana Muda":["FF220|Animasi (Penerbitan Animasi 3D)","FF221|Pengurusan Seni / Pengurusan Industri Kreatif","SI260|Sains Maklumat (Pengurusan Perpustakaan)","SI261|Sains Maklumat (Pengurusan Rekod)","SI262|Sains Maklumat (Pengurusan Sistem Maklumat)","SI263|Sains Maklumat (Pengurusan Kandungan Maklumat)"]
+  },
+  "INTEC":{
+    "Diploma":["DBM|Pengurusan Perniagaan","DIA|Perakaunan","DIF|Kewangan Islam","DPMG|Pengurusan dan Tadbir Urus Awam","DSHP|Amalan Halal Saintifik"]
+  },
+  "MSU":{
+    "Diploma":["Perakaunan","Teknologi Penyelenggaraan Pesawat","Pengurusan Kecantikan","Pengkomputeran Perniagaan","Kejuruteraan Komputer","Forensik Komputer","Sains Komputer","Kaunseling dan Bimbingan","Visual Kreatif","Seni Kulinari","Pendidikan Awal Kanak-Kanak","Pendidikan - TESL","Kejuruteraan Elektrik dan Elektronik","Keusahawanan","Pengurusan Acara","Reka Bentuk Fesyen","Reka Bentuk Permainan dan Animasi","Reka Bentuk Grafik","Dandanan Rambut","Pengurusan Hospitaliti & Pelancongan","Pengurusan Modal Insan","Pengurusan Maklumat","Teknologi Maklumat","Reka Bentuk Dalaman","Pengurusan Pelaburan","Perbankan Islam","Kewangan Islam","Pengurusan Logistik","Pengurusan","Kejuruteraan Mekanikal","Sains Perubatan dan Kesihatan","Teknologi Makmal Perubatan","Sains Perubatan","Multimedia","Muzik","Teknologi Muzik","Kejururawatan","Keselamatan dan Kesihatan Pekerjaan","Teknologi Pengurusan Pejabat","Dispensari Oftalmik","Rekreasi Luar","Seni Patisserie","Farmasi","Fisioterapi","Perhubungan Awam dan Pengurusan Hiburan","Radioterapi","Pengurusan Runcit","Pengurusan SPA","Sains Sukan","Perubatan Tradisional Cina","Terjemahan dan Interpretasi"],
+    "Sarjana Muda":["Reka Bentuk Aksesori","Perakaunan","Perakaunan dan Kewangan","Pengurusan Penerbangan dan Juruterbang","Pengurusan Kecantikan dan Rambut","Bioinformatik","Sains Bioperubatan","Pengkomputeran Perniagaan","Teknologi Kardiovaskular","Kejuruteraan Komputer","Forensik Komputer","Sains Komputer","Kaunseling dan Bimbingan","Multimedia Kreatif","Video dan Fotografi Kreatif","Seni Kulinari","Pembedahan Pergigian","Pendidikan Awal Kanak-Kanak","Pendidikan (Kejuruteraan Elektrik dan Elektronik)","Pendidikan (Pendidikan Jasmani dan Kesihatan)","Pendidikan (Sains)","Pendidikan (Seni Visual)","Pendidikan - TESL","Keusahawanan","Pengurusan Acara","Reka Bentuk Fesyen dengan Pemasaran","Kewangan","Teknologi Perkhidmatan Makanan","Sains Forensik","Reka Bentuk Permainan dan Animasi","Reka Bentuk Grafik","Pengurusan Sains Kesihatan","Pengurusan Hospitaliti & Pelancongan","Pengurusan Modal Insan","Pengurusan Perindustrian","Teknologi Maklumat dan Komunikasi","Pengauditan Sistem Maklumat","Teknologi Maklumat (Teknologi Tanpa Wayar Mudah Alih)","Multimedia Instruksional","Perniagaan Antarabangsa","Pengurusan Pelaburan","Pengurusan Perhubungan Awam","Perbankan Islam","Kewangan Islam","Pengurusan Islam","Pengurusan Logistik","Kejuruteraan Mekanikal","Sains Perubatan","Perubatan dan Pembedahan (MBBS)","Persembahan Muzik","Teknologi Muzik","Media Baharu","Kejururawatan","Pemakanan","Teknologi Pengurusan Pejabat","Optometri","Pengurusan Rekreasi Luar","Seni Patisserie","Teknologi Farmaseutikal","Farmasi","Reka Bentuk Produk","Psikologi","Psikologi dengan Pemasaran","Pengurusan Runcit","Pengurusan SPA","Teknologi (Elektrik dan Elektronik)","Perubatan Tradisional Cina","Perubatan Veterinar","Komunikasi Visual dan Pemasaran"]
+  }
+};
+function kursusParse(s){const i=s.indexOf("|");return i<0?{code:"",nama:s}:{code:s.slice(0,i),nama:s.slice(i+1)};}
+function kursusList(ipt,tahap){const byIpt=KURSUS[(ipt||"").trim()];const l=byIpt&&byIpt[(tahap||"").trim()];
+  return (l||[]).map(kursusParse).sort((a,b)=>a.nama.localeCompare(b.nama));}
+
 const JANTINA=["Lelaki","Perempuan"]; const KERJA=["Belajar","Bekerja"]; const PSPB_YEARS=["2023","2024","2025","2026","2027","2028"];
+/* The session the branch is actually working, so the dashboard opens on it
+   instead of on every cohort ever recorded. viewPapan self-heals to "Semua
+   sesi" if no mad'u carries this year. */
+const PSPB_SEMASA="2026";
 const MEET_STATUS=null;
 const W_STATUS=["Belum","Sudah","Tangguh"];
 const W_MEDIUM=["Online","Fizikal"];
@@ -1074,7 +1103,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=""; let santFilt=""; let santSel=null; let santQ="";
+let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let santFilt=""; let santSel=null; let santQ="";
 /* Which editor tab is open. This lives here, not on the person, because
    syncNow() and pullMerge() replace the whole of S with the server's copy every
    25 seconds — anything parked on a person record is overwritten by whatever
@@ -1094,7 +1123,11 @@ function addOpen(rec){openRows.add(rec.id);return rec;}
 const store={async get(k){try{if(window.storage&&window.storage.get)return await window.storage.get(k);}catch(e){}try{const v=localStorage.getItem(k);return v!=null?{value:v}:null;}catch(e){return null;}},
   async set(k,v){try{if(window.storage&&window.storage.set){await window.storage.set(k,v);return;}}catch(e){}try{localStorage.setItem(k,v);}catch(e){}}};
 async function load(){try{const r=await store.get(KEY);if(r&&r.value)S=JSON.parse(r.value);}catch(e){}if(S&&S._cacheAt&&(Date.now()-S._cacheAt>7*864e5)){try{localStorage.removeItem(KEY);}catch(e){}S={};}normalizeS();}
-let sT,pT;function save(){stampActive();S._localSavedAt=new Date().toISOString();if(SYNC.ok)dirty=true;clearTimeout(sT);sT=setTimeout(async()=>{try{await store.set(KEY,JSON.stringify(cachePayload()));}catch(e){}},150);if(SYNC.ok&&cfg.url&&SYNC.code){clearTimeout(pT);pT=setTimeout(pushSync,900);}}
+/* Bumped by every local edit. syncNow() captures it before an upload and checks
+   it after, which is how it tells "the server echoed back exactly what I sent"
+   from "the user typed again while that request was in flight". */
+let rev=0;
+let sT,pT;function save(){rev++;stampActive();S._localSavedAt=new Date().toISOString();if(SYNC.ok)dirty=true;clearTimeout(sT);sT=setTimeout(async()=>{try{await store.set(KEY,JSON.stringify(cachePayload()));}catch(e){}},150);if(SYNC.ok&&cfg.url&&SYNC.code){clearTimeout(pT);pT=setTimeout(pushSync,900);}}
 const SENSITIVE=["email","telefon","tarikhLahir","alamatCaw","alamatKg1","alamatKg2","poskod","kolej","ic"];
 function cachePayload(){const o={};for(const k in S)o[k]=S[k];if(S.people)o.people=S.people.map(p=>{const c={};for(const k in p)if(SENSITIVE.indexOf(k)<0)c[k]=p[k];return c;});o._redacted=true;o._cacheAt=Date.now();return o;}
 function persistLocal(){try{store.set(KEY,JSON.stringify(cachePayload()));}catch(e){}}
@@ -1104,12 +1137,23 @@ const $=s=>document.querySelector(s);
 function el(t,c){const e=document.createElement(t);if(c)e.className=c;return e;}
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);}
 function esc(s){return(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
-const TITLE_FIELDS=new Set(["nama","bidang","alamatCaw","alamatKg1","alamatKg2","kursus","tajmik","passCaw","program","tajuk","venue","pic","reportName","namaPemohon","namaAgensi","penama","bank","perincianAktiviti"]);
+/* "bidang" is deliberately absent. It is now picked from the programme
+   catalogue, which already carries each IPT's own casing; titleCase capitalises
+   after every space, so it would rewrite a published name like "Sports and
+   Recreational Management" to "Sports And Recreational Management" the moment
+   the field blurred, and the stored value would stop matching the list. */
+const TITLE_FIELDS=new Set(["nama","alamatCaw","alamatKg1","alamatKg2","kursus","tajmik","passCaw","program","tajuk","venue","pic","reportName","namaPemohon","namaAgensi","penama","bank","perincianAktiviti"]);
 function titleCase(v){return(v||"").replace(/(^|[\s\-\/])([a-zà-ÿ])/g,(m,p,c)=>p+c.toUpperCase());}
 function fmtPhone(v){const d=(v||"").replace(/\D/g,"").slice(0,11);if(!d)return"";const a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);return a+(b?"-"+b:"")+(c?" "+c:"");}
 function normVal(f,v){if(f==="telefon")return fmtPhone(v);if(f==="email")return(v||"").trim().toLowerCase();if(f==="poskod")return(v||"").replace(/\D/g,"").slice(0,5);if(TITLE_FIELDS.has(f))return titleCase(v);return v;}
 function initials(n){n=(n||"").trim();if(!n)return"?";return n.split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();}
-function today(){return new Date().toISOString().slice(0,10);}
+/* The one way a Date becomes a YYYY-MM-DD in this app. toISOString() reads the
+   date in UTC, so for a local midnight anywhere east of Greenwich it hands back
+   the day before — in Malaysia (UTC+8) every calendar cell was stamped with
+   yesterday's date, which is why the grid numbers and the events sitting in them
+   disagreed by one, and why "today" was wrong before 8am. */
+function isoDate(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function today(){return isoDate(new Date());}
 function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function get(id){return S.people.find(p=>p.id===id);}
 function getM(id){return S.meetings.find(m=>m.id===id);}
@@ -1131,6 +1175,13 @@ function bpmy(p){const sc=p.bpmy||{};let total=0;const cats=BPMY.map(c=>{let s=0
 function muhStatus(p){const b=bpmy(p);const pc=Math.round(b.pct*100);if(b.pass)return{k:"g",t:"Layak MAY · "+pc+"%"};if(b.total>0)return{k:"b",t:"BPMy "+pc+"%"};return{k:"n",t:"Baru muhib"};}
 function statusOf(p){if(p.stage==="mutabaah")return mutStatus(p);if(p.stage==="muhib")return muhStatus(p);if(p.stage==="muayyid")return{k:"g",t:"Muayyid"};return{k:"n",t:"Baru"};}
 function eligible(p){if(p.stage==="mutabaah")return sesCount(p)>=3&&p.minatUsrah==="Ya"&&p.bukanMusuh!=="Tidak";if(p.stage==="muhib")return bpmy(p).pass;return false;}
+
+/* A mad'u with nobody assigned is stalled, not merely incomplete: no PD means no
+   usrah, so no sesi, so no tarsyih. A muayyid is past the PD relationship. */
+function tiadaPd(p){return p.stage!=="muayyid"&&!(p.pd1||"").trim()&&!(p.pd2||"").trim();}
+/* What the bell, the dashboard card and the sidebar badge all mean by "needs me":
+   either the tarsyih is already earned and waiting, or nobody is assigned yet. */
+function perluTindakan(p){return tiadaPd(p)||eligible(p);}
 function stageCode(s){return {mutabaah:"MUT",muhib:"MUH",muayyid:"MAY"}[s]||"—";}
 function stageLabel(s){return(STAGES.find(x=>x.id===s)||{}).label||s;}
 
@@ -1157,13 +1208,11 @@ function progressOf(p){
   return{pct,k:eligible(p)?"g":(pct>0?"b":"n")};
 }
 
-/* Adds `days` to an ISO date (or to today when the date is missing/unusable).
-   Formatted from the local date parts — toISOString() would roll the answer back a
-   day for anyone east of UTC, Malaysia included. */
+/* Adds `days` to an ISO date (or to today when the date is missing/unusable). */
 function addDays(iso,days){
   const base=/^\d{4}-\d{2}-\d{2}$/.test(iso||"")?new Date(iso+"T00:00:00"):new Date();
   base.setDate(base.getDate()+days);
-  return base.getFullYear()+"-"+String(base.getMonth()+1).padStart(2,"0")+"-"+String(base.getDate()).padStart(2,"0");
+  return isoDate(base);
 }
 function lastSessionDate(p){const d=(p.sessions||[]).map(s=>s&&s.tarikh).filter(Boolean).sort();return d.length?d[d.length-1]:"";}
 
@@ -1176,8 +1225,12 @@ const TARSYIH_DUE={mutabaah:"2026-10-31",muhib:"2027-06-30"};
 function nextAction(p){
   const last=lastSessionDate(p);
   if(p.stage==="muayyid")return null;
+  if(p.stage==="mutabaah"&&p.bukanMusuh==="Tidak")return{label:"Semak semula kelayakan — ditanda musuh Islam",due:"",tone:"red"};
+  /* Sits above the stage split because it outranks every step on either side of
+     it: until somebody is taklif'd to this mad'u, no usrah can be held, so no
+     sesi accrues and no tarsyih can follow. */
+  if(tiadaPd(p))return{label:"Tetapkan Penggerak Dakwah — belum ditugaskan",due:addDays("",7),tone:"red"};
   if(p.stage==="mutabaah"){
-    if(p.bukanMusuh==="Tidak")return{label:"Semak semula kelayakan — ditanda musuh Islam",due:"",tone:"red"};
     const n=sesCount(p);
     if(n===0)return{label:"Mulakan usrah mutabaah — sesi pertama",due:addDays("",14),tone:"amber"};
     if(n<3)return{label:`Teruskan usrah — ${3-n} sesi lagi sebelum tarsyih`,due:addDays(last,14),tone:"amber"};
@@ -1755,6 +1808,10 @@ function viewPapan(){
   const total=ppl.length;
   const nStage=id=>ppl.filter(p=>p.stage===id).length;
   const elig=ppl.filter(p=>eligible(p));
+  /* Kept apart from `elig`: the KPI tile and the hero line count earned tarsyih
+     only, while the action card also owes the coordinator every mad'u still
+     waiting on a PD — those two numbers are not the same question. */
+  const perlu=ppl.filter(p=>perluTindakan(p)).sort((a,b)=>(tiadaPd(b)?1:0)-(tiadaPd(a)?1:0));
   const STAGE_DOT={mutabaah:"var(--kabus-400)",muhib:"var(--biru-600)",muayyid:"var(--emas-500)"};
 
   const kpis=[
@@ -1775,9 +1832,12 @@ function viewPapan(){
   const funnel=STAGES.map(st=>fnlRow(st.label,nStage(st.id),STAGE_DOT[st.id])).join("")
     +(other>0?fnlRow("Tiada peringkat",other,"var(--merah-500)","Rekod tanpa peringkat sah — buka Direktori dan tetapkan peringkat."):"");
 
-  const actRows=elig.map(p=>{
+  const actRows=perlu.map(p=>{
     const st=statusOf(p);
-    return `<button type="button" class="pp-row" data-goto="${esc(p.id)}" aria-label="Buka ${esc(p.nama||"ahli")}">${stageBadge(p.stage)}<span class="pp-rm"><span class="pp-rn">${esc(p.nama||"(nama)")}</span><span class="pp-rs">${esc(st.t||stageLabel(p.stage))}</span></span><span class="chev">›</span></button>`;
+    /* The row says which of the two reasons put it here, so the list can be
+       worked without opening every record to find out. */
+    const why=tiadaPd(p)?`<span class="pp-rs pp-rs-bad">Tiada PD — perlu ditugaskan</span>`:`<span class="pp-rs">${esc(st.t||stageLabel(p.stage))}</span>`;
+    return `<button type="button" class="pp-row" data-goto="${esc(p.id)}" aria-label="Buka ${esc(p.nama||"ahli")}">${stageBadge(p.stage)}<span class="pp-rm"><span class="pp-rn">${esc(p.nama||"(nama)")}</span>${why}</span><span class="chev">›</span></button>`;
   }).join("");
 
   /* Sessions already carry `tarikh`, so upcoming is real. If none are dated in the
@@ -1825,8 +1885,8 @@ function viewPapan(){
     ${kpiCard}
     <div class="pp-2">
       <div class="pp-card">
-        <div class="pp-h">Perlu tindakan${elig.length?`<span class="c">${elig.length}</span>`:""}</div>
-        <div class="pp-list">${actRows||`<div class="pp-empty">Tiada mad'u yang cukup syarat tarsyih buat masa ini.</div>`}</div>
+        <div class="pp-h">Perlu tindakan${perlu.length?`<span class="c">${perlu.length}</span>`:""}</div>
+        <div class="pp-list">${actRows||`<div class="pp-empty">Semua mad'u ada PD, dan tiada siapa yang cukup syarat tarsyih buat masa ini.</div>`}</div>
       </div>
       <div class="pp-card">
         <div class="pp-h">Corong pencalonan</div>
@@ -1844,7 +1904,7 @@ function viewPapan(){
 function renderNav(){
   /* INTEC is out here too, so the badge matches the "Semua" pill it links to. */
   const act=maduPool();
-  const n={papan:act.filter(p=>eligible(p)).length,
+  const n={papan:act.filter(p=>perluTindakan(p)).length,
     pencalonan:act.filter(p=>eligible(p)).length,
     keahlian:act.length,
     minit:(S.meetings||[]).length,
@@ -1894,6 +1954,35 @@ function attList(kind,id,arr){arr=arr||[];return `<div class="grp"><h3>Lampiran 
    assignment is never silently dropped. */
 function selPd(id,f,v){const opts=pdOptions();const cur=(v&&!opts.includes(v))?`<option selected>${esc(v)}</option>`:"";
   return `<select data-ed="${id}" data-f="${f}" data-list="__pd__"><option value="">— pilih —</option>${cur}${opts.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}<option value="__add__">＋ Tambah baharu…</option></select>`;}
+/* Tahap is a closed set, so it is a select — and it is asked BEFORE bidang,
+   because together with the IPT it is what decides which programmes the bidang
+   picker may offer. A value already on file that is outside the set is kept as
+   its own option rather than silently dropped. */
+function selTahap(p){const v=p.tahap||"";const extra=(v&&TAHAP_PENGAJIAN.indexOf(v)<0)?`<option selected>${esc(v)}</option>`:"";
+  return `<select id="${fieldId("ed",p.id,"tahap")}" data-ed="${p.id}" data-f="tahap"><option value="">— pilih —</option>${extra}${TAHAP_PENGAJIAN.map(x=>`<option${x===v?" selected":""}>${x}</option>`).join("")}</select>`;}
+
+/* Bidang is a combo box, not a select: the datalist carries every programme this
+   IPT publishes at this tahap — so the field is a dropdown that also searches as
+   you type — while the input underneath still accepts anything, because a mad'u
+   on a programme the catalogue does not hold must not be blocked from being
+   recorded. With no catalogue for the pairing it degrades to plain free text. */
+function selBidang(p){
+  const list=kursusList(p.universiti,p.tahap);
+  const lid="kursus-"+p.id;
+  const ph=list.length?"Pilih atau taip untuk cari…":"cth. Perubatan";
+  const inp=`<input id="${fieldId("ed",p.id,"bidang")}" data-ed="${p.id}" data-f="bidang" value="${esc(p.bidang)}" placeholder="${ph}" autocomplete="off" spellcheck="false"${list.length?` list="${lid}"`:""}>`;
+  if(!list.length)return inp;
+  return inp+`<datalist id="${lid}">${list.map(k=>`<option value="${esc(k.nama)}">${esc(k.code?k.code+" · "+k.nama:k.nama)}</option>`).join("")}</datalist>`;
+}
+/* Says where the list came from, or why there isn't one — otherwise an empty
+   dropdown reads as "no such course" instead of "we hold no list for this". */
+function bidangHint(p){
+  const n=kursusList(p.universiti,p.tahap).length;
+  if(n)return `<div class="hint" style="margin:-4px 0 10px">${n} program ${esc((p.tahap||"").toLowerCase())} ${esc(iptLabel(p.universiti))} disenaraikan — taip untuk mencari. Isi sendiri jika tiada dalam senarai.</div>`;
+  if(!(p.universiti||"").trim()||!(p.tahap||"").trim())return `<div class="hint" style="margin:-4px 0 10px">Pilih IPT dan tahap pengajian dahulu untuk senarai bidang.</div>`;
+  return `<div class="hint" style="margin:-4px 0 10px">Tiada senarai program untuk ${esc(iptLabel(p.universiti))} peringkat ${esc((p.tahap||"").toLowerCase())} — isi sendiri.</div>`;
+}
+
 function selManaged(id,f,v,list){const opts=S[list]||[];const cur=(v&&!opts.includes(v))?`<option selected>${esc(v)}</option>`:"";return `<select data-ed="${id}" data-f="${f}" data-list="${list}"><option value="">— pilih —</option>${cur}${opts.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}<option value="__add__">＋ Tambah baharu…</option></select>`;}
 function stageSelect(id,v){return `<select data-ed="${id}" data-f="stage">`+STAGES.map(s=>`<option value="${s.id}"${s.id===v?" selected":""}>${s.label}</option>`).join("")+`</select>`;}
 
@@ -1934,7 +2023,7 @@ function filteredPeople(allStages){let list=S.people.slice();
   /* Search spans name, IPT (full name and short label) and the derived ID, which
      is what the placeholder promises. */
   if(q)list=list.filter(p=>[p.nama,p.universiti,iptLabel(p.universiti)].some(v=>String(v||"").toLowerCase().includes(q)));
-  if(F.perlu)list=list.filter(p=>eligible(p));
+  if(F.perlu)list=list.filter(p=>perluTindakan(p));
   if(F.pd){if(F.pd==="__none__")list=list.filter(p=>!p.pd1&&!p.pd2);else list=list.filter(p=>p.pd1===F.pd||p.pd2===F.pd);}
   if(F.minat)list=list.filter(p=>(p.minatUsrah||"Belum")===F.minat);
   if(F.ajk)list=list.filter(p=>(p.minatAJK||"Tidak")===F.ajk);
@@ -2002,9 +2091,9 @@ function viewKeahlian(){
   const isKb=kMode==="kanban";
   const modeTgl=`<div class="toggle" role="group" aria-label="Paparan"><button data-kmode="senarai" class="${isKb?"":"on"}" aria-pressed="${!isKb}">Senarai</button><button data-kmode="kanban" class="${isKb?"on":""}" aria-pressed="${isKb}">Kanban</button></div>`;
 
-  /* Bell = "needs my attention": everyone whose next action is a tarsyih that is
-     already earned. Same rule as the dashboard's Perlu tindakan card. */
-  const perluN=act.filter(p=>eligible(p)).length;
+  /* Bell = "needs my attention": a tarsyih already earned, or nobody assigned
+     yet. Same rule as the dashboard's Perlu tindakan card. */
+  const perluN=act.filter(p=>perluTindakan(p)).length;
 
   const sub=showArsip
     ? `${act.length} aktif · memaparkan arkib (${arsipN})`
@@ -2068,10 +2157,23 @@ function actCell(p){const a=nextAction(p);
   return a?`<span class="kt-act${a.tone==="green"?" go":(a.tone==="red"?" bad":"")}">${esc(a.label)}</span>`:`<span class="kt-dim">\u2014</span>`;}
 function stagePill(p){return `<span class="kstage kstage-${esc(p.stage)}"><i></i>${esc(stageLabel(p.stage))}</span>`;}
 
+/* Keahlian ISMA is a yes/no fact that the peringkat badge beside it does not
+   answer — a muayyid need not have signed the borang, a mutabaah may already
+   have. Both states are drawn, because a missing mark would otherwise read the
+   same as "not a member" when it really means "nobody has asked yet". */
+function ahliMark(p){const ya=p.statusAhli==="Ya";
+  const t=ya?"Ahli berdaftar ISMA":"Belum ahli berdaftar";
+  return `<span class="ahli${ya?" ahli-y":""}" title="${t}" role="img" aria-label="${t}">${ya
+    ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.4 12.3 2.5 2.5 4.7-5.1"/></svg>`
+    :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12h7"/></svg>`}</span>`;}
+
 function ktable(list){
   const ar=k=>sortKey===k?`<span class="kt-ar on">${sortDir==="asc"?"\u2191":"\u2193"}</span>`:`<span class="kt-ar">\u21c5</span>`;
+  /* The avatar/name pair is laid out by an inner wrapper, never by the <td>
+     itself: a cell set to display:flex leaves the table's row box, so its
+     bottom border stops lining up with the borders of the cells beside it. */
   const rows=list.map(p=>`<tr data-sel="${p.id}" role="button" tabindex="0" aria-label="Buka ${esc(p.nama||"ahli")}">
-      <td class="kt-id"><span class="kt-av rav-${p.stage}">${initials(p.nama)}</span><span class="kt-idm"><span class="kt-name">${esc(p.nama||"(nama baharu)")}</span></span></td>
+      <td class="kt-id"><span class="kt-idw"><span class="kt-av rav-${p.stage}">${initials(p.nama)}</span><span class="kt-idm"><span class="kt-name">${esc(p.nama||"(nama baharu)")}</span></span>${ahliMark(p)}</span></td>
       <td>${iptCell(p)}</td>
       <td>${pdCell(p)}</td>
       <td>${stagePill(p)}</td>
@@ -2091,7 +2193,7 @@ function ktable(list){
 function kcards(list){return list.map(p=>`<div class="kc" data-sel="${p.id}" role="button" tabindex="0" aria-label="Buka ${esc(p.nama||"ahli")}">
     <div class="kc-av rav-${p.stage}">${initials(p.nama)}</div>
     <div class="kc-main">
-      <div class="kc-top"><span class="kc-name">${esc(p.nama||"(nama baharu)")}</span>${stagePill(p)}</div>
+      <div class="kc-top"><span class="kc-name">${esc(p.nama||"(nama baharu)")}</span>${ahliMark(p)}${stagePill(p)}</div>
       <div class="kc-sub">${p.universiti?esc(iptLabel(p.universiti)):"Tiada IPT"}${p.bidang?" \u00b7 "+esc(p.bidang):""}</div>
       <div class="kc-sub">${pdCell(p)}</div>
       ${progCell(p)}
@@ -2121,7 +2223,7 @@ function rowKeahlian(p){
   </div>`;
 }
 function detailDrawer(){const p=get(selId);if(!p)return "";
-  return `<div class="drawer-back" data-selclose="1"></div><div class="drawer" role="dialog" aria-modal="true" aria-label="Butiran ahli" tabindex="-1"><div class="drawer-head"><span class="iptblk" style="background:${iptColor(p.universiti)}"></span><div class="rav">${initials(p.nama)}</div><div class="dname">${p.nama?esc(p.nama):"(nama baharu)"}</div><button class="drawer-close" data-selclose="1" aria-label="Tutup">✕</button></div><div class="drawer-body">${nextActionCard(p)}${journeyRail(p)}${editorKeahlian(p)}</div></div>`;}
+  return `<div class="drawer-back" data-selclose="1"></div><div class="drawer" role="dialog" aria-modal="true" aria-label="Butiran ahli" tabindex="-1"><div class="drawer-head"><span class="iptblk" style="background:${iptColor(p.universiti)}"></span><div class="rav">${initials(p.nama)}</div><div class="dname">${p.nama?esc(p.nama):"(nama baharu)"}</div>${ahliMark(p)}<button class="drawer-close" data-selclose="1" aria-label="Tutup">✕</button></div><div class="drawer-body">${nextActionCard(p)}${editorKeahlian(p)}</div></div>`;}
 
 /* One inline icon set for the whole app. Feather-style: 24px box, 2.2 stroke,
    round caps and joins, currentColor. Anything that reads as an icon comes from
@@ -2159,39 +2261,10 @@ const ICO={
   eye:svg('<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>'),
   eyeOff:svg('<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="m1 1 22 22"/>')
 };
-/* The journey rail addresses the same set under its original name. */
-const JICON=ICO;
-
-/* The tarsyih story in four beats, newest first. Every beat needs a real date —
-   an undated milestone is left out rather than guessed at. */
-function journeySteps(p){
-  const ses=(p.sessions||[]).filter(s=>s&&s.tarikh).slice().sort((a,b)=>a.tarikh.localeCompare(b.tarikh));
-  const out=[];
-  if(ses.length)out.push({d:ses[ses.length-1].tarikh,label:"Perjumpaan terkini",icon:"meet",tone:"cyan"});
-  if(p.tarikhMuayyid)out.push({d:p.tarikhMuayyid,label:"Tarsyih Muhib → Muayyid",icon:"star",tone:"gold"});
-  if(p.tarikhMuhib)out.push({d:p.tarikhMuhib,label:"Tarsyih MUT → Muhib",icon:"up",tone:"brand"});
-  if(ses.length)out.push({d:ses[0].tarikh,label:"Mula usrah mutabaah",icon:"book",tone:"brand"});
-  /* Entry date: the earliest hard date we hold on the record. */
-  const entry=[p.mulaP,ses.length?ses[0].tarikh:""].filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x||"")).sort()[0]||"";
-  if(entry)out.push({d:entry,label:"Direkod sebagai mad'u baharu",icon:"user",tone:"muted"});
-  /* A one-session record would otherwise show "terkini" and "mula" on the same
-     date; keep only the first (newest) occurrence of any given date+label pair. */
-  return out.filter((x,i)=>out.findIndex(y=>y.d===x.d&&y.label===x.label)===i);
-}
-
-function journeyRail(p){
-  const steps=journeySteps(p);
-  if(!steps.length)return "";
-  const items=steps.map((s,i)=>`<div class="jr-i${i===steps.length-1?" last":""}">
-      <span class="jr-dot jr-${s.tone}">${JICON[s.icon]||""}</span>
-      <span class="jr-b"><span class="jr-l">${esc(s.label)}</span><span class="jr-d">${esc(dmy(s.d))}</span></span>
-    </div>`).join("");
-  return `<section class="jr-wrap"><h3 class="jr-h">Perjalanan pencalonan</h3><div class="jr">${items}</div></section>`;
-}
 
 function nextActionCard(p){
   const a=nextAction(p);
-  if(!a)return `<div class="nact nact-done"><span class="nact-e">${JICON.star}Peringkat tertinggi</span><span class="nact-t">Muayyid — perjalanan tarsyih selesai</span></div>`;
+  if(!a)return `<div class="nact nact-done"><span class="nact-e">${ICO.star}Peringkat tertinggi</span><span class="nact-t">Muayyid — perjalanan tarsyih selesai</span></div>`;
   return `<div class="nact nact-${a.tone}">
     <span class="nact-e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>Tindakan seterusnya</span>
     <span class="nact-t">${esc(a.label)}</span>
@@ -2204,8 +2277,9 @@ function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
     <div class="g2">${fld("Tarikh lahir",T(p.id,"tarikhLahir",p.tarikhLahir,"","date"))}${fld("Email",T(p.id,"email",p.email,"nama@email.com","email"))}</div>
     <div class="g2">${fld("No. telefon",T(p.id,"telefon",p.telefon,"01_-___ ____","tel"))}${fld("Status ahli",`<div class="toggle g"><button data-tgl="${p.id}|statusAhli|Ya" class="${p.statusAhli==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|statusAhli|Belum" class="${p.statusAhli!=="Ya"?"on":""}">Belum</button></div>`)}</div>
     ${fld("Institut Pengajian Tinggi (IPT)",selManaged(p.id,"universiti",p.universiti,"universities"))}
-    <div class="g2">${fld("Bidang pengajian",T(p.id,"bidang",p.bidang,"cth. Perubatan"))}${fld("Tahap pengajian",T(p.id,"tahap",p.tahap,"cth. Sarjana Muda"))}</div>
-    <div class="g2">${fld("Tahun kemasukan IPT",T(p.id,"tahunMasuk",p.tahunMasuk,"cth. 2024"))}${fld("Status",SELf(p.id,"kerja",p.kerja,KERJA))}</div>
+    <div class="g2">${fld("Tahap pengajian",selTahap(p))}${fld("Tahun kemasukan IPT",T(p.id,"tahunMasuk",p.tahunMasuk,"cth. 2024"))}</div>
+    ${fld("Bidang pengajian",selBidang(p))}${bidangHint(p)}
+    ${fld("Status",SELf(p.id,"kerja",p.kerja,KERJA))}
     ${(p.stage==="muhib"||p.stage==="muayyid")?fld("Tarikh naik ke Muhib",T(p.id,"tarikhMuhib",p.tarikhMuhib,"","date"))+(p.tarsyihMuhibOleh?`<div class="hint" style="margin:-6px 0 8px">Disahkan oleh: <b>${esc(p.tarsyihMuhibOleh)}</b></div>`:""):""}
     ${p.stage==="muayyid"?fld("Tarikh kenaikan MAY",T(p.id,"tarikhMuayyid",p.tarikhMuayyid,"","date"))+(p.tarsyihMayOleh?`<div class="hint" style="margin:-6px 0 8px">Disahkan oleh: <b>${esc(p.tarsyihMayOleh)}</b></div>`:""):""}
     ${fld("Kolej kediaman (jika ada)",selManaged(p.id,"kolej",p.kolej,"kolej"))}
@@ -2299,7 +2373,7 @@ function memCalendar(p){
   const mine=new Set((p.sessions||[]).map(s=>s._usrahId).filter(Boolean));
   const absent={};usrahGroups().forEach(g=>{if(!g.tarikh)return;if(g.jenis!=="Usrah")return;const myPD=grPds(g).some(n=>n===p.pd1||n===p.pd2);if(myPD&&!mine.has(g.id)&&!byDay[g.tarikh]){absent[g.tarikh]=(absent[g.tarikh]||0)+1;}});
   const first=new Date(y,mo,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
-  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toISOString().slice(0,10);const out=d.getMonth()!==mo;const ss=byDay[iso]||[];const ab=absent[iso];const cls=ss.length?({DF:"df",Program:"pg",Tugasan:"tg"}[ss[0].jenis]||"us"):(ab?"abs":"");
+  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=isoDate(d);const out=d.getMonth()!==mo;const ss=byDay[iso]||[];const ab=absent[iso];const cls=ss.length?({DF:"df",Program:"pg",Tugasan:"tg"}[ss[0].jenis]||"us"):(ab?"abs":"");
     const tag=ss.length?(ss.length>1?ss.length+" sesi":esc(ss[0].jenis)):(ab?"Absen":"");
     const tt=ss.length?ss.map(x=>esc(x.jenis)+(x.oleh?" · "+esc(x.oleh):"")).join(", "):(ab?"Tidak hadir usrah PD":"");
     cells+=`<div class="cald memday ${cls}${out?" out":""}" title="${tt}"><div class="dn">${d.getDate()}</div>${tag?`<div class="memtag">${tag}</div>`:""}</div>`;}
@@ -2429,25 +2503,52 @@ function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").lengt
 
 /* ---------- WASILAH ---------- */
 let wasMode="list"; let wasAddOpen=false;
+/* Which program or tarikh penting the drawer is holding, and whether it was made
+   by this drawer session — a record the user opened by Tambah and then closed
+   without ever naming is discarded, so an abandoned Tambah leaves nothing behind
+   on the calendar. {kind:"w"|"h", id, fresh} */
+let wasDrawer=null;
+function wasDrawerRec(){if(!wasDrawer)return null;return wasDrawer.kind==="h"?getH(wasDrawer.id):getW(wasDrawer.id);}
+function wasDrawerOpen(kind,id,fresh){previousFocus=document.activeElement;wasDrawer={kind,id,fresh:!!fresh};}
+/* Closing drops the record only if it is still the blank one Tambah created. */
+function wasDrawerClose(){const d=wasDrawer;wasDrawer=null;if(!d||!d.fresh)return;
+  const r=d.kind==="h"?getH(d.id):getW(d.id);
+  if(r&&!(r.nama||"").trim()){
+    if(d.kind==="h")S.holidays=S.holidays.filter(x=>x.id!==d.id);
+    else S.wasilah=S.wasilah.filter(x=>x.id!==d.id);
+    save();
+  }}
+function wasilahDrawer(){
+  const r=wasDrawerRec();if(!r)return "";
+  const isH=wasDrawer.kind==="h";
+  const title=(r.nama||"").trim()||(isH?"Tarikh penting baharu":"Program baharu");
+  const del=isH?`<button class="del" data-delhol="${r.id}" style="flex:1">Buang</button>`:`<button class="del" data-delwas="${r.id}" style="flex:1">Buang</button>`;
+  return `<div class="drawer-back" data-wclose="1"></div><div class="drawer" role="dialog" aria-modal="true" aria-label="${isH?"Butiran tarikh penting":"Butiran program"}" tabindex="-1">
+    <div class="drawer-head"><span class="iptblk" style="background:${isH?holColor(r.jenis):((r.peserta==="Campur")?"#1f8f80":"var(--blueb)")}"></span>
+      <div class="dname">${esc(title)}</div><button class="drawer-close" data-wclose="1" aria-label="Tutup">✕</button></div>
+    <div class="drawer-body"><div class="grp">${isH?holFields(r):wasFields(r)}</div>
+      <div class="actions">${del}<button class="arch" data-wclose="1" style="flex:1">Selesai</button></div></div></div>`;
+}
 function viewWasilah(){
   const toggle=`<div class="bar"><div class="toggle"><button class="${wasMode==="list"?"on":""}" data-wmode="list">Senarai</button><button class="${wasMode==="cal"?"on":""}" data-wmode="cal">Kalendar</button></div><div class="wadd" style="margin-left:auto"><button class="add" id="addAnyBtn">＋ Tambah</button>${wasAddOpen?`<div class="wadd-menu"><button data-addprog="1">＋ Program</button><button data-addtp="1">＋ Tarikh penting</button></div>`:""}</div></div>`;
-  if(wasMode==="cal")return toggle+calLegend()+calendarHTML()+calDayDetail();
+  if(wasMode==="cal")return toggle+calLegend()+calendarHTML()+calDayDetail()+wasilahDrawer();
   const MM=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
   const entries=[];S.wasilah.forEach(w=>entries.push({t:"w",d:w.tarikh||"",o:w}));(S.holidays||[]).forEach(x=>entries.push({t:"h",d:x.start||"",o:x}));
-  if(!entries.length)return toggle+`<div class="rows"><div class="empty"><b>Belum ada program</b></div></div>`;
+  if(!entries.length)return toggle+`<div class="rows"><div class="empty"><b>Belum ada program</b></div></div>`+wasilahDrawer();
   const groups={};entries.forEach(e=>{const mk=(e.d||"").slice(0,7)||"zzzz";(groups[mk]=groups[mk]||[]).push(e);});
   const body=Object.keys(groups).sort().map(mk=>{const items=groups[mk].slice().sort((a,b)=>(a.d||"~").localeCompare(b.d||"~"));const lbl=mk==="zzzz"?"Tiada tarikh":(MM[(+mk.slice(5,7))-1]+" "+mk.slice(0,4));return `<div class="grouphdr">${lbl}<span class="gc">${items.length}</span></div>`+items.map(e=>e.t==="w"?wasCard(e.o):holCard(e.o)).join("");}).join("");
-  return toggle+`<div class="rows">${body}</div>`;
+  return toggle+`<div class="rows">${body}</div>`+wasilahDrawer();
 }
 function calLegend(){const L=(c,t)=>`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:${c};display:inline-block"></span>${t}</span>`;return `<div class="hint" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:8px">${L("var(--blueb)","Akhawat")}${L("#1f8f80","Campur")}${L("var(--red)","Cuti umum")}${L("var(--purple)","Cuti semester")}${L("var(--amber)","Study week")}<span>\uD83C\uDF82 Hari lahir</span></div>`;}
-function holCard(h){const c=holColor(h.jenis);return `<div class="row hrow${isOpen(h.id)?" open":""}" style="border-left:5px solid ${c}"><div class="rhead" data-htog="${h.id}"><div class="hdate"><div class="hdd">${(h.start||"").slice(8,10)||"—"}</div><div class="hdm">${monShort(h.start)}</div></div><div class="rname${h.nama?"":" empty"}">${h.nama?esc(h.nama):"(tarikh penting)"}<div class="hsub" style="color:${c}">${esc(h.jenis)}${h.end&&h.end!==h.start?" · s/d "+esc(h.end):""}</div></div><span class="chev">▾</span></div><div class="rbody"><div class="g2">${fld("Nama",`<input data-hed="${h.id}" data-f="nama" value="${esc(h.nama)}">`)}${fld("Jenis",`<select data-hed="${h.id}" data-f="jenis">${H_TYPES.map(o=>`<option${o===h.jenis?" selected":""}>${o}</option>`).join("")}</select>`)}</div><div class="g2">${fld("Tarikh mula",`<input data-hed="${h.id}" data-f="start" type="date" value="${esc(h.start)}">`)}${fld("Tarikh tamat (pilihan)",`<input data-hed="${h.id}" data-f="end" type="date" value="${esc(h.end)}">`)}</div><div class="actions"><button class="del" data-delhol="${h.id}" style="flex:1">Buang</button></div></div></div>`;}
+function holFields(h){return `<div class="g2">${fld("Nama",`<input data-hed="${h.id}" data-f="nama" value="${esc(h.nama)}" placeholder="cth. Hari Malaysia">`)}${fld("Jenis",`<select data-hed="${h.id}" data-f="jenis">${H_TYPES.map(o=>`<option${o===h.jenis?" selected":""}>${o}</option>`).join("")}</select>`)}</div><div class="g2">${fld("Tarikh mula",`<input data-hed="${h.id}" data-f="start" type="date" value="${esc(h.start)}">`)}${fld("Tarikh tamat (pilihan)",`<input data-hed="${h.id}" data-f="end" type="date" value="${esc(h.end)}">`)}</div>`;}
+function holCard(h){const c=holColor(h.jenis);return `<div class="row hrow${isOpen(h.id)?" open":""}" style="border-left:5px solid ${c}"><div class="rhead" data-htog="${h.id}"><div class="hdate"><div class="hdd">${(h.start||"").slice(8,10)||"\u2014"}</div><div class="hdm">${monShort(h.start)}</div></div><div class="rname${h.nama?"":" empty"}">${h.nama?esc(h.nama):"(tarikh penting)"}<div class="hsub" style="color:${c}">${esc(h.jenis)}${h.end&&h.end!==h.start?" \u00b7 s/d "+esc(h.end):""}</div></div><span class="chev">\u25be</span></div><div class="rbody">${holFields(h)}<div class="actions"><button class="del" data-delhol="${h.id}" style="flex:1">Buang</button></div></div></div>`;}
 function monShort(iso){const MS=["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogos","Sep","Okt","Nov","Dis"];const m=+((iso||"").slice(5,7));return m?MS[m-1]:"";}
 function holColor(j){return j==="Study Week"?"var(--amber)":j==="Exam Week"?"var(--red)":j==="Semester Break"?"var(--purple)":j==="Mid Semester Break"?"var(--blueb)":j==="Minggu Orientasi"?"var(--green)":j==="Cuti Umum"?"var(--red)":"var(--muted)";}
-function wasCard(w){const sb={"Sudah":"b-g","Belum":"b-n","Tangguh":"b-a"}[w.status]||"b-n";
-  return `<div class="row${isOpen(w.id)?" open":""}"><div class="rhead" data-wtog="${w.id}"><div class="wdate ${(w.peserta==="Campur")?"pc":"pa"}"><div class="wdd">${(w.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(w.tarikh)}</div></div>
-    <div class="rname">${esc(w.nama||"(nama program)")}<div class="hsub">${esc(w.peserta||"Akhawat")} · ${esc(w.status)}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · s/d "+esc(w.tarikhTamat):""}</div></div><span class="chev">▾</span></div>
-    <div class="rbody">
-      <div class="g2">${fld("Nama program",`<input data-wed="${w.id}" data-f="nama" value="${esc(w.nama)}">`)}${fld("Bahan",`<input data-wed="${w.id}" data-f="bahan" value="${esc(w.bahan)}" placeholder="cth. OBI">`)}</div>
+/* The program's editable fields, shared verbatim by the list row and the drawer
+   so a program is filled in the same way wherever it is opened from. */
+function wasFields(w){
+  return `
+      <div class="g2">${fld("Nama program",`<input data-wed="${w.id}" data-f="nama" value="${esc(w.nama)}" placeholder="cth. Campus Tour">`)}${fld("Bahan",`<input data-wed="${w.id}" data-f="bahan" value="${esc(w.bahan)}" placeholder="cth. OBI">`)}</div>
       <div class="g2">${fld("Tarikh",`<input data-wed="${w.id}" data-f="tarikh" type="date" value="${esc(w.tarikh)}">`)}${fld("Program lebih 1 hari?",`<div class="toggle"><button data-wtgl="${w.id}|multi|true" class="${w.multi?"on":""}">Ya</button><button data-wtgl="${w.id}|multi|false" class="${!w.multi?"on":""}">Tidak</button></div>`)}</div>
       ${w.multi?fld("Tarikh tamat",`<input data-wed="${w.id}" data-f="tarikhTamat" type="date" value="${esc(w.tarikhTamat||"")}">`):""}
       <div class="g2">${fld("Medium",SELw(w.id,"medium",w.medium,W_MEDIUM))}${fld("Status pelaksanaan",wtgl(w.id,"status",w.status,W_STATUS))}</div>
@@ -2456,7 +2557,12 @@ function wasCard(w){const sb={"Sudah":"b-g","Belum":"b-n","Tangguh":"b-a"}[w.sta
       <div class="g3">${fld("Target peserta",`<input data-wed="${w.id}" data-f="target" type="number" min="0" value="${esc(w.target)}" placeholder="cth. 30">`)}${fld("Venue",`<input data-wed="${w.id}" data-f="venue" value="${esc(w.venue)}">`)}${fld("Anggaran budget (RM)",`<input data-wed="${w.id}" data-f="budget" type="number" min="0" step="0.01" value="${esc(w.budget)}" placeholder="0.00">`)}</div>
       ${fld("PIC",`<input data-wed="${w.id}" data-f="pic" value="${esc(w.pic)}">`)}
       <div class="g2">${fld("Dapatan — MUH hadir",`<input data-wed="${w.id}" data-f="dapMUH" type="number" min="0" value="${esc(w.dapMUH)}" placeholder="bil.">`)}${fld("Dapatan — MUT hadir",`<input data-wed="${w.id}" data-f="dapMUT" type="number" min="0" value="${esc(w.dapMUT)}" placeholder="bil.">`)}</div>
-      ${fld("Catatan / dapatan lain",`<textarea data-wed="${w.id}" data-f="catatan">${esc(w.catatan)}</textarea>`)}
+      ${fld("Catatan / dapatan lain",`<textarea data-wed="${w.id}" data-f="catatan">${esc(w.catatan)}</textarea>`)}`;
+}
+function wasCard(w){
+  return `<div class="row${isOpen(w.id)?" open":""}"><div class="rhead" data-wtog="${w.id}"><div class="wdate ${(w.peserta==="Campur")?"pc":"pa"}"><div class="wdd">${(w.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(w.tarikh)}</div></div>
+    <div class="rname">${esc(w.nama||"(nama program)")}<div class="hsub">${esc(w.peserta||"Akhawat")} · ${esc(w.status)}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · s/d "+esc(w.tarikhTamat):""}</div></div><span class="chev">▾</span></div>
+    <div class="rbody">${wasFields(w)}
       <div class="actions"><button class="del" data-delwas="${w.id}" style="flex:1">Buang</button></div>
     </div></div>`;
 }
@@ -2471,7 +2577,7 @@ function calendarHTML(){
   const months=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
   const dows=["Isn","Sel","Rab","Kha","Jum","Sab","Ahd"];
   const bdays=S.people.map(p=>({b:bdayOf(p),n:(p.nama||"").split(/\s+/)[0]||"?"})).filter(x=>x.b);
-  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toISOString().slice(0,10);const out=d.getMonth()!==mo;const cm=d.getMonth()+1,cd=d.getDate();
+  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=isoDate(d);const out=d.getMonth()!==mo;const cm=d.getMonth()+1,cd=d.getDate();
     const hs=(S.holidays||[]).filter(x=>x.start&&iso>=x.start&&iso<=(x.end||x.start));
     const evs=S.wasilah.filter(w=>w.tarikh&&iso>=w.tarikh&&iso<=(w.tarikhTamat||w.tarikh));
     const bd=bdays.filter(x=>x.b.mm===cm&&x.b.dd===cd);
@@ -2489,7 +2595,7 @@ function calDayDetail(){
   const ws=(S.wasilah||[]).filter(w=>w.tarikh&&iso>=w.tarikh&&iso<=(w.tarikhTamat||w.tarikh));
   const bd=(S.people||[]).map(x=>({b:bdayOf(x),n:x.nama})).filter(x=>x.b&&x.b.mm===cm&&x.b.dd===cd);
   let items="";
-  hs.forEach(x=>{const c=x.jenis==="Cuti Umum"?"var(--red)":x.jenis==="Cuti Semester"?"var(--purple)":x.jenis==="Study Week"?"var(--amber)":"var(--muted)";items+=`<div class="dd-item"><span class="dd-dot" style="background:${c}"></span><div><b>${esc(x.nama||"Cuti")}</b><div class="dd-sub">${esc(x.jenis)}</div></div></div>`;});
+  hs.forEach(x=>{const c=x.jenis==="Cuti Umum"?"var(--red)":x.jenis==="Cuti Semester"?"var(--purple)":x.jenis==="Study Week"?"var(--amber)":"var(--muted)";items+=`<div class="dd-item" data-hopen="${x.id}" style="cursor:pointer"><span class="dd-dot" style="background:${c}"></span><div style="flex:1"><b>${esc(x.nama||"Cuti")}</b><div class="dd-sub">${esc(x.jenis)}</div></div><span class="chev">\u203a</span></div>`;});
   ws.forEach(w=>items+=`<div class="dd-item" data-wopen="${w.id}" style="cursor:pointer"><span class="dd-dot" style="background:${(w.peserta==="Campur")?"#1f8f80":"var(--blueb)"}"></span><div style="flex:1"><b>${esc(w.nama||"(program)")}</b><div class="dd-sub">${esc(w.peserta||"Akhawat")}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · "+esc(w.tarikh)+" → "+esc(w.tarikhTamat):""} · ${esc(w.status)}${w.kolab?" · kolab: "+esc(w.kolabNama||"ya"):""}</div></div><span class="chev">›</span></div>`);
   bd.forEach(x=>items+=`<div class="dd-item"><span class="dd-dot" style="background:#c2367a"></span><div><b>\uD83C\uDF82 ${esc(x.n)}</b><div class="dd-sub">Hari lahir</div></div></div>`);
   if(!items)items=`<div class="hint">Tiada program atau cuti pada tarikh ini.</div>`;
@@ -2627,10 +2733,21 @@ document.addEventListener("click",e=>{
   const ht=e.target.closest("[data-htog]");if(ht){const x=getH(ht.dataset.htog);if(x){toggleOpen(x.id);render();}return;}
   if($("#addHolBtn")&&e.target.closest("#addHolBtn")){S.holidays.unshift(addOpen(newHoliday()));holOpen=true;save();render();return;}
   if(e.target.closest&&e.target.closest("#addAnyBtn")){e.stopPropagation();wasAddOpen=!wasAddOpen;render();return;}
-  const apg=e.target.closest("[data-addprog]");if(apg){S.wasilah.unshift(addOpen(newWasilah()));wasAddOpen=false;save();render();return;}
-  const atp=e.target.closest("[data-addtp]");if(atp){S.holidays.unshift(addOpen(newHoliday()));wasAddOpen=false;save();render();return;}
+  /* Tambah opens the record for filling in straight away rather than dropping a
+     nameless entry onto today's date and leaving the user to find it — which in
+     Kalendar mode meant finding a row the calendar does not even draw. A day
+     picked on the calendar seeds the date, so adding from 23 Sep dates it 23
+     Sep, not today. */
+  const apg=e.target.closest("[data-addprog]");if(apg){const w=newWasilah();if(selDate&&wasMode==="cal")w.tarikh=selDate;
+    S.wasilah.unshift(addOpen(w));wasAddOpen=false;wasDrawerOpen("w",w.id,true);save();render();focusDrawer();return;}
+  const atp=e.target.closest("[data-addtp]");if(atp){const x=newHoliday();if(selDate&&wasMode==="cal")x.start=selDate;
+    S.holidays.unshift(addOpen(x));wasAddOpen=false;wasDrawerOpen("h",x.id,true);save();render();focusDrawer();return;}
   const cday=e.target.closest("[data-calday]");if(cday){selDate=cday.dataset.calday;render();return;}
-  const wop=e.target.closest("[data-wopen]");if(wop){const w=getW(wop.dataset.wopen);if(w){wasMode="list";openRows.add(w.id);render();}return;}
+  /* Opening from the calendar keeps the calendar: it used to switch the whole
+     view to Senarai, which lost the month the user was looking at. */
+  const wop=e.target.closest("[data-wopen]");if(wop){const w=getW(wop.dataset.wopen);if(w){wasDrawerOpen("w",w.id,false);render();focusDrawer();}return;}
+  const hop=e.target.closest("[data-hopen]");if(hop){const x=getH(hop.dataset.hopen);if(x){wasDrawerOpen("h",x.id,false);render();focusDrawer();}return;}
+  if(e.target.closest("[data-wclose]")){wasDrawerClose();render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
   const holt=e.target.closest("[data-holtoggle]");if(holt){holOpen=!holOpen;render();return;}
   const wtg=e.target.closest("[data-wtgl]");if(wtg){const pr=wtg.dataset.wtgl.split("|");const w=getW(pr[0]);if(w){w[pr[1]]=(pr[2]==="true"?true:(pr[2]==="false"?false:pr[2]));if(pr[1]==="multi"&&pr[2]==="false")w.tarikhTamat="";stamp(w);save();render();}return;}
   const dhl=e.target.closest("[data-delhol]");if(dhl){const x=getH(dhl.dataset.delhol);if(x&&confirm("Buang tarikh ini?")){S._del[x.id]=Date.now();S.holidays=S.holidays.filter(y=>y.id!==x.id);save();render();}return;}
@@ -2649,11 +2766,15 @@ document.addEventListener("click",e=>{
   if(!e.target.closest(".menu"))$("#menuPop").classList.remove("show");
   if(wasAddOpen&&!(e.target.closest&&e.target.closest(".wadd"))){wasAddOpen=false;render();}
 });
+/* Same focus handover the mad'u drawer uses: the panel takes focus when it
+   opens and hands it back to whatever opened it on close. */
+function focusDrawer(){setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);}
 function closeDrawer(){if(!selId)return;selId=null;noteEdit="";render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);}
 document.addEventListener("keydown",e=>{
   /* The log drawer sits above everything and is not tied to a selected mad'u, so
      it gets its own Escape before the drawer logic below. */
   if(e.key==="Escape"&&logOpen){e.preventDefault();logOpen=false;render();const b=$("#logBtn");if(b)b.focus();return;}
+  if(e.key==="Escape"&&wasDrawer){e.preventDefault();wasDrawerClose();render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
   if(e.key==="Escape"&&santSel){e.preventDefault();santSel=null;render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
   if(selId){const dw=document.querySelector(".drawer");if(e.key==="Escape"){e.preventDefault();
     /* Escape closes the innermost thing first: an open note editor, and only
@@ -3084,7 +3205,7 @@ function saveCfg(){try{localStorage.setItem(CFGKEY,JSON.stringify({url:cfg.url,n
    after a deploy, and after the seven-day cache expiry. Pushing that empty copy
    overwrites the whole team's data. So: nothing is ever uploaded until this tab
    has adopted the server's document at least once. */
-let SYNC={ok:false,code:"",busy:false,pulled:false}; let dirty=false; let pollT=null; let lastSyncAt=0;
+let SYNC={ok:false,code:"",busy:false,pulled:false,again:false}; let dirty=false; let pollT=null; let lastSyncAt=0;
 /* Adopt the server's document as the truth for this tab. */
 function adoptRemote(raw,savedAt){try{S=JSON.parse(raw);}catch(e){return false;}normalizeS();S._localSavedAt=savedAt||"";SYNC.pulled=true;persistLocal();return true;}
 function setSyncUI(saving){const el=document.getElementById("syncPill");if(!el)return;if(!SYNC.ok){el.style.display="none";return;}el.style.display="block";if(saving){el.textContent="Menyegerak…";el.classList.add("on");}else{el.classList.remove("on");el.textContent=lastSyncAt?("✓ Segerak "+new Date(lastSyncAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})):"";}}
@@ -3116,12 +3237,35 @@ function isEditing(){const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAR
 async function apiGet(code){const u=cfg.url+(cfg.url.indexOf("?")>-1?"&":"?")+"action=get&code="+encodeURIComponent(code);const r=await fetch(u);return await r.json();}
 async function apiSave(){const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})});return await r.json();}
 function sig(x){try{const o=Object.assign({},x);delete o._localSavedAt;return JSON.stringify(o);}catch(e){return Math.random()+"";}}
-async function syncNow(){if(!SYNC.ok||!SYNC.pulled||!cfg.url||!SYNC.code||SYNC.busy)return;SYNC.busy=true;setSyncUI(true);try{const r=await apiSave();if(r&&r.ok){dirty=false;lastSyncAt=Date.now();if(r.data&&!isEditing()){const before=sig(S);if(adoptRemote(r.data,r.savedAt)&&sig(S)!==before)render();}}}catch(e){}SYNC.busy=false;setSyncUI(false);}
+/* An upload takes a round trip, and the user keeps working during it. Two things
+   used to go wrong when an edit landed mid-flight: the reply cleared `dirty`,
+   although that edit had never been sent — so the 25s poll was then free to pull
+   the server's older copy over it — and the reply's document was adopted whole,
+   visibly undoing the edit on screen. Both are now gated on the revision being
+   unchanged; if it moved, the edit is still outstanding and we go round again.
+   A push arriving while one is in flight is queued rather than dropped, which is
+   what used to make a change sit and do nothing until some later save. */
+async function syncNow(){
+  if(!SYNC.ok||!SYNC.pulled||!cfg.url||!SYNC.code)return;
+  if(SYNC.busy){SYNC.again=true;return;}
+  SYNC.busy=true;setSyncUI(true);
+  const sent=rev;
+  try{const r=await apiSave();
+    if(r&&r.ok){
+      lastSyncAt=Date.now();
+      if(rev===sent){dirty=false;
+        if(r.data&&!isEditing()){const before=sig(S);if(adoptRemote(r.data,r.savedAt)&&sig(S)!==before)render();}}
+      else SYNC.again=true;
+    }
+  }catch(e){}
+  SYNC.busy=false;setSyncUI(false);
+  if(SYNC.again){SYNC.again=false;setTimeout(syncNow,200);}
+}
 function pushSync(){syncNow();}
 async function pullMerge(){if(!SYNC.ok||dirty||SYNC.busy||isEditing())return;setSyncUI(true);try{const r=await apiGet(SYNC.code);if(r&&r.ok&&r.data){const before=sig(S);if(adoptRemote(r.data,r.savedAt)){lastSyncAt=Date.now();if(sig(S)!==before)render();}}}catch(e){}setSyncUI(false);}
 function startPolling(){if(pollT)clearInterval(pollT);pollT=setInterval(pullMerge,25000);}
 async function pullNow(){if(!SYNC.ok){toast("Log masuk dahulu");return;}try{const r=await apiGet(SYNC.code);if(r&&r.ok){if(r.data)adoptRemote(r.data,r.savedAt);render();toast("Data terkini ditarik");}else toast("Gagal menarik data");}catch(e){toast("Tidak dapat menyambung");}}
-function logout(){SYNC={ok:false,code:"",busy:false,pulled:false};dirty=false;if(pollT)clearInterval(pollT);try{localStorage.removeItem(KEY);}catch(e){}S={};normalizeS();render();gateShow();toast("Telah log keluar");}
+function logout(){SYNC={ok:false,code:"",busy:false,pulled:false,again:false};dirty=false;if(pollT)clearInterval(pollT);try{localStorage.removeItem(KEY);}catch(e){}S={};normalizeS();render();gateShow();toast("Telah log keluar");}
 function gateShow(){const g=$("#gate");g.style.display="flex";const u=$("#gUrl");if(u)u.value=cfg.url||"";$("#gName").value=cfg.name||"";$("#gErr").textContent="";setTimeout(()=>$("#gName")?.focus(),0);}
 function gateHide(){$("#gate").style.display="none";}
 function bindGate(){const s=$("#gSave");if(s)s.addEventListener("click",()=>{cfg.url=$("#gUrl").value.trim()||APPS_SCRIPT_URL;saveCfg();toast("URL disimpan");});const o=$("#gOffline");if(o)o.addEventListener("click",()=>{gateHide();toast("Mod luar talian");});$("#gLogin").addEventListener("click",doLogin);
