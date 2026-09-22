@@ -1,5 +1,30 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
 
+# Backend & deploy — Code.gs is pasted into the Apps Script editor by hand,
+# so the copy in this folder is a working copy, not the deployed one.
 Code.gs
 *.gs
-.DS_Store
 deploy.sh
+
+# Tooling installed per-machine (impeccable skills, agents, hooks and its
+# platform-specific binary — ~16MB, and darwin-x64 only). Run the installer
+# locally rather than committing it; settings.local.json is per-person too.
+.claude/
+
+# Jangan commit rahsia atau eksport data — fail ini mengandungi butiran
+# peribadi mad'u (emel, telefon, alamat). Nama fail ikut dl() dalam
+# index.html: backup penuh KitPD-<tarikh>.json, eksport Direktori
+# KitPD-Direktori-<tarikh>.csv, eksport BPMy BPMy-<nama>-<tarikh>.csv.
+# *-backup-*.json pula menangkap fail dari folder "KitPD Backups" di Drive.
+*.local
+secrets.*
+KitPD-*.json
+KitPD-*.csv
+BPMy-*.csv
+*-backup-*.json
+data-export*.json
