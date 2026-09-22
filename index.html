@@ -185,7 +185,10 @@
   .snfilt .ipt-pill{padding:7px 13px;font-size:12.5px}
   .sndot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
   .pdipt-w>.sndot{position:absolute;left:12px;pointer-events:none}
-  .sngrid-h,.snrow{display:grid;grid-template-columns:minmax(0,1fr) 178px 192px 110px 110px 40px;align-items:center;gap:12px;padding:0 18px}
+  /* Berminat usrah and Status ahli were the two narrowest columns but are the
+     two that decide whether a name progresses, so they take the space back from
+     the PD and status selects, which only ever hold one short line each. */
+  .sngrid-h,.snrow{display:grid;grid-template-columns:minmax(0,1fr) 150px 172px 144px 144px 40px;align-items:center;gap:12px;padding:0 18px}
   .sngrid-h{height:42px;background:var(--surface-sunken);border-bottom:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
   .snrow{padding-top:10px;padding-bottom:10px;border-bottom:1px solid var(--border-subtle);transition:background var(--dur-fast) var(--ease-standard)}
   .snrow:last-child{border-bottom:none}
@@ -278,8 +281,17 @@
   }
   .ugrp{margin-bottom:14px} .ugrp-h{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:7px;display:flex;align-items:center} .ugrp-h .c{background:var(--surface-brand-soft);color:var(--biru-700);border-radius:var(--radius-pill);padding:2px 9px;font-family:var(--font-mono);font-size:11px;font-weight:600;margin-left:8px}
   .uchips{display:flex;flex-wrap:wrap;gap:6px}
-  .uchip{border:1px solid var(--border-subtle);background:#fff;color:var(--ink);border-radius:var(--radius-pill);padding:7px 13px;font-weight:600;font-size:13px;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard)}
+  .uchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-subtle);background:#fff;color:var(--ink);border-radius:var(--radius-pill);padding:7px 13px;font-weight:600;font-size:13px;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard)}
   .uchip.on{background:var(--green);border-color:var(--green);color:#fff}
+  /* Two independent signals on one chip: the tick is membership, the green fill
+     is attendance. On a filled chip the tick inverts to white so it stays
+     readable, and stays dimmed for a non-ahli so the pair remain tellable apart. */
+  .uchip .ahli{width:15px;height:15px}
+  .uchip.on .ahli{color:rgba(255,255,255,.5)}
+  .uchip.on .ahli-y{color:#fff}
+  .uleg{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:8px 0 7px;font-size:12px;color:var(--muted)}
+  .uleg-i{display:inline-flex;align-items:center;gap:6px}
+  .uleg-sw{flex:0 0 auto;width:14px;height:14px;border-radius:var(--radius-pill);background:var(--green);border:1px solid var(--green)}
   .urow{background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);box-shadow:var(--shadow-xs);margin-bottom:10px;overflow:hidden}
   .urow-h{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer} .urow-b{padding:0 15px 15px}
   
@@ -424,12 +436,11 @@
   .search.sm input{padding:9px 14px 9px 36px;font-size:13.5px;background:var(--surface-sunken);border-color:transparent;box-shadow:none}
   .search.sm input:focus{background:#fff;border-color:var(--blueb)}
   .search .ic svg{width:16px;height:16px;display:block}
+  /* Round icon button in the Direktori toolbar. Named for the notification bell
+     it was built for; that bell is gone and only the Excel upload uses it now. */
   .bellb{flex:0 0 auto;position:relative;width:40px;height:40px;border-radius:50%;border:1px solid var(--border-strong);background:#fff;color:var(--muted);display:grid;place-items:center;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard)}
   .bellb svg{width:19px;height:19px}
   .bellb:hover{color:var(--blue);border-color:var(--blueb)}
-  .bellb.on{background:var(--blue);border-color:var(--blue);color:#fff}
-  .bellb-c{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:var(--cyan-500);color:var(--putih);font-family:var(--font-mono);font-size:10px;font-weight:700;display:grid;place-items:center;border:2px solid var(--paper)}
-  .bellb.on .bellb-c{border-color:var(--blue)}
 
   /* ---------- Direktori filters: stage pills left, refiners right ---------- */
   .dirfilt{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
@@ -495,7 +506,7 @@
   @media(max-width:1000px){ .kwrap-tbl{display:none} .kwrap-card{display:block} }
   @media(max-width:720px){
     .dirhead-t h2{font-size:22px}
-    /* Search + bell share row one; the primary action takes a full-width row two. */
+    /* Search + upload share row one; the primary action takes a full-width row two. */
     .dirhead-a{width:100%;flex-wrap:wrap} .search.sm{flex:1 1 auto;min-width:0} .add{flex:1 1 100%}
     .dirfilt-p{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
     .dirfilt-p::-webkit-scrollbar{display:none}
@@ -1036,7 +1047,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=2;
+const APP_VERSION=3;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -1164,7 +1175,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let santFilt=""; let santSel=null; let santQ="";
+let F={pd:"",ipt:"",minat:"",ajk:"",tahun:""}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let santFilt=""; let santSel=null; let santQ="";
 /* Which editor tab is open. This lives here, not on the person, because
    syncNow() and pullMerge() replace the whole of S with the server's copy every
    25 seconds — anything parked on a person record is overwritten by whatever
@@ -1244,9 +1255,27 @@ function eligible(p){if(p.stage==="mutabaah")return sesCount(p)>=3&&p.minatUsrah
 /* A mad'u with nobody assigned is stalled, not merely incomplete: no PD means no
    usrah, so no sesi, so no tarsyih. A muayyid is past the PD relationship. */
 function tiadaPd(p){return p.stage!=="muayyid"&&!(p.pd1||"").trim()&&!(p.pd2||"").trim();}
-/* What the bell, the dashboard card and the sidebar badge all mean by "needs me":
-   either the tarsyih is already earned and waiting, or nobody is assigned yet. */
+/* What the dashboard card and the sidebar badge both mean by "needs me": either
+   the tarsyih is already earned and waiting, or nobody is assigned yet. */
 function perluTindakan(p){return tiadaPd(p)||eligible(p);}
+
+/* ---- Who owns the next step ----
+   "Perlu tindakan" was a list of what, with no who, so items sat unclaimed.
+   Every action now names one person. Taklif — putting a PD on a mad'u — is the
+   IPT coordinator's job, one per campus; everything after that (usrah, BPMy,
+   tarsyih) belongs to the PD already assigned. ADMIN: update this map when the
+   coordinator for an IPT changes. An IPT that is not listed shows no owner
+   rather than a guessed one. */
+const IPT_OWNER={
+  "MSU":"Syifa Syafinaz",
+  "UiTM Shah Alam":"Syifa' Solehah",
+  "UiTM Puncak Perdana":"Canah"
+};
+function iptOwner(p){return IPT_OWNER[String((p&&p.universiti)||"").trim()]||"";}
+function pdOwner(p){return [p&&p.pd1,p&&p.pd2].map(x=>String(x||"").trim()).filter(Boolean).join(", ");}
+/* Before taklif the coordinator owns it; after, the PD does. The coordinator is
+   the fallback so a mad'u whose PD fields were cleared still has a name on it. */
+function actionOwner(p){return tiadaPd(p)?iptOwner(p):(pdOwner(p)||iptOwner(p));}
 function stageCode(s){return {mutabaah:"MUT",muhib:"MUH",muayyid:"MAY"}[s]||"—";}
 function stageLabel(s){return(STAGES.find(x=>x.id===s)||{}).label||s;}
 
@@ -1286,35 +1315,39 @@ function lastSessionDate(p){const d=(p.sessions||[]).map(s=>s&&s.tarikh).filter(
 const TARSYIH_DUE={mutabaah:"2026-10-31",muhib:"2027-06-30"};
 
 /* The single next thing this mad'u needs. `tone` drives the colour: `due` is the
-   date to aim for. Returns null only for a muayyid, who has no next step. */
-function nextAction(p){
+   date to aim for. Returns null only for a muayyid, who has no next step.
+   Labels are kept to three words at most — the card is scanned, not read, and
+   the owner and target date carry the rest of the context on their own line. */
+function nextAction(p){const a=nextActionRaw(p);if(a)a.owner=actionOwner(p);return a;}
+function nextActionRaw(p){
   const last=lastSessionDate(p);
   if(p.stage==="muayyid")return null;
-  if(p.stage==="mutabaah"&&p.bukanMusuh==="Tidak")return{label:"Semak semula kelayakan — ditanda musuh Islam",due:"",tone:"red"};
+  if(p.stage==="mutabaah"&&p.bukanMusuh==="Tidak")return{label:"Semak semula kelayakan",due:"",tone:"red"};
   /* Sits above the stage split because it outranks every step on either side of
      it: until somebody is taklif'd to this mad'u, no usrah can be held, so no
      sesi accrues and no tarsyih can follow. */
-  if(tiadaPd(p))return{label:"Tetapkan Penggerak Dakwah — belum ditugaskan",due:addDays("",7),tone:"red"};
+  if(tiadaPd(p))return{label:"Tetapkan PD",due:addDays("",7),tone:"red"};
   if(p.stage==="mutabaah"){
     const n=sesCount(p);
-    if(n===0)return{label:"Mulakan usrah mutabaah — sesi pertama",due:addDays("",14),tone:"amber"};
-    if(n<3)return{label:`Teruskan usrah — ${3-n} sesi lagi sebelum tarsyih`,due:addDays(last,14),tone:"amber"};
-    if(p.minatUsrah!=="Ya")return{label:"Sahkan minat mad'u untuk teruskan usrah",due:addDays(last,14),tone:"amber"};
-    return{label:"Tarsyih MUT → Muhib — syarat lengkap",due:TARSYIH_DUE.mutabaah,tone:"green"};
+    if(n===0)return{label:"Mulakan usrah",due:addDays("",14),tone:"amber"};
+    if(n<3)return{label:`${3-n} sesi lagi`,due:addDays(last,14),tone:"amber"};
+    if(p.minatUsrah!=="Ya")return{label:"Sahkan minat usrah",due:addDays(last,14),tone:"amber"};
+    return{label:"Tarsyih ke Muhib",due:TARSYIH_DUE.mutabaah,tone:"green"};
   }
-  /* Muhib: point at the weakest BPMy category so the action names the actual gap. */
+  /* Muhib: point at the weakest BPMy category so the action names the actual gap.
+     Each label keeps the category name so the card still says which one. */
   const b=bpmy(p);
-  if(b.pass)return{label:"Tarsyih MHB → Muayyid — BPMy ≥ 50%",due:TARSYIH_DUE.muhib,tone:"green"};
+  if(b.pass)return{label:"Tarsyih ke Muayyid",due:TARSYIH_DUE.muhib,tone:"green"};
   const FOCUS={
-    c1:"Muayyasyah — ziarah & jaulah bersama",
-    c2:"Komitmen — kehadiran usrah & wasilah",
-    c3:"Kerja pasukan — taklif AJK program",
-    c4:"Kesolehan — mutabaah amal harian",
-    c5:"Coaching AB — syarat tarbiah khusus"
+    c1:"Muayyasyah: jaulah",
+    c2:"Komitmen: kehadiran",
+    c3:"Kerja berpasukan",
+    c4:"Kesolehan: mutabaah",
+    c5:"Coaching AB"
   };
-  if(b.total===0)return{label:"Mula skor BPMy — nilai muhib buat kali pertama",due:addDays("",21),tone:"amber"};
+  if(b.total===0)return{label:"Mula skor BPMy",due:addDays("",21),tone:"amber"};
   const weak=b.cats.slice().sort((x,y)=>(x.score/(x.max||1))-(y.score/(y.max||1)))[0];
-  return{label:FOCUS[weak.id]||"Teruskan pembinaan muhib",due:addDays(last,21),tone:"amber"};
+  return{label:FOCUS[weak.id]||"Teruskan pembinaan",due:addDays(last,21),tone:"amber"};
 }
 /* Reusable stage badge: MUT grey · MUH biru · MAY emas. Colour comes from .sb-<stage>. */
 function stageBadge(s){return `<span class="sb sb-${esc(s)}" title="${esc(stageLabel(s))}">${stageCode(s)}</span>`;}
@@ -1682,6 +1715,14 @@ function viewPD(){
     </div>`;
 }
 function eligibleMadu(){return S.people.filter(p=>!p.arsip&&(p.stage==="mutabaah"||p.stage==="muhib"));}
+/* Each chip carries two unrelated facts and people were reading the green fill
+   as membership. Spell both out once, directly above the checklist, reusing the
+   very marks being explained so the legend cannot drift from the chips. */
+function usrahLegend(){return `<div class="uleg">
+  <span class="uleg-i">${ahliMark({statusAhli:"Ya"})}Ahli berdaftar</span>
+  <span class="uleg-i">${ahliMark({statusAhli:"Belum"})}Belum ahli</span>
+  <span class="uleg-i"><i class="uleg-sw" aria-hidden="true"></i>Ditanda hadir</span>
+</div>`;}
 function usrahGroups(){const g={};S.people.forEach(p=>{(p.sessions||[]).forEach(s=>{if(!s._usrahId)return;const k=s._usrahId;(g[k]=g[k]||{id:k,tarikh:s.tarikh,jenis:s.jenis,pd:s.oleh,pd2:s.oleh2||"",butiran:s.nota,catatan:s.catatan||"",att:[]});g[k].att.push({id:p.id,nama:p.nama||"(tanpa nama)"});});});return Object.values(g);}
 /* A session may be run by two PDs. Both names read the same way everywhere:
    joined for display, and either one matching makes a mad'u part of the pool. */
@@ -1721,15 +1762,17 @@ function usrahEditor(gr,pds,madu){
   const seen=new Set(pool.map(m=>m.id));
   /* Anyone already in the record stays listed even once they are out of the
      eligible pool — promoted, reassigned or archived. Their attendance happened. */
-  const chips=pool.concat(gr.att.filter(a=>!seen.has(a.id))).map(m=>
-    `<button class="uchip${on.has(m.id)?" on":""}" data-ugatt="${esc(gr.id)}|${esc(m.id)}" aria-pressed="${on.has(m.id)}">${esc(m.nama||"(nama)")}</button>`).join("");
+  /* gr.att entries are {id,nama} stubs, so the membership tick is read from the
+     real record. A stub whose record is gone gets no tick rather than a wrong one. */
+  const chips=pool.concat(gr.att.filter(a=>!seen.has(a.id))).map(m=>{const r=get(m.id);
+    return `<button class="uchip${on.has(m.id)?" on":""}" data-ugatt="${esc(gr.id)}|${esc(m.id)}" aria-pressed="${on.has(m.id)}">${r?ahliMark(r):""}${esc(m.nama||"(nama)")}</button>`;}).join("");
   return `<div class="urow-b">
     <div class="g2">${fld("Tarikh",`<input data-uged="${esc(gr.id)}" data-f="tarikh" type="date" value="${esc(gr.tarikh||"")}">`)}${fld("Jenis",`<select data-uged="${esc(gr.id)}" data-f="jenis">${SES_JENIS.map(x=>`<option${gr.jenis===x?" selected":""}>${x}</option>`).join("")}</select>`)}</div>
     <div class="g2">${fld("Penggerak Dakwah (PD 1)",`<select data-uged="${esc(gr.id)}" data-f="pd"><option value="">— Pilih PD —</option>${pdOptsFor(gr.pd).filter(x=>x===gr.pd||x!==gr.pd2).map(x=>`<option${gr.pd===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}${fld("PD 2 (pilihan)",`<select data-uged="${esc(gr.id)}" data-f="pd2"><option value="">— Tiada —</option>${pdOptsFor(gr.pd2).filter(x=>x===gr.pd2||x!==gr.pd).map(x=>`<option${gr.pd2===x?" selected":""}>${esc(x)}</option>`).join("")}</select>`)}</div>
     ${fld("Butiran (pilihan)",`<input data-uged="${esc(gr.id)}" data-f="butiran" value="${esc(gr.butiran||"")}" placeholder="Tajuk / tema usrah">`)}
     ${fld("Catatan (pilihan)",`<textarea data-uged="${esc(gr.id)}" data-f="catatan" rows="3" placeholder="Apa yang berlaku, perkara dibincang, tindakan susulan…">${esc(gr.catatan||"")}</textarea>`)}
     <div class="hint" style="margin:8px 0 6px">Tanda mad'u yang <b>hadir</b> &middot; ${gr.att.length} hadir</div>
-    ${chips?`<div class="uchips">${chips}</div>`:`<div class="hint">Tiada mad'u di bawah PD ini.</div>`}
+    ${chips?usrahLegend()+`<div class="uchips">${chips}</div>`:`<div class="hint">Tiada mad'u di bawah PD ini.</div>`}
     <button class="del" data-udel="${esc(gr.id)}" style="margin-top:12px;width:100%">Padam usrah ini</button>
   </div>`;}
 function viewUsrah(){
@@ -1739,7 +1782,7 @@ function viewUsrah(){
   /* Either PD opens the checklist, and a two-PD session pools both their mad'u. */
   const fNames=grPds({pd:uForm.pd,pd2:uForm.pd2});
   if(fNames.length){const mem=madu.filter(m=>underPds(m,fNames));
-    checklist=mem.length?`<div class="uchips">${mem.map(m=>`<button class="uchip${uForm.att[m.id]?" on":""}" data-uatt="${m.id}">${esc(m.nama||"(nama)")}</button>`).join("")}</div>`:`<div class="hint">Tiada mad'u di bawah PD ini.</div>`;}
+    checklist=mem.length?usrahLegend()+`<div class="uchips">${mem.map(m=>`<button class="uchip${uForm.att[m.id]?" on":""}" data-uatt="${m.id}">${ahliMark(m)}${esc(m.nama||"(nama)")}</button>`).join("")}</div>`:`<div class="hint">Tiada mad'u di bawah PD ini.</div>`;}
   else checklist=`<div class="hint">Pilih Penggerak Dakwah dahulu untuk papar senarai mad'u.</div>`;
   const nSel=Object.values(uForm.att).filter(Boolean).length;
   const form=`<div class="grp"><h3>Log usrah / DF</h3>
@@ -1901,7 +1944,10 @@ function viewPapan(){
     const st=statusOf(p);
     /* The row says which of the two reasons put it here, so the list can be
        worked without opening every record to find out. */
-    const why=tiadaPd(p)?`<span class="pp-rs pp-rs-bad">Tiada PD — perlu ditugaskan</span>`:`<span class="pp-rs">${esc(st.t||stageLabel(p.stage))}</span>`;
+    const own=actionOwner(p);
+    const why=tiadaPd(p)
+      ?`<span class="pp-rs pp-rs-bad">Tiada PD${own?" &middot; "+esc(own):""}</span>`
+      :`<span class="pp-rs">${esc(st.t||stageLabel(p.stage))}${own?" &middot; "+esc(own):""}</span>`;
     return `<button type="button" class="pp-row" data-goto="${esc(p.id)}" aria-label="Buka ${esc(p.nama||"ahli")}">${stageBadge(p.stage)}<span class="pp-rm"><span class="pp-rn">${esc(p.nama||"(nama)")}</span>${why}</span><span class="chev">›</span></button>`;
   }).join("");
 
@@ -2088,7 +2134,6 @@ function filteredPeople(allStages){let list=S.people.slice();
   /* Search spans name, IPT (full name and short label) and the derived ID, which
      is what the placeholder promises. */
   if(q)list=list.filter(p=>[p.nama,p.universiti,iptLabel(p.universiti)].some(v=>String(v||"").toLowerCase().includes(q)));
-  if(F.perlu)list=list.filter(p=>perluTindakan(p));
   if(F.pd){if(F.pd==="__none__")list=list.filter(p=>!p.pd1&&!p.pd2);else list=list.filter(p=>p.pd1===F.pd||p.pd2===F.pd);}
   if(F.minat)list=list.filter(p=>(p.minatUsrah||"Belum")===F.minat);
   if(F.ajk)list=list.filter(p=>(p.minatAJK||"Tidak")===F.ajk);
@@ -2155,10 +2200,6 @@ function viewKeahlian(){
   const isKb=kMode==="kanban";
   const modeTgl=`<div class="toggle" role="group" aria-label="Paparan"><button data-kmode="senarai" class="${isKb?"":"on"}" aria-pressed="${!isKb}">Senarai</button><button data-kmode="kanban" class="${isKb?"on":""}" aria-pressed="${isKb}">Kanban</button></div>`;
 
-  /* Bell = "needs my attention": a tarsyih already earned, or nobody assigned
-     yet. Same rule as the dashboard's Perlu tindakan card. */
-  const perluN=act.filter(p=>perluTindakan(p)).length;
-
   const sub=showArsip
     ? `${act.length} aktif · memaparkan arkib (${arsipN})`
     : (stage===ASING_PILL
@@ -2172,10 +2213,6 @@ function viewKeahlian(){
     </div>
     <div class="dirhead-a">
       <div class="search sm"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><input id="search" value="${esc(q)}" placeholder="Cari nama atau IPT" aria-label="Cari nama, IPT atau ID mad'u"></div>
-      <button class="bellb${F.perlu?" on":""}" data-perlu="1" aria-pressed="${!!F.perlu}" aria-label="Tapis: perlu tindakan (${perluN})" title="Perlu tindakan (${perluN})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-        ${perluN?`<span class="bellb-c">${perluN}</span>`:""}
-      </button>
       <button class="bellb" id="dirXlBtn" aria-label="Muat naik senarai nama (Excel/CSV)" title="Muat naik senarai nama — masuk sebagai Mutabaah">${ICO.upload}</button>
       <button class="add" id="addBtn">＋ Tambah mad'u</button>
     </div>
@@ -2328,11 +2365,15 @@ const ICO={
 
 function nextActionCard(p){
   const a=nextAction(p);
-  if(!a)return `<div class="nact nact-done"><span class="nact-e">${ICO.star}Peringkat tertinggi</span><span class="nact-t">Muayyid — perjalanan tarsyih selesai</span></div>`;
+  if(!a)return `<div class="nact nact-done"><span class="nact-e">${ICO.star}Peringkat tertinggi</span><span class="nact-t">Tarsyih selesai</span></div>`;
+  /* Owner first, then the date: the question the card exists to answer is who
+     does this, and an action with no name against it is the one that stalls. */
+  const meta=[a.owner?`<b>${esc(a.owner)}</b>`:`<i class="nact-noown">Tiada pemilik</i>`,
+              a.due?"Sasaran "+esc(dmy(a.due)):""].filter(Boolean).join(" &middot; ");
   return `<div class="nact nact-${a.tone}">
     <span class="nact-e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>Tindakan seterusnya</span>
     <span class="nact-t">${esc(a.label)}</span>
-    ${a.due?`<span class="nact-d">Sasaran ${esc(dmy(a.due))}</span>`:""}
+    <span class="nact-d">${meta}</span>
   </div>`;
 }
 
@@ -2727,8 +2768,6 @@ document.addEventListener("click",e=>{
   const sel=e.target.closest("[data-sel]");if(sel){previousFocus=document.activeElement;selId=sel.dataset.sel;eTab=1;const _p=get(selId);if(_p){const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);return;}
   const scl=e.target.closest("[data-selclose]");if(scl){closeDrawer();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
-  /* Bell: narrow the directory to whoever already meets their tarsyih syarat. */
-  const prl=e.target.closest("[data-perlu]");if(prl){F.perlu=!F.perlu;render();return;}
   const so=e.target.closest("[data-sort]");if(so){const k=so.dataset.sort;if(sortKey===k)sortDir=sortDir==="asc"?"desc":"asc";else{sortKey=k;sortDir=(k==="sesi"||k==="kemajuan")?"desc":"asc";}render();return;}
   const rjm=e.target.closest("[data-rujmain]");if(rjm){rujMain=rjm.dataset.rujmain;render();return;}
   const rjt=e.target.closest("[data-rujtab]");if(rjt){rujTab=rjt.dataset.rujtab;render();return;}
