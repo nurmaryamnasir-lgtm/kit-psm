@@ -600,6 +600,20 @@
   .stat-row b{font-family:var(--font-mono);font-weight:600;color:var(--blue)}
   .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);background:var(--dakwat-900);color:#fff;padding:12px 20px;border-radius:var(--radius-md);font-size:13.5px;font-weight:500;opacity:0;transition:.3s;pointer-events:none;z-index:60;box-shadow:var(--shadow-lg);max-width:90%}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* Stale-client banner. Sits above the sticky header (z-index 30) because a
+     read-only tab must not be able to scroll the warning out of sight. Shown
+     only by staleUI(); body.stale then reserves the height it occupies so the
+     header and page content are pushed down rather than covered. */
+  .stalebar{position:fixed;left:0;right:0;top:0;z-index:100;display:none;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
+    background:var(--amber-100);border-bottom:3px solid var(--red);color:var(--merah-600);
+    padding:calc(11px + env(safe-area-inset-top)) 16px 11px;font-size:13.5px;font-weight:600;line-height:1.45;text-align:center;box-shadow:var(--shadow-lg)}
+  .stalebar.show{display:flex}
+  .stalebar .sb-t{max-width:640px}
+  .stalebar .sb-t b{color:var(--red)}
+  .stalebar button{flex:0 0 auto;background:var(--red);color:#fff;border:0;border-radius:var(--radius-pill);padding:0 18px;min-height:44px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .stalebar button:hover{background:var(--merah-600)}
+  body.stale{padding-top:var(--stale-h,0px)}
+  body.stale header{top:var(--stale-h,0px)}
   input[type=file]{display:none}
   .cev.hol-umum{background:var(--red-s);color:var(--red)} .cev.hol-sem{background:#efe8f8;color:var(--purple)}
   .cev.hol-study{background:var(--amber-s);color:var(--amber)} .cev.hol-lain{background:var(--grey-s);color:var(--muted)}
@@ -998,10 +1012,57 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="syncPill" class="syncpill" role="status" aria-live="polite"></div>
+<!-- Kekal dalam DOM tetapi tersembunyi; staleUI() menayangkannya apabila pelayan
+     melaporkan lantai versi yang lebih tinggi daripada APP_VERSION binaan ini. -->
+<div class="stalebar" id="staleBar" role="alert" aria-live="assertive">
+  <span class="sb-t"><b>Versi lama dikesan.</b> Data anda hanya boleh dibaca. Muat semula untuk kemas kini sebelum menyimpan.</span>
+  <button type="button" id="staleReload">Muat semula sekarang</button>
+</div>
 
 <script>
 "use strict";
 const KEY="kitpd_psm_sa";
+
+/* ---- Stale-client write guard ("suis mati") ----------------------------------
+   GitHub Pages serves index.html from cache, so a tab can stay on an old build
+   for days. Because the shared document is last-write-wins, that old build can
+   push a shape the current one no longer understands over everyone's data.
+   Every Apps Script reply carries REQUIRED_APP_VERSION as `requiredVersion`
+   (see out() in Code.gs) — no extra round trip. If this build is below that
+   floor we flip STALE and every outbound write becomes a no-op; reads carry on
+   as normal so the user can still see live data while they reload.
+   ADMIN: bump APP_VERSION by one on each deploy that must be able to write, and
+   raise REQUIRED_APP_VERSION in Code.gs only when older builds must be locked
+   out. APP_VERSION must never be below the backend's floor for a fresh deploy.
+   Fail direction: a reply with no `requiredVersion` (backend not yet updated)
+   leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
+const APP_VERSION=1;
+let STALE=false;
+/* Called on every backend reply. Only a numeric, strictly-higher floor trips
+   the switch; anything else (absent, null, junk) is treated as "no floor". */
+function noteVersion(r){
+  try{
+    if(!r||typeof r!=="object")return r;
+    const req=r.requiredVersion;
+    if(typeof req!=="number"||!isFinite(req))return r;
+    if(APP_VERSION<req&&!STALE){STALE=true;staleUI();}
+  }catch(e){}
+  return r;
+}
+/* Shows the banner and reserves its height so the sticky header is pushed down
+   instead of covered. Never reloads on its own — the button is the only way. */
+function staleUI(){
+  try{
+    const bar=document.getElementById("staleBar");if(!bar)return;
+    bar.classList.add("show");
+    const btn=document.getElementById("staleReload");
+    if(btn&&!btn.dataset.bound){btn.dataset.bound="1";
+      btn.addEventListener("click",()=>{location.replace(location.pathname+"?v="+Date.now());});}
+    document.body.classList.add("stale");
+    const setH=()=>{document.documentElement.style.setProperty("--stale-h",bar.offsetHeight+"px");};
+    setH();window.addEventListener("resize",setH);
+  }catch(e){}
+}
 
 /* ---- Papan Pemuka: edit these two lines to change the dashboard greeting ---- */
 /* Fallback only — used before login or in offline mode. The greeting prefers the
@@ -1127,11 +1188,15 @@ async function load(){try{const r=await store.get(KEY);if(r&&r.value)S=JSON.pars
    it after, which is how it tells "the server echoed back exactly what I sent"
    from "the user typed again while that request was in flight". */
 let rev=0;
-let sT,pT;function save(){rev++;stampActive();S._localSavedAt=new Date().toISOString();if(SYNC.ok)dirty=true;clearTimeout(sT);sT=setTimeout(async()=>{try{await store.set(KEY,JSON.stringify(cachePayload()));}catch(e){}},150);if(SYNC.ok&&cfg.url&&SYNC.code){clearTimeout(pT);pT=setTimeout(pushSync,900);}}
+/* A stale tab still writes to its own localStorage — that harms nobody — but it
+   neither marks the document dirty nor schedules a push. Leaving `dirty` false
+   also keeps the 25s pullMerge() alive, which is how a read-only tab goes on
+   showing live data. */
+let sT,pT;function save(){rev++;stampActive();S._localSavedAt=new Date().toISOString();if(SYNC.ok&&!STALE)dirty=true;clearTimeout(sT);sT=setTimeout(async()=>{try{await store.set(KEY,JSON.stringify(cachePayload()));}catch(e){}},150);if(SYNC.ok&&!STALE&&cfg.url&&SYNC.code){clearTimeout(pT);pT=setTimeout(pushSync,900);}}
 const SENSITIVE=["email","telefon","tarikhLahir","alamatCaw","alamatKg1","alamatKg2","poskod","kolej","ic"];
 function cachePayload(){const o={};for(const k in S)o[k]=S[k];if(S.people)o.people=S.people.map(p=>{const c={};for(const k in p)if(SENSITIVE.indexOf(k)<0)c[k]=p[k];return c;});o._redacted=true;o._cacheAt=Date.now();return o;}
 function persistLocal(){try{store.set(KEY,JSON.stringify(cachePayload()));}catch(e){}}
-window.addEventListener("beforeunload",()=>{try{localStorage.setItem(KEY,JSON.stringify(cachePayload()));}catch(e){}try{if(dirty&&SYNC.ok&&SYNC.pulled&&cfg.url&&SYNC.code&&navigator.sendBeacon){navigator.sendBeacon(cfg.url,new Blob([JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})],{type:"text/plain;charset=utf-8"}));}}catch(e){}});
+window.addEventListener("beforeunload",()=>{try{localStorage.setItem(KEY,JSON.stringify(cachePayload()));}catch(e){}try{if(!STALE&&dirty&&SYNC.ok&&SYNC.pulled&&cfg.url&&SYNC.code&&navigator.sendBeacon){navigator.sendBeacon(cfg.url,new Blob([JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})],{type:"text/plain;charset=utf-8"}));}}catch(e){}});
 
 const $=s=>document.querySelector(s);
 function el(t,c){const e=document.createElement(t);if(c)e.className=c;return e;}
@@ -3234,8 +3299,11 @@ function recFromDataset(d){d=d||{};
   return null;}
 function stampActive(){try{const a=document.activeElement;if(a)stamp(recFromDataset(a.dataset||{}));}catch(e){}}
 function isEditing(){const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));}
-async function apiGet(code){const u=cfg.url+(cfg.url.indexOf("?")>-1?"&":"?")+"action=get&code="+encodeURIComponent(code);const r=await fetch(u);return await r.json();}
-async function apiSave(){const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})});return await r.json();}
+/* Every reply passes through noteVersion() so the version floor is picked up
+   from whichever call happens first — the sign-in read, a poll, a save echo or
+   an upload — including the error replies, which carry it too. */
+async function apiGet(code){const u=cfg.url+(cfg.url.indexOf("?")>-1?"&":"?")+"action=get&code="+encodeURIComponent(code);const r=await fetch(u);return noteVersion(await r.json());}
+async function apiSave(){const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",code:SYNC.code,by:cfg.name,data:JSON.stringify(S)})});return noteVersion(await r.json());}
 function sig(x){try{const o=Object.assign({},x);delete o._localSavedAt;return JSON.stringify(o);}catch(e){return Math.random()+"";}}
 /* An upload takes a round trip, and the user keeps working during it. Two things
    used to go wrong when an edit landed mid-flight: the reply cleared `dirty`,
@@ -3246,6 +3314,7 @@ function sig(x){try{const o=Object.assign({},x);delete o._localSavedAt;return JS
    A push arriving while one is in flight is queued rather than dropped, which is
    what used to make a change sit and do nothing until some later save. */
 async function syncNow(){
+  if(STALE)return;                                     // suis mati: binaan lama tidak menulis
   if(!SYNC.ok||!SYNC.pulled||!cfg.url||!SYNC.code)return;
   if(SYNC.busy){SYNC.again=true;return;}
   SYNC.busy=true;setSyncUI(true);
@@ -3261,7 +3330,7 @@ async function syncNow(){
   SYNC.busy=false;setSyncUI(false);
   if(SYNC.again){SYNC.again=false;setTimeout(syncNow,200);}
 }
-function pushSync(){syncNow();}
+function pushSync(){if(STALE)return;syncNow();}
 async function pullMerge(){if(!SYNC.ok||dirty||SYNC.busy||isEditing())return;setSyncUI(true);try{const r=await apiGet(SYNC.code);if(r&&r.ok&&r.data){const before=sig(S);if(adoptRemote(r.data,r.savedAt)){lastSyncAt=Date.now();if(sig(S)!==before)render();}}}catch(e){}setSyncUI(false);}
 function startPolling(){if(pollT)clearInterval(pollT);pollT=setInterval(pullMerge,25000);}
 async function pullNow(){if(!SYNC.ok){toast("Log masuk dahulu");return;}try{const r=await apiGet(SYNC.code);if(r&&r.ok){if(r.data)adoptRemote(r.data,r.savedAt);render();toast("Data terkini ditarik");}else toast("Gagal menarik data");}catch(e){toast("Tidak dapat menyambung");}}
@@ -3296,12 +3365,14 @@ async function doLogin(){const name=$("#gName").value.trim(),code=$("#gCode").va
 
 /* ---- upload lampiran ke Drive (via Apps Script) ---- */
 async function uploadFile(file,cb){
+  if(STALE){toast("Versi lama — muat semula sebelum memuat naik");return;}  // suis mati
   if(!SYNC.ok||!cfg.url||!SYNC.code){toast("Log masuk & sync dahulu untuk muat naik");return;}
   if(file.size>5*1024*1024){toast("Fail terlalu besar (maks 5MB)");return;}
   let b64;try{b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(file);});}catch(e){toast("Gagal baca fail");return;}
   toast("Memuat naik…");
   try{const r=await fetch(cfg.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"upload",code:SYNC.code,filename:file.name,mime:file.type||"application/octet-stream",data:b64})});
-    const res=await r.json();
+    const res=noteVersion(await r.json());
+    if(STALE){toast("Versi lama — muat semula sebelum memuat naik");return;}  // lantai versi baru sahaja diketahui
     if(res&&res.ok&&res.url){cb({name:res.name||file.name,url:res.url});toast("Berjaya dimuat naik");}
     else toast((res&&res.error)?("Gagal: "+res.error):"Muat naik gagal");
   }catch(e){toast("Tidak dapat menyambung");}
