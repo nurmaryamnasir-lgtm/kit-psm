@@ -38,8 +38,12 @@
   --emas-600:#AC8836; --emas-500:#C8A24A; --emas-300:#E2C88C; --emas-100:#F7EFDC;
   /* Status hues */
   --hijau-600:#187A5B; --hijau-500:#1E9C72; --hijau-100:#E1F4EE;
-  --amber-600:#A86A10; --amber-500:#D08A1C; --amber-100:#FCF1DD;
-  --merah-600:#B4302E; --merah-500:#D94A47; --merah-100:#FBE7E6;
+  /* The 700 steps exist for TEXT. The 500s are marks and fills, the 600s are
+     borders and large glyphs; neither clears 4.5:1 as small text on its own
+     tint (--amber-600 on --amber-100 is 3.96:1, and even on white it is 4.44:1,
+     just under). Anything that sets `color:` in amber or red reaches for these. */
+  --amber-700:#8A560C; --amber-600:#A86A10; --amber-500:#D08A1C; --amber-100:#FCF1DD;
+  --merah-700:#8F2624; --merah-600:#B4302E; --merah-500:#D94A47; --merah-100:#FBE7E6;
 
   --font-display:"Archivo",system-ui,sans-serif;
   --font-body:"Inter",system-ui,-apple-system,sans-serif;
@@ -93,6 +97,12 @@
   --shadow-xs:0 1px 2px rgba(20,32,58,.05);
   --shadow-lg:0 20px 44px -12px rgba(20,32,58,.22),0 6px 14px rgba(20,32,58,.07);
 
+  /* The floor for functional text — eyebrows, table headers, badges, codes,
+     metadata. Everything that used to sit at 9.5/10/10.5px was one role wearing
+     three arbitrary sizes, none of them legible at arm's length on a phone,
+     which PRODUCT.md records as the primary capture scene. One name, one value,
+     so it cannot drift back. Nothing functional goes below this. */
+  --text-label:11px;
   --tracking-eyebrow:.1em;
   --tracking-heading:-.02em;
   --tracking-mono:.02em;
@@ -137,7 +147,7 @@ h1, h2, h3 { margin: 0; }
 .grp { border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: var(--pad-card); margin-bottom: 14px; }
 .fld { margin-bottom: 12px; }
 .fld:last-child { margin-bottom: 0; }
-.fld label { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.fld label { display: block; font-size: var(--text-label); font-weight: 700; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 .fld input, .fld select, .fld textarea { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px 12px; background: #fff; color: var(--ink); transition: border-color var(--dur-fast) var(--ease-standard); }
 .fld input:focus, .fld select:focus, .fld textarea:focus { border-color: var(--blueb); }
 .fld textarea { resize: vertical; min-height: 44px; }
@@ -152,6 +162,19 @@ input[type=date] { width: 100%; min-width: 0; }
 .toggle.g button.on { background: var(--green); }
 .toggle.r button.on { background: var(--red); }
 
+/* Reduced motion means less movement, not less feedback. The blanket .01ms kill
+   this replaces also removed the colour and shadow transitions that tell a user
+   a toggle flipped, a chip became active, or a field took focus — on a
+   data-entry tool that is information, not decoration, and removing it makes
+   the interface harder to read, which is the opposite of the request. So:
+   animations and scrolling stop, movement stops, and state changes survive at a
+   speed that reads as instant without snapping. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-property: color, background-color, border-color, box-shadow, opacity, fill, stroke !important;
+    transition-duration: 80ms !important;
+  }
 }
