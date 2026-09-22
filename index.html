@@ -127,7 +127,11 @@
   .kkn{flex:0 0 auto;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;color:#fff;font-size:14px}
   .kkc-g .kkn{background:var(--green)} .kkc-b .kkn{background:var(--blueb)} .kkc-a .kkn{background:var(--amber)}
   .kkt{font-weight:700;font-size:14.5px;letter-spacing:-.01em} .kkd{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}
-  .arsiplink{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:4px}
+  /* Arkib sits in the filter row but is navigation, not a filter, so it stays a
+     text action rather than taking the chip shape beside it. */
+  .arsiplink{background:none;border:none;font-family:inherit;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;padding:0 6px;min-height:34px;border-radius:var(--radius-sm)}
+  .arsiplink:hover{text-decoration:underline}
+  .arsiplink:focus-visible{outline:3px solid var(--blueb);outline-offset:2px}
   .arch{background:#fff;border:1px solid var(--border-subtle);color:var(--muted);border-radius:var(--radius-md);padding:0 14px;font-weight:600}
   /* ---------- Senarai Penggerak: one editable roster table ----------
      The row is a grid, not a flex line, so the name, the IPT select and the
@@ -446,8 +450,23 @@
   .dirfilt{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
   .dirfilt-p{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .dirfilt-sp{flex:1 1 auto}
-  .dirfilt-s{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
-  .dirfilt-s select{border:1px solid var(--border-strong);border-radius:var(--radius-pill);padding:8px 13px;background:#fff;font-size:13px;font-weight:500;color:var(--ink);cursor:pointer}
+  /* Filter row. The selects used to be bare <select>s carrying native OS chrome,
+     while the PD and Santunan pages already owned a custom-select pattern
+     (.pdipt-w + .pdipt + ICO.chev); these now reuse it so the three surfaces
+     read as one control. Compact sunken chips, because the row is scanned
+     rather than read. An applied filter tints itself through :has() — before,
+     a filter that was doing something looked identical to one set to "semua". */
+  .dirfilt-s{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+  .dirfilt-w{position:relative;display:inline-flex;align-items:center;min-width:0}
+  .dirfilt-w>i{position:absolute;right:11px;display:block;width:14px;height:14px;color:var(--muted);pointer-events:none}
+  .dirfilt-w>i svg{display:block;width:100%;height:100%}
+  .dirfilt-c{appearance:none;-webkit-appearance:none;height:34px;border:1px solid transparent;border-radius:var(--radius-pill);padding:0 30px 0 13px;background:var(--surface-sunken);font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;text-overflow:ellipsis;max-width:100%;transition:border-color var(--dur-fast) var(--ease-standard),background var(--dur-fast) var(--ease-standard)}
+  .dirfilt-c:hover{border-color:var(--border-strong)}
+  .dirfilt-c:focus-visible{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--surface-brand-soft)}
+  /* An option with value="" is the "semua" entry, so anything else selected
+     means the filter is actually narrowing the list. */
+  .dirfilt-c:has(option:checked:not([value=""])){background:var(--surface-brand-soft);color:var(--biru-700)}
+  .dirfilt-w:has(option:checked:not([value=""]))>i{color:var(--blue)}
 
   .iptbar{margin-bottom:12px}
   .ktbl{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-xs)}
@@ -524,7 +543,11 @@
     .dirhead-a{width:100%;flex-wrap:wrap} .search.sm{flex:1 1 auto;min-width:0} .add{flex:1 1 100%}
     .dirfilt-p{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
     .dirfilt-p::-webkit-scrollbar{display:none}
+    /* Taller controls on a phone: PRODUCT.md records capture in the field, one
+       handed, as a first-class scene, and 34px is not a comfortable tap. */
     .dirfilt-s{justify-content:flex-start}
+    .dirfilt-c{height:38px}
+    .arsiplink{min-height:38px}
     .iptbar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none} .iptbar::-webkit-scrollbar{display:none}
   }
   @media(max-width:720px){
@@ -1068,7 +1091,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=7;
+const APP_VERSION=8;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -2281,10 +2304,10 @@ function viewKeahlian(){
   const filters=`<div class="dirfilt">
     <div class="dirfilt-p">${isKb?asingPill:pills}<span class="dirfilt-sp"></span>${modeTgl}</div>
     <div class="dirfilt-s">
-      <select data-flt="ipt" aria-label="Tapis ikut IPT">${iptOpt}</select>
-      <select data-flt="pd" aria-label="Tapis ikut PD">${pdOpt}</select>
-      <select data-flt="ajk" aria-label="Tapis ikut AJK"><option value="">AJK: semua</option><option${F.ajk==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.ajk==="Tidak"?" selected":""}>Tidak</option></select>
-      ${showMut?`<select data-flt="minat" aria-label="Tapis ikut minat usrah"><option value="">Minat usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.minat==="Tidak"?" selected":""}>Tidak</option></select>`:""}
+      <span class="dirfilt-w"><select class="dirfilt-c" data-flt="ipt" aria-label="Tapis ikut IPT">${iptOpt}</select><i aria-hidden="true">${ICO.chev}</i></span>
+      <span class="dirfilt-w"><select class="dirfilt-c" data-flt="pd" aria-label="Tapis ikut PD">${pdOpt}</select><i aria-hidden="true">${ICO.chev}</i></span>
+      <span class="dirfilt-w"><select class="dirfilt-c" data-flt="ajk" aria-label="Tapis ikut AJK"><option value="">AJK: semua</option><option${F.ajk==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.ajk==="Tidak"?" selected":""}>Tidak</option></select><i aria-hidden="true">${ICO.chev}</i></span>
+      ${showMut?`<span class="dirfilt-w"><select class="dirfilt-c" data-flt="minat" aria-label="Tapis ikut minat usrah"><option value="">Minat usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.minat==="Tidak"?" selected":""}>Tidak</option></select><i aria-hidden="true">${ICO.chev}</i></span>`:""}
       ${(arsipN>0||showArsip)?`<button class="arsiplink" data-arsip="1">${showArsip?"← Senarai aktif":("Arkib ("+arsipN+")")}</button>`:""}
     </div>
   </div>`;
