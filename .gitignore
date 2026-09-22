@@ -1,0 +1,5 @@
+
+Code.gs
+*.gs
+.DS_Store
+deploy.sh
