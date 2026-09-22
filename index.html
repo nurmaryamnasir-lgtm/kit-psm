@@ -471,7 +471,13 @@
      marks can be read straight down without the names getting in the way. */
   /* Ahli and Usrah are their own columns now, so the marks no longer ride along
      inside the name cell. Narrow and centred — they are glanced at, not read. */
-  .kt-mark{width:56px;text-align:center}
+  .kt-mark{width:62px;text-align:center;padding-left:6px;padding-right:6px}
+  .ktbl th.kt-mark{white-space:normal;padding-left:6px;padding-right:6px}
+  .ktbl td.kt-mark{padding-left:6px;padding-right:6px}
+  /* Penggerak shows initials, so two PDs still fit in a narrow column; the full
+     names stay reachable on the cell's title. */
+  .kt-pdi{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 5px;margin-right:4px;border-radius:var(--radius-sm);background:var(--surface-brand-soft);color:var(--biru-700);font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:var(--tracking-mono)}
+  .kt-pdi:last-child{margin-right:0}
   .usm{flex:0 0 auto;display:inline-grid;place-items:center;width:18px;height:18px;color:var(--kabus-400);vertical-align:middle}
   .usm svg{width:100%;height:100%}
   .usm-y{color:var(--hijau-600)}
@@ -479,9 +485,12 @@
   .ahli svg{width:100%;height:100%}
   .ahli-y{color:var(--hijau-600)}
   /* Column sizing: let the name and next-action columns breathe, pin the rest. */
-  .ktbl th:nth-child(2),.ktbl td:nth-child(2){min-width:165px}
-  .ktbl th:nth-child(3),.ktbl td:nth-child(3){min-width:105px}
-  .ktbl th:nth-child(4),.ktbl td:nth-child(4),.ktbl th:nth-child(5),.ktbl td:nth-child(5){width:1%;white-space:nowrap}
+  /* Keyed to the cell's own class, not its position. These were nth-child rules
+     and silently sized the wrong columns the moment Ahli and Usrah were inserted
+     ahead of them — which is what made those two marks span a third of the table. */
+  .kt-iptc{min-width:165px}
+  .kt-pdc{min-width:105px}
+  .kt-progc{width:1%;white-space:nowrap}
   .kt-actc{width:210px}
   .kt-act{font-weight:500;line-height:1.35;color:var(--ink)} .kt-act.go{color:var(--hijau-600);font-weight:700} .kt-act.bad{color:var(--merah-600);font-weight:600}
   .kt-chev{width:34px;text-align:right;padding-left:0}
@@ -1059,7 +1068,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=4;
+const APP_VERSION=5;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -1321,7 +1330,7 @@ function actDismissed(p){
   const a=nextAction(p);if(!a)return false;
   return (S._actHide||{})[p.id]===a.label;
 }
-function stageCode(s){return {mutabaah:"MUT",muhib:"MUH",muayyid:"MAY"}[s]||"—";}
+function stageCode(s){return {mutabaah:"MUT",muhib:"MHB",muayyid:"MUY"}[s]||"—";}
 function stageLabel(s){return(STAGES.find(x=>x.id===s)||{}).label||s;}
 
 /* ---- Directory identity, progress & next action ----
@@ -2275,7 +2284,7 @@ function viewKeahlian(){
       <select data-flt="ipt" aria-label="Tapis ikut IPT">${iptOpt}</select>
       <select data-flt="pd" aria-label="Tapis ikut PD">${pdOpt}</select>
       <select data-flt="ajk" aria-label="Tapis ikut AJK"><option value="">AJK: semua</option><option${F.ajk==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.ajk==="Tidak"?" selected":""}>Tidak</option></select>
-      ${showMut?`<select data-flt="minat" aria-label="Tapis ikut usrah"><option value="">Usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.minat==="Tidak"?" selected":""}>Tidak</option></select>`:""}
+      ${showMut?`<select data-flt="minat" aria-label="Tapis ikut minat usrah"><option value="">Minat usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.minat==="Tidak"?" selected":""}>Tidak</option></select>`:""}
       ${(arsipN>0||showArsip)?`<button class="arsiplink" data-arsip="1">${showArsip?"← Senarai aktif":("Arkib ("+arsipN+")")}</button>`:""}
     </div>
   </div>`;
@@ -2299,8 +2308,11 @@ function statsPD(){const map={};const MM=["Jan","Feb","Mac","Apr","Mei","Jun","J
 
 /* Row helpers shared by the table and the mobile cards, so both read the same. */
 function progColor(k){return {g:"var(--green)",a:"var(--amber)",b:"var(--blueb)",n:"var(--muted)"}[k]||"var(--muted)";}
+/* Initials, not full names: the column is scanned to see whether somebody is on
+   the mad'u and who, and two full Malay names wrapped over three lines each was
+   most of the row's height. The full names stay on the title for hover. */
 function pdCell(p){const pd=[p.pd1,p.pd2].filter(Boolean);
-  if(pd.length)return esc(pd.join(", "));
+  if(pd.length)return `<span title="${esc(pd.join(", "))}">${pd.map(n=>`<span class="kt-pdi">${esc(initials(n))}</span>`).join("")}</span>`;
   return p.stage==="muayyid"?`<span class="kt-dim">\u2014</span>`:`<span class="kt-warn">Tiada PD</span>`;}
 function iptCell(p){
   const bidang=[esc(p.bidang||""),esc(tahunPengajian(p))].filter(Boolean).join(" \u00b7 ");
@@ -2310,7 +2322,9 @@ function progCell(p){const g=progressOf(p);
   return `<span class="kprog" role="img" aria-label="Kemajuan ${g.pct} peratus"><span class="kprog-t"><span class="kprog-f" style="width:${g.pct}%;background:${progColor(g.k)}"></span></span><span class="kprog-n">${g.pct}%</span></span>`;}
 function actCell(p){const a=nextAction(p);
   return a?`<span class="kt-act${a.tone==="green"?" go":(a.tone==="red"?" bad":"")}">${esc(a.label)}</span>`:`<span class="kt-dim">\u2014</span>`;}
-function stagePill(p){return `<span class="kstage kstage-${esc(p.stage)}"><i></i>${esc(stageLabel(p.stage))}</span>`;}
+/* stagePill() lived here and rendered the Peringkat column and the card's stage
+   chip. Both now read the peringkat off the avatar instead, so it had no callers
+   left; its .kstage rules are kept in case the chip is wanted back. */
 
 /* Keahlian ISMA is a yes/no fact that the peringkat badge beside it does not
    answer — a muayyid need not have signed the borang, a mutabaah may already
@@ -2335,30 +2349,31 @@ function ktable(list){
      itself: a cell set to display:flex leaves the table's row box, so its
      bottom border stops lining up with the borders of the cells beside it. */
   const rows=list.map(p=>`<tr data-sel="${p.id}" role="button" tabindex="0" aria-label="Buka ${esc(p.nama||"ahli")}">
-      <td class="kt-id"><span class="kt-idw"><span class="kt-av rav-${p.stage}">${initials(p.nama)}</span><span class="kt-idm"><span class="kt-name">${esc(p.nama||"(nama baharu)")}</span></span></span></td>
+      <td class="kt-id"><span class="kt-idw"><span class="kt-av rav-${p.stage}" title="${esc(stageLabel(p.stage))}">${stageCode(p.stage)}</span><span class="kt-idm"><span class="kt-name">${esc(p.nama||"(nama baharu)")}</span></span></span></td>
       <td class="kt-mark">${ahliMark(p)}</td>
       <td class="kt-mark">${usrahMark(p)}</td>
-      <td>${iptCell(p)}</td>
-      <td>${pdCell(p)}</td>
-      <td>${stagePill(p)}</td>
-      <td>${progCell(p)}</td>
+      <td class="kt-iptc">${iptCell(p)}</td>
+      <td class="kt-pdc">${pdCell(p)}</td>
+      <td class="kt-progc">${progCell(p)}</td>
       <td class="kt-actc">${actCell(p)}</td>
       <td class="kt-chev"><span class="chev">\u203a</span></td>
     </tr>`).join("");
   return `<table class="ktbl"><thead><tr>
       <th class="sortable" data-sort="nama">Mad'u${ar("nama")}</th>
-      <th class="kt-mark">Ahli</th><th class="kt-mark">Usrah</th>
-      <th>IPT / Bidang</th><th>Penggerak</th><th>Peringkat</th>
-      <th class="sortable" data-sort="kemajuan">Kemajuan${ar("kemajuan")}</th>
+      <th class="kt-mark">Ahli</th><th class="kt-mark">Minat usrah</th>
+      <th class="kt-iptc">IPT / Bidang</th><th class="kt-pdc">Penggerak</th>
+      <th class="sortable kt-progc" data-sort="kemajuan">Kemajuan${ar("kemajuan")}</th>
       <th>Tindakan seterusnya</th><th><span class="sr-only">Buka</span></th>
     </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 /* Narrow screens get the same six facts stacked instead of a table. */
 function kcards(list){return list.map(p=>`<div class="kc" data-sel="${p.id}" role="button" tabindex="0" aria-label="Buka ${esc(p.nama||"ahli")}">
-    <div class="kc-av rav-${p.stage}">${initials(p.nama)}</div>
+    <div class="kc-av rav-${p.stage}" title="${esc(stageLabel(p.stage))}">${stageCode(p.stage)}</div>
     <div class="kc-main">
-      <div class="kc-top"><span class="kc-name">${esc(p.nama||"(nama baharu)")}</span>${ahliMark(p)}${usrahMark(p)}${stagePill(p)}</div>
+      ${/* The avatar now carries the peringkat, so the pill that used to repeat it
+            here is gone — same reason the Peringkat column came out of the table. */""}
+      <div class="kc-top"><span class="kc-name">${esc(p.nama||"(nama baharu)")}</span>${ahliMark(p)}${usrahMark(p)}</div>
       <div class="kc-sub">${p.universiti?esc(iptLabel(p.universiti)):"Tiada IPT"}${p.bidang?" \u00b7 "+esc(p.bidang):""}</div>
       <div class="kc-sub">${pdCell(p)}</div>
       ${progCell(p)}
