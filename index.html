@@ -1164,7 +1164,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",minSesi:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let santFilt=""; let santSel=null; let santQ="";
+let F={pd:"",ipt:"",minat:"",ajk:"",tahun:"",perlu:false}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let santFilt=""; let santSel=null; let santQ="";
 /* Which editor tab is open. This lives here, not on the person, because
    syncNow() and pullMerge() replace the whole of S with the server's copy every
    25 seconds — anything parked on a person record is overwritten by whatever
@@ -1225,7 +1225,7 @@ function getM(id){return S.meetings.find(m=>m.id===id);}
 function getW(id){return S.wasilah.find(w=>w.id===id);}
 function getC(id){return S.claims.find(c=>c.id===id);}
 
-function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Belum",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",arsip:false,_upd:Date.now()};}
+function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Belum",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",arsip:false,ditambahOleh:coordName(),ditambahPada:today(),_upd:Date.now()};}
 function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_upd:Date.now()};}
 function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"To do"};}
 function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_upd:Date.now()};}
@@ -2074,8 +2074,8 @@ function iptOptions(){const set=new Set(S.universities||[]);S.people.forEach(p=>
 function iptLabel(u){u=(u||"").trim();return {"UiTM Puncak Perdana":"UiTM PP","UiTM Shah Alam":"UiTM SA"}[u]||u;}
 function iptColor(u){u=(u||"").trim();if(!u)return "#b8c2d6";const fixed={"MSU":"#6b3fa0","UiTM Shah Alam":"#e07b39","UiTM Puncak Perdana":"#1f9d55","INTEC":"#0f766e"};if(fixed[u])return fixed[u];const pal=["#147FB3","#c2367a","#3f74d6","#2a9d8f","#7048b6","#d98324"];let s=0;for(let i=0;i<u.length;i++)s=(s+u.charCodeAt(i))%99991;return pal[s%pal.length];}
 /* allStages=true skips only the MUT/MUH/MAY pill filter (Kanban shows all three
-   columns). Every other rule — arsip, search, PD, IPT, minat, AJK, sesi, tahun —
-   is unchanged, so list and board always agree. Existing callers pass nothing. */
+   columns). Every other rule — arsip, search, PD, IPT, minat, AJK, tahun — is
+   unchanged, so list and board always agree. Existing callers pass nothing. */
 function filteredPeople(allStages){let list=S.people.slice();
   if(showArsip)list=list.filter(p=>p.arsip);else list=list.filter(p=>!p.arsip);
   /* INTEC is its own count, so it is hidden from the stage pills and from
@@ -2094,7 +2094,6 @@ function filteredPeople(allStages){let list=S.people.slice();
   if(F.ajk)list=list.filter(p=>(p.minatAJK||"Tidak")===F.ajk);
   if(F.ipt){if(F.ipt==="__blank__")list=list.filter(p=>!(p.universiti||"").trim());else list=list.filter(p=>(p.universiti||"")===F.ipt);}
   if(F.tahun)list=list.filter(p=>(p.tahunPSPB||"")===F.tahun);
-  if(F.minSesi){const n=+F.minSesi;list=list.filter(p=>n===3?sesCount(p)>=3:sesCount(p)===n);}
   list.sort((a,b)=>(a.nama||"~").localeCompare(b.nama||"~"));
   return list;}
 
@@ -2188,7 +2187,7 @@ function viewKeahlian(){
       <select data-flt="ipt" aria-label="Tapis ikut IPT">${iptOpt}</select>
       <select data-flt="pd" aria-label="Tapis ikut PD">${pdOpt}</select>
       <select data-flt="ajk" aria-label="Tapis ikut minat AJK"><option value="">Minat AJK: semua</option><option${F.ajk==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.ajk==="Tidak"?" selected":""}>Tidak</option></select>
-      ${showMut?`<select data-flt="minat" aria-label="Tapis ikut minat usrah"><option value="">Minat usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option${F.minat==="Belum"?" selected":""}>Belum</option></select><select data-flt="minSesi" aria-label="Tapis ikut bilangan sesi"><option value="">Sesi: semua</option><option value="1"${F.minSesi==="1"?" selected":""}>1 sesi</option><option value="2"${F.minSesi==="2"?" selected":""}>2 sesi</option><option value="3"${F.minSesi==="3"?" selected":""}>3+ sesi</option></select>`:""}
+      ${showMut?`<select data-flt="minat" aria-label="Tapis ikut minat usrah"><option value="">Minat usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option${F.minat==="Belum"?" selected":""}>Belum</option></select>`:""}
       ${(arsipN>0||showArsip)?`<button class="arsiplink" data-arsip="1">${showArsip?"← Senarai aktif":("Arkib ("+arsipN+")")}</button>`:""}
     </div>
   </div>`;
@@ -2337,8 +2336,19 @@ function nextActionCard(p){
   </div>`;
 }
 
+/* Provenance remark under the name — who keyed this mad'u in, and when. Set once
+   by newPerson(), so it covers the manual "tambah mad'u" button and both import
+   paths alike, and nothing ever rewrites it. Mad'u created before this build
+   carry no author, so the line is omitted rather than guessed at. Styled as a
+   hint, matching the "Disahkan oleh:" lines further down this section. */
+function addedByHint(p){
+  const who=String((p&&p.ditambahOleh)||"").trim();
+  if(!who)return "";
+  const when=String((p&&p.ditambahPada)||"").trim();
+  return `<div class="hint" style="margin:-6px 0 8px">Ditambah oleh: <b>${esc(who)}</b>${when?" · "+esc(dmy(when)):""}</div>`;
+}
 function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
-    ${fld("Nama penuh",T(p.id,"nama",p.nama,"Nama"))}
+    ${fld("Nama penuh",T(p.id,"nama",p.nama,"Nama"))}${addedByHint(p)}
     <div class="g2">${fld("Tarikh lahir",T(p.id,"tarikhLahir",p.tarikhLahir,"","date"))}${fld("Email",T(p.id,"email",p.email,"nama@email.com","email"))}</div>
     <div class="g2">${fld("No. telefon",T(p.id,"telefon",p.telefon,"01_-___ ____","tel"))}${fld("Status ahli",`<div class="toggle g"><button data-tgl="${p.id}|statusAhli|Ya" class="${p.statusAhli==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|statusAhli|Belum" class="${p.statusAhli!=="Ya"?"on":""}">Belum</button></div>`)}</div>
     ${fld("Institut Pengajian Tinggi (IPT)",selManaged(p.id,"universiti",p.universiti,"universities"))}
@@ -2713,7 +2723,7 @@ document.addEventListener("click",e=>{
      the pill the single switch for "show me INTEC". */
   const stg=e.target.closest("[data-stage]");if(stg){const was=stage;stage=stg.dataset.stage;
     if(stage===ASING_PILL||was===ASING_PILL||F.ipt===IPT_ASING)F.ipt="";
-    if(stage!=="mutabaah"&&stage!=="all"&&stage!==ASING_PILL){F.minat="";F.minSesi="";}render();return;}
+    if(stage!=="mutabaah"&&stage!=="all"&&stage!==ASING_PILL){F.minat="";}render();return;}
   const sel=e.target.closest("[data-sel]");if(sel){previousFocus=document.activeElement;selId=sel.dataset.sel;eTab=1;const _p=get(selId);if(_p){const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);return;}
   const scl=e.target.closest("[data-selclose]");if(scl){closeDrawer();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
