@@ -254,19 +254,9 @@
      fill uses, so the state reads across the whole bar; the count, the percentage
      and the status word carry it in text so colour is never the only channel. */
   .pspbbar{margin-bottom:16px}
-  .kpim{display:grid;gap:16px}
-  .kpim-t{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:9px}
-  .kpim-l{font-weight:700;font-size:14px;letter-spacing:-.01em}
-  .kpim-v{font-family:var(--font-display);font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1}
-  .kpim-g{font-size:12.5px;color:var(--muted)}
-  .kpim-st{margin-left:auto;font-size:var(--text-label);font-weight:700;text-transform:uppercase;letter-spacing:var(--tracking-eyebrow);padding:4px 9px;border-radius:var(--radius-pill);white-space:nowrap}
-  .kpim-bar{height:12px;border-radius:var(--radius-pill);overflow:hidden}
-  .kpim-bar i{display:block;height:100%;border-radius:var(--radius-pill);min-width:4px;transition:width var(--dur-base) var(--ease-standard)}
+  /* Only the footnote survives: the KPI meters were replaced by the trend
+     card's per-series stat tiles, which carry the same target read-out. */
   .kpim-n{margin-top:7px;font-size:11.5px;color:var(--muted);line-height:1.45}
-  .kpim-good .kpim-bar{background:var(--hijau-100)} .kpim-good .kpim-bar i{background:var(--hijau-500)} .kpim-good .kpim-st{background:var(--hijau-100);color:var(--hijau-600)}
-  .kpim-warn .kpim-bar{background:var(--amber-100)} .kpim-warn .kpim-bar i{background:var(--amber-500)} .kpim-warn .kpim-st{background:var(--amber-100);color:var(--amber-700)}
-  .kpim-low .kpim-bar{background:var(--merah-100)}  .kpim-low .kpim-bar i{background:var(--merah-500)}  .kpim-low .kpim-st{background:var(--merah-100);color:var(--merah-600)}
-  @media(max-width:560px){.kpim-st{margin-left:0}}
   .syncpill{position:fixed;right:14px;bottom:14px;z-index:40;background:#fff;border:1px solid var(--border-subtle);box-shadow:var(--shadow-md);border-radius:var(--radius-pill);padding:7px 14px;font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--muted);display:none}
   .syncpill.on{color:var(--blue)}
   .row [data-sel],.kc,.ktbl tbody tr{cursor:pointer}
@@ -776,6 +766,56 @@
      reads as a note beside the targets, not as another number inside them. */
   .kpi.t-asing{background:var(--surface-sunken);border-style:dashed;border-color:var(--border-strong);box-shadow:none}
   .kpi.t-asing .kpi-k,.kpi.t-asing .kpi-s{color:var(--muted)}.kpi.t-asing .kpi-v{color:var(--ink)}
+  /* Trend + activity sit side by side: the chart is the wide, scanning half and
+     the feed is the narrow, reading half. */
+  .pp-3{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;align-items:start}
+  .tc-head{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  .tc-ti{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+  .tc-sub{font-size:12px;color:var(--muted)}
+  /* Segmented range control. One row, above the chart, as a filter should be. */
+  .tc-rgs{flex:0 0 auto;display:inline-flex;gap:3px;padding:3px;border-radius:var(--radius-pill);background:var(--surface-sunken)}
+  .tc-rg{border:none;background:none;border-radius:var(--radius-pill);padding:7px 14px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:background var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard)}
+  .tc-rg:hover{color:var(--ink)}
+  .tc-rg.active{background:var(--blue);color:#fff;box-shadow:var(--shadow-xs)}
+  .tc-lgs{display:flex;flex-wrap:wrap;gap:8px 18px}
+  .tc-lg{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink)}
+  .tc-lg i{width:10px;height:10px;flex:0 0 auto;border-radius:3px}
+  /* A 38px gutter of HTML y-labels, the plot beside it, HTML x-labels beneath.
+     Both label sets are absolutely positioned from percentages the chart builder
+     works out, so they line up with the SVG at any width without scaling. */
+  .tc{display:flex;flex-direction:column;gap:5px}
+  .tc-plot{display:flex;align-items:stretch;gap:8px}
+  .tc-yax{position:relative;flex:0 0 38px;width:38px}
+  .tc-yax span{position:absolute;right:0;transform:translateY(-50%);font-family:var(--font-mono);font-size:10.5px;color:var(--kabus-500);white-space:nowrap}
+  .tc-area{position:relative;flex:1;min-width:0}
+  .tc-xax{position:relative;height:15px;margin-left:46px}
+  .tc-xax span{position:absolute;top:0;font-family:var(--font-mono);font-size:10.5px;color:var(--kabus-500);white-space:nowrap}
+  .tc-svg{display:block;width:100%;height:auto;touch-action:pan-y}
+  /* Crosshair tooltip. Positioned in px against .tc-area, so it never leaves the card. */
+  .tc-tip{position:absolute;top:0;z-index:3;pointer-events:none;min-width:132px;padding:9px 11px;border-radius:var(--radius-md);background:var(--dakwat-900);color:#fff;box-shadow:var(--shadow-md);font-size:12px;line-height:1.5}
+  .tc-tip[hidden]{display:none}
+  .tc-tt{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--kabus-300);margin-bottom:5px}
+  .tc-tr{display:flex;align-items:center;gap:7px;white-space:nowrap}
+  .tc-tr i{width:8px;height:8px;flex:0 0 auto;border-radius:2px}
+  .tc-tr b{margin-left:auto;font-family:var(--font-mono);font-weight:600}
+  /* One card per line: the chart's direct labels, and the target read-out. */
+  .tcs-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .tcs{display:flex;flex-direction:column;gap:6px;padding:13px 14px 14px;border-radius:var(--radius-md);background:var(--surface-sunken);border-left:3px solid var(--c)}
+  .tcs-l{font-size:12px;font-weight:700;color:var(--c);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tcs-top{display:flex;align-items:baseline;gap:8px}
+  .tcs-v{font-family:var(--font-display);font-size:29px;font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .tcs-w{margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .tcs-bar{height:6px;border-radius:var(--radius-pill);background:var(--kabus-200);overflow:hidden}
+  .tcs-bar i{display:block;height:100%;border-radius:var(--radius-pill);background:var(--c)}
+  .tcs-g{font-family:var(--font-mono);font-size:10.5px;color:var(--muted)}
+  .tcs-d{font-size:11.5px;font-weight:600;color:var(--muted)}
+  .tcs-d.up{color:var(--hijau-600)}.tcs-d.dn{color:var(--merah-600)}
+  .pp-feed .alog-feed{display:flex;flex-direction:column}
+  .pp-feed .alog-r{padding:11px 2px}
+  .tc-all{align-self:flex-start;border:none;background:none;padding:2px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--blue);cursor:pointer}
+  .tc-all:hover{text-decoration:underline}
+  @media(max-width:1180px){.pp-3{grid-template-columns:1fr}}
+  @media(max-width:560px){.tcs-row{grid-template-columns:1fr}.tc-rgs{width:100%}.tc-rg{flex:1}}
   .pp-2{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;align-items:start}
   .pp-card{display:flex;flex-direction:column;gap:14px;padding:var(--pad-card-lg);border:1px solid var(--border-subtle);border-radius:var(--radius-card);background:#fff;box-shadow:var(--shadow-xs)}
   .pp-h{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:700;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
@@ -1113,7 +1153,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=10;
+const APP_VERSION=11;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -1262,7 +1302,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",tahun:""}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let santFilt=""; let santSel=null; let santQ="";
+let F={pd:"",ipt:"",minat:"",ajk:"",tahun:""}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let papanRange=30; let santFilt=""; let santSel=null; let santQ="";
 /* Which editor tab is open. This lives here, not on the person, because
    syncNow() and pullMerge() replace the whole of S with the server's copy every
    25 seconds — anything parked on a person record is overwritten by whatever
@@ -1323,7 +1363,7 @@ function getM(id){return S.meetings.find(m=>m.id===id);}
 function getW(id){return S.wasilah.find(w=>w.id===id);}
 function getC(id){return S.claims.find(c=>c.id===id);}
 
-function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Tidak",minatAhli:"Tidak",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",arsip:false,ditambahOleh:coordName(),ditambahPada:today(),_upd:Date.now()};}
+function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Tidak",minatAhli:"Tidak",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",tarikhAhli:"",arsip:false,ditambahOleh:coordName(),ditambahPada:today(),_upd:Date.now()};}
 function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_upd:Date.now()};}
 function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"To do"};}
 function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_upd:Date.now()};}
@@ -1997,10 +2037,92 @@ function viewPencalonan(){
    PSPB_YEARS would pad the filter with pills that select nothing. */
 function pspbYears(){const set=new Set();maduPool().forEach(p=>{if(p.tahunPSPB)set.add(String(p.tahunPSPB));});return[...set].sort((a,b)=>b.localeCompare(a));}
 
-/* The branch targets for the coming PSPB. "Ahli" is the whole roster for a
-   session; "Muhib" counts muhib and above, because a muayyid has already passed
-   through muhib and dropping them would make the KPI go backwards on promotion. */
-const KPI_TARGET={ahli:97,muhib:24};
+/* The branch targets for the coming PSPB. "Ahli" is registered membership —
+   statusAhli === "Ya", not the size of the roster, because being under guidance
+   and having signed up as an ahli ISMA are different questions. "Muhib" counts
+   muhib and above, because a muayyid has already passed through muhib and
+   dropping them would make the KPI go backwards on promotion; "Muayyid" is the
+   top of the ladder and counts only those who have arrived. */
+const KPI_TARGET={ahli:293,muhib:88,muayyid:18};
+
+/* ---------- Trend: the three KPI lines over real recorded dates ----------
+   Nothing here is synthesised. A mad'u counts toward a tier from the date the
+   record itself carries — tarikhAhli for registration, tarikhMuhib and
+   tarikhMuayyid for the two promotions. A record that reached a tier but has no
+   date for it (imported rosters often have none) is counted as already standing
+   there before the window opens, which is what actually happened; it shows as a
+   flat head on the line rather than a fake climb. */
+const TREND_SERIES=[
+  {id:"ahli",   label:"Ahli berdaftar", colour:"#3D5AB8"},
+  {id:"muhib",  label:"Muhib & ke atas",colour:"#189CCC"},
+  {id:"muayyid",label:"Muayyid",        colour:"#AC8836"}
+];
+const TREND_RANGES=[{d:7,l:"7h"},{d:30,l:"30h"},{d:90,l:"90h"}];
+/* "" = reached, date unknown (count from the start). null = never reached. */
+function reachedOn(p,id){
+  if(id==="ahli")return p.statusAhli==="Ya"?(p.tarikhAhli||""):null;
+  if(id==="muhib")return (p.stage==="muhib"||p.stage==="muayyid")?(p.tarikhMuhib||""):null;
+  return p.stage==="muayyid"?(p.tarikhMuayyid||""):null;
+}
+function shiftDays(n){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return isoDate(d);}
+/* One value per series per day across the window, plus the matching ISO dates. */
+function trendData(ppl,days){
+  const dates=[];for(let i=days-1;i>=0;i--)dates.push(shiftDays(-i));
+  const series=TREND_SERIES.map(s=>{
+    const marks=[];ppl.forEach(p=>{const r=reachedOn(p,s.id);if(r!==null)marks.push(r);});
+    return Object.assign({},s,{pts:dates.map(d=>marks.filter(m=>m===""||m<=d).length)});
+  });
+  return {dates,series};
+}
+
+/* An inline SVG line chart. 2px strokes, a recessive grid, one 8px end marker
+   per line, and a hover layer wired up by trendHover().
+
+   Only the marks live in the SVG. Both axes are real HTML positioned around it,
+   because an SVG <text> scales with the viewBox: at phone width the plot shrinks
+   to a little over half size and SVG labels shrink with it, to about 6px. HTML
+   labels stay the size they are set to at every width.
+
+   The point data rides on the element as JSON so the hover handler needs no
+   state of its own and survives every re-render. */
+function trendChart(td){
+  const W=660,H=200,L=3,R=9,T=9,B=9;
+  const n=td.dates.length;
+  const peak=Math.max(1,...td.series.map(s=>Math.max(...s.pts)));
+  /* Every candidate divides by 4, so the five gridlines land on whole numbers. */
+  const NICE=[4,8,12,20,40,60,100,160,200,300,400,600,800,1000,1600,2000];
+  const top=NICE.find(v=>v>=peak)||Math.ceil(peak/1000)*1000;
+  const px=i=>L+(n<2?0:(i/(n-1))*(W-L-R));
+  const py=v=>T+(1-v/top)*(H-T-B);
+  const ticks=[0,.25,.5,.75,1].map(f=>Math.round(top*f));
+  const grid=ticks.map(v=>`<line x1="0" x2="${W}" y1="${py(v).toFixed(1)}" y2="${py(v).toFixed(1)}" stroke="var(--kabus-200)" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join("");
+  const ylab=ticks.map(v=>`<span style="top:${(py(v)/H*100).toFixed(2)}%">${v}</span>`).join("");
+  const xAt=[0,Math.round((n-1)/3),Math.round((n-1)*2/3),n-1].filter((v,i,a)=>a.indexOf(v)===i);
+  const xlab=xAt.map(i=>`<span style="left:${(px(i)/W*100).toFixed(2)}%;transform:translateX(${i===0?"0":(i===n-1?"-100%":"-50%")})">${esc(dayShort(td.dates[i]))}</span>`).join("");
+  const lines=td.series.map(s=>{
+    const d=s.pts.map((v,i)=>(i?"L":"M")+px(i).toFixed(1)+" "+py(v).toFixed(1)).join(" ");
+    return `<path d="${d}" fill="none" stroke="${s.colour}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`
+      +`<circle cx="${px(n-1).toFixed(1)}" cy="${py(s.pts[n-1]).toFixed(1)}" r="4" fill="${s.colour}" stroke="#fff" stroke-width="2"/>`;
+  }).join("");
+  const hov=td.series.map(s=>`<circle class="tc-hd" cx="-99" cy="-99" r="4.5" fill="${s.colour}" stroke="#fff" stroke-width="2" opacity="0"/>`).join("");
+  const meta={L,R,W,T,B,H,top,dates:td.dates,series:td.series.map(s=>({label:s.label,colour:s.colour,pts:s.pts}))};
+  return `<div class="tc" data-tc="${esc(JSON.stringify(meta))}">
+    <div class="tc-plot">
+      <div class="tc-yax" aria-hidden="true">${ylab}</div>
+      <div class="tc-area">
+        <svg viewBox="0 0 ${W} ${H}" class="tc-svg" role="img" aria-label="Kemajuan ${esc(td.series.map(s=>s.label+" "+s.pts[n-1]).join(", "))} sepanjang ${n} hari">
+          ${grid}${lines}
+          <line class="tc-cross" x1="-99" x2="-99" y1="${T}" y2="${H-B}" stroke="var(--kabus-400)" stroke-width="1" stroke-dasharray="3 3" opacity="0" vector-effect="non-scaling-stroke"/>
+          ${hov}
+        </svg>
+        <div class="tc-tip" hidden></div>
+      </div>
+    </div>
+    <div class="tc-xax" aria-hidden="true">${xlab}</div>
+  </div>`;
+}
+function dayShort(iso){const MM=["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogos","Sep","Okt","Nov","Dis"];
+  const p=String(iso||"").split("-");if(p.length<3)return iso||"";return Number(p[2])+" "+MM[Number(p[1])-1];}
 
 function viewPapan(){
   /* INTEC is out of the pool on purpose: it has its own tile below and its own
@@ -2070,24 +2192,48 @@ function viewPapan(){
     ${years.map(y=>`<button class="ipt-pill${papanPSPB===y?" active":""}" data-pspb="${esc(y)}">PSPB ${esc(y)}<span class="c">${allp.filter(p=>String(p.tahunPSPB||"")===y).length}</span></button>`).join("")}
   </div>`:"";
 
-  const meter=(label,n,target,note)=>{
-    const raw=target?Math.round(n/target*100):0;
-    const tone=raw>=100?"good":(raw>=60?"warn":"low");
-    const word=raw>=100?"Tercapai":(raw>=60?"Sedang menuju":"Perlu usaha");
-    return `<div class="kpim-r kpim-${tone}">
-      <div class="kpim-t"><span class="kpim-l">${esc(label)}</span><span class="kpim-v">${n}</span><span class="kpim-g">daripada sasaran ${target} &middot; ${raw}%</span><span class="kpim-st">${word}</span></div>
-      <div class="kpim-bar" role="img" aria-label="${esc(label)}: ${n} daripada sasaran ${target}, ${raw} peratus — ${word}"><i style="width:${Math.min(100,raw)}%"></i></div>
-      ${note?`<div class="kpim-n">${note}</div>`:""}
-    </div>`;};
-  const nMuhib=ppl.filter(p=>p.stage==="muhib"||p.stage==="muayyid").length;
   const scope=papanPSPB?("PSPB "+papanPSPB):"semua sesi";
-  const kpiCard=`<div class="pp-card">
-    <div class="pp-h">Sasaran KPI &middot; ${esc(scope)}</div>
-    <div class="kpim">
-      ${meter("Ahli",total,KPI_TARGET.ahli)}
-      ${meter("Muhib",nMuhib,KPI_TARGET.muhib,"Muhib dan ke atas — seorang muayyid sudah melepasi peringkat muhib.")}
+
+  /* ---- Trend card: the three KPI lines, their targets, and the movement the
+     selected window actually produced. The stat strip underneath doubles as the
+     direct label for each line, so identity never rests on colour alone. ---- */
+  const trend=trendData(ppl,papanRange);
+  const last=trend.dates.length-1;
+  const ranges=TREND_RANGES.map(r=>`<button type="button" class="tc-rg${papanRange===r.d?" active":""}" data-prange="${r.d}" aria-pressed="${papanRange===r.d}">${r.l}</button>`).join("");
+  const legend=trend.series.map(s=>`<span class="tc-lg"><i style="background:${s.colour}"></i>${esc(s.label)}</span>`).join("");
+  const stats=trend.series.map(s=>{
+    const now=s.pts[last],was=s.pts[0],dlt=now-was;
+    const target=KPI_TARGET[s.id]||0;
+    const pct=target?Math.round(now/target*100):0;
+    const word=pct>=100?"Tercapai":(pct>=60?"Sedang menuju":"Perlu usaha");
+    return `<div class="tcs" style="--c:${s.colour}">
+      <div class="tcs-l">${esc(s.label)}</div>
+      <div class="tcs-top"><span class="tcs-v">${now}</span><span class="tcs-w">${esc(word)}</span></div>
+      <div class="tcs-bar" role="img" aria-label="${esc(s.label)}: ${now} daripada sasaran ${target}, ${pct} peratus — ${word}"><i style="width:${Math.min(100,pct)}%"></i></div>
+      <div class="tcs-g">sasaran ${target} &middot; ${pct}%</div>
+      <div class="tcs-d ${dlt>0?"up":(dlt<0?"dn":"flat")}">${dlt>0?"&uarr; +"+dlt:(dlt<0?"&darr; "+dlt:"&mdash; tiada perubahan")} dalam ${papanRange} hari</div>
+    </div>`;}).join("");
+  const trendCard=`<div class="pp-card">
+    <div class="tc-head">
+      <div class="tc-ti"><div class="pp-h">Kemajuan sasaran KPI &middot; ${esc(scope)}</div>
+        <div class="tc-sub">Kiraan terkumpul ikut tarikh direkod &middot; ${papanRange} hari terakhir</div></div>
+      <div class="tc-rgs" role="group" aria-label="Tempoh papan pemuka">${ranges}</div>
     </div>
-    ${asingN?`<div class="kpim-n" style="margin-top:10px"><b>${asingN}</b> mad'u INTEC dikira berasingan dan tidak termasuk dalam sasaran di atas.</div>`:""}
+    <div class="tc-lgs">${legend}</div>
+    ${trendChart(trend)}
+    <div class="tcs-row">${stats}</div>
+    ${asingN?`<div class="kpim-n"><b>${asingN}</b> mad'u INTEC dikira berasingan dan tidak termasuk dalam sasaran di atas.</div>`:""}
+  </div>`;
+
+  /* ---- Activity card: the same S.log the drawer shows, five newest entries. ---- */
+  const lg=(S.log||[]).slice(0,5);
+  const lgRows=lg.length?lg.map(r=>`<div class="alog-r"><span class="alog-av" title="${esc(r.by)}">${esc(initials(r.by))}</span><span class="alog-m"><span class="alog-a">${esc(r.act)}${r.item?` <b>${esc(r.item)}</b>`:""}</span><span class="alog-s">${esc(r.by)} &middot; ${esc(logDayLabel(r.ts))} ${esc(logStamp(r.ts))}</span></span></div>`).join("")
+    :`<div class="pp-empty">Belum ada aktiviti. Setiap perubahan akan disenaraikan di sini bersama nama pembuatnya.</div>`;
+  const logCard=`<div class="pp-card pp-feed">
+    <div class="tc-ti"><div class="pp-h">Log aktiviti</div>
+      <div class="tc-sub">${lg.length?"5 perubahan terkini":"Suapan langsung"} &middot; seluruh cawangan</div></div>
+    <div class="alog-feed">${lgRows}</div>
+    <button type="button" class="tc-all" data-logopen="1">Lihat log penuh <span aria-hidden="true">&rsaquo;</span></button>
   </div>`;
 
   return `<div class="pp">
@@ -2098,7 +2244,7 @@ function viewPapan(){
     </div>
     ${pills}
     <div class="pp-kpis">${kpis}</div>
-    ${kpiCard}
+    <div class="pp-3">${trendCard}${logCard}</div>
     <div class="pp-2">
       <div class="pp-card">
         <div class="pp-h">Perlu tindakan${perlu.length?`<span class="c">${perlu.length}</span>`:""}</div>
@@ -2923,6 +3069,8 @@ document.addEventListener("click",e=>{
   if(e.target.closest&&e.target.closest("#logBtn")){logOpen=!logOpen;render();if(logOpen)setTimeout(()=>{const dw=document.querySelector("#logdrawer .drawer");if(dw)dw.focus();},0);return;}
   if(e.target.closest&&e.target.closest("[data-logclose]")){logOpen=false;render();const b=$("#logBtn");if(b)b.focus();return;}
   const psp=e.target.closest("[data-pspb]");if(psp){papanPSPB=psp.dataset.pspb;render();return;}
+  const prg=e.target.closest("[data-prange]");if(prg){papanRange=Number(prg.dataset.prange)||30;render();return;}
+  if(e.target.closest("[data-logopen]")){logOpen=true;render();setTimeout(()=>{const dw=document.querySelector("#logdrawer .drawer");if(dw)dw.focus();},0);return;}
   const snf=e.target.closest("[data-snfilt]");if(snf){santFilt=snf.dataset.snfilt;render();return;}
   const sns=e.target.closest("[data-snsel]");if(sns){previousFocus=document.activeElement;santSel=sns.dataset.snsel;render();setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);return;}
   if(e.target.closest&&e.target.closest("[data-snclose]")){santSel=null;render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
@@ -2951,7 +3099,13 @@ document.addEventListener("click",e=>{
   const udl=e.target.closest("[data-udel]");if(udl){const uid=udl.dataset.udel;if(!confirm("Padam usrah ini? Kehadiran mad'u akan ditarik balik."))return;S.people.forEach(pp=>{if(pp.sessions){const b=pp.sessions.length;pp.sessions=pp.sessions.filter(s=>s._usrahId!==uid);if(pp.sessions.length!==b)stamp(pp);}});logAct("Padam usrah","");save();render();toast("Usrah dipadam");return;}
   if(e.target.closest&&e.target.closest("#saveUsrahBtn")){const ids=Object.keys(uForm.att).filter(k=>uForm.att[k]);if(!ids.length){toast("Tanda sekurang-kurangnya seorang");return;}const uid="u_"+Date.now();ids.forEach(id=>{const pp=get(id);if(pp){pp.sessions=pp.sessions||[];pp.sessions.push({id:"s_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),_usrahId:uid,jenis:uForm.jenis,tarikh:uForm.tarikh,oleh:uForm.pd,oleh2:uForm.pd2,nota:uForm.butiran,catatan:uForm.catatan});stamp(pp);}});logAct("Rekod "+uForm.jenis,(uForm.butiran||uForm.tarikh)+" · "+ids.length+" hadir");uForm.att={};uForm.butiran="";uForm.catatan="";save();render();toast(ids.length+" kehadiran direkod");return;}
   const et=e.target.closest("[data-etab]");if(et){const[id,t]=et.dataset.etab.split("|");if(get(id)){eTab=+t;render();}return;}
-  const tgl=e.target.closest("[data-tgl]");if(tgl){const[id,f,v]=tgl.dataset.tgl.split("|");const p=get(id);if(p){const was=p[f];p[f]=(v==="true"?true:(v==="false"?false:v));if(was!==p[f])logField(p,f,p[f]);save();render();}return;}
+  const tgl=e.target.closest("[data-tgl]");if(tgl){const[id,f,v]=tgl.dataset.tgl.split("|");const p=get(id);if(p){const was=p[f];p[f]=(v==="true"?true:(v==="false"?false:v));
+    /* Registering as an ahli is the one KPI tier with no date field of its own,
+       so stamp it here: without a date the papan pemuka trend cannot tell a
+       registration this week from one last year. Clearing it on "Belum" means a
+       later re-registration is dated when it actually happens. */
+    if(f==="statusAhli"&&was!==p[f])p.tarikhAhli=(p[f]==="Ya"?(p.tarikhAhli||today()):"");
+    if(was!==p[f])logField(p,f,p[f]);save();render();}return;}
   const sc=e.target.closest("[data-score]");if(sc){const[id,it,v]=sc.dataset.score.split("|");const p=get(id);if(p){p.bpmy=p.bpmy||{};p.bpmy[it]=+v;save();render();}return;}
   const as=e.target.closest("[data-addses]");if(as){const p=get(as.dataset.addses);if(p){p.sessions=p.sessions||[];p.sessions.push({id:uid("s_"),jenis:"Usrah",tarikh:today(),oleh:p.pd1||"",oleh2:p.pd2||"",nota:"",catatan:""});save();render();}return;}
   const st=e.target.closest("[data-sestgl]");if(st){const k=st.dataset.sestgl;sesOpen=(sesOpen===k)?"":k;render();return;}
@@ -3023,6 +3177,48 @@ document.addEventListener("click",e=>{
   if(!e.target.closest(".menu"))$("#menuPop").classList.remove("show");
   if(wasAddOpen&&!(e.target.closest&&e.target.closest(".wadd"))){wasAddOpen=false;render();}
 });
+/* ---- Trend chart hover: crosshair, per-series dots and a tooltip ----
+   Delegated from the document because render() replaces the board wholesale, so
+   a listener bound to the chart element would die on every re-render. The point
+   data is read back off the element's data-tc, which keeps this handler free of
+   any state of its own. Touch gets the same read-out via pointer events. */
+function trendHover(e){
+  const tc=e.target.closest&&e.target.closest(".tc");
+  if(!tc){document.querySelectorAll(".tc").forEach(trendHoverOff);return;}
+  let m;try{m=JSON.parse(tc.dataset.tc||"");}catch(err){return;}
+  const area=tc.querySelector(".tc-area");
+  const svg=tc.querySelector(".tc-svg"),tip=tc.querySelector(".tc-tip");
+  if(!svg||!tip||!m.dates.length)return;
+  const box=svg.getBoundingClientRect(),k=box.width/m.W;
+  const n=m.dates.length;
+  const plot=(m.W-m.L-m.R);
+  const rel=(e.clientX-box.left)/k;
+  let i=n<2?0:Math.round(((rel-m.L)/plot)*(n-1));
+  i=Math.max(0,Math.min(n-1,i));
+  const cx=m.L+(n<2?0:(i/(n-1))*plot);
+  const cross=svg.querySelector(".tc-cross");
+  if(cross){cross.setAttribute("x1",cx);cross.setAttribute("x2",cx);cross.setAttribute("opacity","1");}
+  const dots=svg.querySelectorAll(".tc-hd");
+  m.series.forEach((s,j)=>{const d=dots[j];if(!d)return;
+    const y=m.T+(1-s.pts[i]/m.top)*(m.H-m.T-m.B);
+    d.setAttribute("cx",cx);d.setAttribute("cy",y);d.setAttribute("opacity","1");});
+  tip.innerHTML=`<div class="tc-tt">${esc(dayShort(m.dates[i]))}</div>`
+    +m.series.map(s=>`<div class="tc-tr"><i style="background:${s.colour}"></i>${esc(s.label)}<b>${s.pts[i]}</b></div>`).join("");
+  tip.hidden=false;
+  /* Pinned to the corner away from the cursor rather than centred on it: a
+     tooltip over the crosshair hides the very dots it is describing. */
+  const w=tip.offsetWidth,px=cx*k;
+  tip.style.left=(px<area.clientWidth/2?Math.max(0,area.clientWidth-w-4):4)+"px";
+  tip.style.top=Math.max(0,(m.T*k)-4)+"px";
+}
+function trendHoverOff(tc){
+  const tip=tc.querySelector(".tc-tip");if(tip)tip.hidden=true;
+  const cross=tc.querySelector(".tc-cross");if(cross)cross.setAttribute("opacity","0");
+  tc.querySelectorAll(".tc-hd").forEach(d=>d.setAttribute("opacity","0"));
+}
+document.addEventListener("pointermove",trendHover);
+document.addEventListener("pointerleave",()=>document.querySelectorAll(".tc").forEach(trendHoverOff),true);
+
 /* Same focus handover the mad'u drawer uses: the panel takes focus when it
    opens and hands it back to whatever opened it on close. */
 function focusDrawer(){setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);}
