@@ -525,6 +525,7 @@
   .kc-av{flex:0 0 auto;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:13px}
   .kc-main{flex:1;min-width:0} .kc-name{font-weight:700;font-size:15px;letter-spacing:-.01em} .kc-sub{font-size:12.5px;color:var(--muted);margin-top:3px}
   .kc-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .kc-wa{margin-top:6px} .dirwa{align-self:flex-start}
   .kc>.chev{align-self:center}
   .kc-main .kprog{margin-top:8px} .kc-act{margin-top:7px;font-size:13px}
   .muwc{overflow:hidden} .muwh{cursor:pointer;display:flex;align-items:center;gap:12px}
@@ -1157,7 +1158,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=12;
+const APP_VERSION=13;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -1657,6 +1658,12 @@ function snContact(sn){
   if(url)bits.push(`<a class="sncon-a lnk" href="${esc(url)}" target="_blank" rel="noopener" title="${esc(url)}"><i aria-hidden="true">${ICO.link}</i>Pautan</a>`);
   const inner=bits.length?bits.join(""):`<span class="sncon-x none">Tiada nombor</span>`;
   return `<span class="sncon" data-sncon="${esc(sn.id)}">${inner}</span>`;}
+/* The same WhatsApp chip on the Direktori row and card. Nothing is drawn when
+   the number is missing or unusable: most rows would otherwise carry a "Tiada
+   nombor" stub, and the drawer is where the number gets filled in. The row
+   opens the drawer on click, so the click handler lets this link through. */
+function dirWa(p){const wa=waLink(p.telefon);if(!wa)return "";
+  return `<a class="sncon-a wa dirwa" href="${esc(wa)}" target="_blank" rel="noopener" title="WhatsApp ${esc(p.telefon)}" aria-label="WhatsApp ${esc(p.nama||"")} ${esc(p.telefon)}"><i aria-hidden="true">${ICO.wa}</i>${esc(p.telefon)}</a>`;}
 
 /* The same managed list the Direktori's IPT picker writes to, so adding an IPT
    here makes it available there too. A value already on the record is kept as an
@@ -2544,7 +2551,7 @@ function ktable(list){
      itself: a cell set to display:flex leaves the table's row box, so its
      bottom border stops lining up with the borders of the cells beside it. */
   const rows=list.map(p=>`<tr data-sel="${p.id}" role="button" tabindex="0" aria-label="Buka ${esc(p.nama||"ahli")}">
-      <td class="kt-id"><span class="kt-idw"><span class="kt-av rav-${p.stage}" title="${esc(stageLabel(p.stage))}">${stageCode(p.stage)}</span><span class="kt-idm"><span class="kt-name">${esc(p.nama||"(nama baharu)")}</span></span></span></td>
+      <td class="kt-id"><span class="kt-idw"><span class="kt-av rav-${p.stage}" title="${esc(stageLabel(p.stage))}">${stageCode(p.stage)}</span><span class="kt-idm"><span class="kt-name">${esc(p.nama||"(nama baharu)")}</span>${dirWa(p)}</span></span></td>
       <td class="kt-mark">${ahliMark(p)}</td>
       <td class="kt-mark">${usrahMark(p)}</td>
       <td class="kt-iptc">${iptCell(p)}</td>
@@ -2571,6 +2578,7 @@ function kcards(list){return list.map(p=>`<div class="kc" data-sel="${p.id}" rol
       <div class="kc-top"><span class="kc-name">${esc(p.nama||"(nama baharu)")}</span>${ahliMark(p)}${usrahMark(p)}</div>
       <div class="kc-sub">${p.universiti?esc(iptLabel(p.universiti)):"Tiada IPT"}${p.bidang?" \u00b7 "+esc(p.bidang):""}</div>
       <div class="kc-sub">${pdCell(p)}</div>
+      ${dirWa(p)?`<div class="kc-wa">${dirWa(p)}</div>`:""}
       ${progCell(p)}
       <div class="kc-act">${actCell(p)}</div>
     </div><span class="chev">\u203a</span></div>`).join("");}
@@ -3059,6 +3067,8 @@ document.addEventListener("click",e=>{
   const stg=e.target.closest("[data-stage]");if(stg){const was=stage;stage=stg.dataset.stage;
     if(stage===ASING_PILL||was===ASING_PILL||F.ipt===IPT_ASING)F.ipt="";
     if(stage!=="mutabaah"&&stage!=="all"&&stage!==ASING_PILL){F.minat="";}render();return;}
+  /* The WhatsApp chip sits inside a clickable row: let the link open, not the drawer. */
+  if(e.target.closest(".dirwa"))return;
   const sel=e.target.closest("[data-sel]");if(sel){previousFocus=document.activeElement;selId=sel.dataset.sel;eTab=1;const _p=get(selId);if(_p){const _ls=(_p.sessions||[]).map(s=>s.tarikh).filter(Boolean).sort();memCalDate=_ls.length?new Date(_ls[_ls.length-1]+"T00:00:00"):new Date();}render();setTimeout(()=>{const dw=document.querySelector(".drawer");if(dw)dw.focus();},0);return;}
   const scl=e.target.closest("[data-selclose]");if(scl){closeDrawer();return;}
   const arB=e.target.closest("[data-arsip]");if(arB){showArsip=!showArsip;selId=null;render();return;}
