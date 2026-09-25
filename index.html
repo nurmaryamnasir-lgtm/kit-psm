@@ -275,7 +275,7 @@
     .pdfilt{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none} .pdfilt::-webkit-scrollbar{display:none}
     .pdfilt .ipt-pill{flex:0 0 auto}
     .pdhead .add{flex:1 1 100%}
-    .syncpill{bottom:auto;top:70px;right:10px;padding:5px 10px;font-size:11px}
+    .syncpill{right:10px;padding:4px 9px;font-size:10.5px}
   }
   .ugrp{margin-bottom:14px} .ugrp-h{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:7px;display:flex;align-items:center} .ugrp-h .c{background:var(--surface-brand-soft);color:var(--biru-700);border-radius:var(--radius-pill);padding:2px 9px;font-family:var(--font-mono);font-size:11px;font-weight:600;margin-left:8px}
   .uchips{display:flex;flex-wrap:wrap;gap:6px}
@@ -1050,7 +1050,11 @@
   }
   /* The home indicator overlaps anything pinned to the bottom edge. */
   .toast{bottom:max(20px, env(safe-area-inset-bottom))}
-  .syncpill{bottom:max(14px, env(safe-area-inset-bottom))}
+  /* Only ever pinned by its bottom edge: a top offset here as well stretches the
+     fixed pill into a column down the whole screen. Kept faint while it only
+     reports success, so it does not compete with the page. */
+  .syncpill{top:auto;bottom:max(14px, env(safe-area-inset-bottom));opacity:.75}
+  .syncpill.on,.syncpill.bad{opacity:1}
   /* Unsent work. Loud enough to notice, quiet enough not to block the task. */
   .syncpill.bad{background:var(--merah-100);border-color:var(--merah-500);color:var(--merah-700);font-weight:600}
 </style>
@@ -1153,7 +1157,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=11;
+const APP_VERSION=12;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
