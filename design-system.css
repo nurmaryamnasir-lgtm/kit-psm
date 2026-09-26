@@ -21,6 +21,7 @@
   --biru-900:#101C42; --biru-800:#18296B; --biru-700:#1F3785;
   --biru-600:#28459D; --biru-500:#3D5AB8; --biru-400:#6480CE;
   --biru-300:#9AAEE3; --biru-200:#C6D2F1; --biru-100:#E4EAF9; --biru-050:#F0F4FD;
+  --lilac-050:#EEEAFA;
   /* Cyan — secondary, from the logo. The 800 step exists because cyan-700 on a
      cyan-100 surface is only 3.87:1 — fine for a heading, short of the 4.5:1
      small-text floor that tinted cards need. */
@@ -63,7 +64,7 @@
   --ink:       var(--dakwat-800);
   --muted:     var(--kabus-600);
   --line:      var(--kabus-200);
-  --paper:     var(--biru-050);   /* soft blue page wash */
+  --paper:     var(--lilac-050);  /* light lilac page wash */
   --card:      var(--putih);
   --grey-s:    var(--kertas-100);
   --green:     var(--hijau-500);  --green-s: var(--hijau-100);
@@ -95,6 +96,10 @@
   --surface-brand-deep:var(--biru-900);
 
   --shadow-xs:0 1px 2px rgba(20,32,58,.05);
+  /* White cards float on the lilac wash: a wide, low-opacity violet-tinted
+     blur so the edge reads as lift, not as a border. */
+  --shadow-card:0 6px 20px -6px rgba(72,52,130,.13),0 1px 3px rgba(20,32,58,.05);
+  --shadow-card-hover:0 10px 26px -8px rgba(72,52,130,.18),0 2px 5px rgba(20,32,58,.06);
   --shadow-lg:0 20px 44px -12px rgba(20,32,58,.22),0 6px 14px rgba(20,32,58,.07);
 
   /* The floor for functional text — eyebrows, table headers, badges, codes,
@@ -121,7 +126,7 @@
    Colours unchanged; radius / padding / elevation retuned to the scale above. */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; overflow-x: hidden; }
-body { font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.4; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font); color: var(--ink); background: var(--putih); line-height: 1.4; -webkit-font-smoothing: antialiased; }
 button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; font-size: 15px; }
 h1, h2, h3 { margin: 0; }

@@ -16,7 +16,7 @@
 <style>
   /* Colour, type and shape tokens all come from design-system.css.
      The old hardcoded :root block lived here and shadowed them; removed. */
-  *{box-sizing:border-box}html,body{margin:0;overflow-x:hidden}body{font-family:var(--font);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}html,body{margin:0;overflow-x:hidden}body{font-family:var(--font);background:var(--putih);color:var(--ink);-webkit-font-smoothing:antialiased}
   
   header{position:sticky;top:0;z-index:30;width:100%;background:linear-gradient(135deg,var(--biru-900),var(--biru-800));color:#fff;padding:calc(11px + env(safe-area-inset-top)) 0 11px}
   .hin{max-width:1160px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:12px}
@@ -35,17 +35,17 @@
 
   /* Shell: sticky header on top, vertical sidebar + main content below. */
   .shell{max-width:1290px;margin:0 auto;display:flex;align-items:flex-start;gap:0}
-  .sidenav{position:sticky;top:70px;z-index:25;flex:0 0 244px;width:244px;align-self:stretch;min-height:calc(100vh - 70px);display:flex;flex-direction:column;gap:2px;padding:16px 12px;background:var(--surface-brand-deep);color:var(--putih)}
-  .navtab{display:flex;align-items:center;gap:11px;width:100%;height:42px;flex:0 0 auto;padding:0 12px;border:none;border-radius:var(--radius-md);background:transparent;color:var(--biru-200);font-weight:500;font-size:14px;text-align:left;transition:background var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard)}
-  .navtab:hover{background:rgba(255,255,255,.07);color:var(--putih)}
-  .navtab.active{background:rgba(255,255,255,.12);color:var(--putih);font-weight:600}
-  .nvi{flex:0 0 auto;display:inline-flex;color:var(--biru-300);transition:color var(--dur-fast) var(--ease-standard)}
+  .sidenav{position:sticky;top:70px;z-index:25;flex:0 0 244px;width:244px;align-self:stretch;min-height:calc(100vh - 70px);display:flex;flex-direction:column;gap:2px;padding:16px 12px;background:var(--putih);color:var(--ink);border-right:1px solid var(--border-subtle);box-shadow:4px 0 18px -10px rgba(72,52,130,.14)}
+  .navtab{display:flex;align-items:center;gap:11px;width:100%;height:42px;flex:0 0 auto;padding:0 12px;border:none;border-radius:var(--radius-md);background:transparent;color:var(--muted);font-weight:500;font-size:14px;text-align:left;transition:background var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard)}
+  .navtab:hover{background:var(--paper);color:var(--ink)}
+  .navtab.active{background:var(--surface-brand-soft);color:var(--biru-700);font-weight:600}
+  .nvi{flex:0 0 auto;display:inline-flex;color:var(--kabus-500);transition:color var(--dur-fast) var(--ease-standard)}
   .nvi svg{width:18px;height:18px;display:block}
-  .navtab.active .nvi{color:var(--cyan-400)}
+  .navtab.active .nvi{color:var(--biru-600)}
   .nvl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .nvc{flex:0 0 auto;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 7px;border-radius:var(--radius-pill);background:rgba(255,255,255,.14);color:var(--putih)}
+  .nvc{flex:0 0 auto;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 7px;border-radius:var(--radius-pill);background:var(--surface-sunken);color:var(--muted)}
   .nvc:empty{display:none}
-  .navtab.active .nvc{background:var(--cyan-600)}
+  .navtab.active .nvc{background:var(--biru-600);color:var(--putih)}
 
   .app{flex:1;min-width:0;max-width:1160px;margin:0 auto;padding:18px 16px 100px}
   .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
@@ -461,6 +461,16 @@
      means the filter is actually narrowing the list. */
   .dirfilt-c:has(option:checked:not([value=""])){background:var(--surface-brand-soft);color:var(--biru-700)}
   .dirfilt-w:has(option:checked:not([value=""]))>i{color:var(--blue)}
+  /* IPT is the filter coordinators reach for first, so it is the one chip in
+     the row that is outlined in brand blue with its own icon, and it fills solid
+     once an IPT is picked. */
+  .dirfilt-ipt>b{position:absolute;left:12px;display:block;width:16px;height:16px;color:var(--blue);pointer-events:none}
+  .dirfilt-ipt>b svg{display:block;width:100%;height:100%}
+  .dirfilt-ipt .dirfilt-c{height:38px;padding-left:36px;background:var(--putih);border:1.5px solid var(--biru-300);color:var(--biru-700);font-size:13.5px;font-weight:700}
+  .dirfilt-ipt .dirfilt-c:hover{border-color:var(--blue)}
+  .dirfilt-ipt>i{color:var(--blue)}
+  .dirfilt-ipt .dirfilt-c:has(option:checked:not([value=""])){background:var(--blue);border-color:var(--blue);color:var(--putih)}
+  .dirfilt-ipt:has(option:checked:not([value=""]))>b,.dirfilt-ipt:has(option:checked:not([value=""]))>i{color:var(--putih)}
 
   .iptbar{margin-bottom:12px}
   .ktbl{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border:1px solid var(--border-subtle);border-radius:var(--radius-card);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow-xs)}
@@ -746,30 +756,46 @@
   .pp-eyebrow{font-family:var(--font-mono);font-size:var(--text-label);font-weight:600;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--cyan-700)}
   .pp-greet{font-family:var(--font-display);font-size:23px;font-weight:800;letter-spacing:var(--tracking-heading);color:var(--ink)}
   .pp-sub{font-size:13px;color:var(--muted)}
-  .pp-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  /* Bento rhythm: one gap (16px) for every seam on the board, so tiles and
+     cards line up on the same grid lines instead of drifting 12 vs 16. */
+  .pp-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
   /* Each tier owns a surface rather than a border, so the row reads as a ramp
      from paper to deep blue and the eye lands on the tier that needs action. */
-  .kpi{display:flex;flex-direction:column;min-width:0;padding:17px 18px 19px;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:#fff;box-shadow:var(--shadow-xs)}
+  .kpi{display:flex;flex-direction:column;min-width:0;padding:17px 18px 19px;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:#fff;box-shadow:var(--shadow-card)}
   .kpi-k{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-height:20px;font-size:var(--text-label);font-weight:700;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
   .kpi-i{flex:0 0 auto;width:19px;height:19px;margin-top:-2px}
   .kpi-i svg{display:block;width:100%;height:100%}
-  .kpi-v{margin:15px 0 7px;font-family:var(--font-display);font-size:38px;font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .kpi-v{margin:auto 0 0;padding-top:15px;font-family:var(--font-display);font-size:38px;font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)}
   .kpi-s{font-size:12px;line-height:1.45;color:var(--muted)}
-  .kpi.t-mut{background:var(--biru-100);border-color:transparent;box-shadow:none}
-  .kpi.t-mut .kpi-k,.kpi.t-mut .kpi-s{color:var(--biru-700)}.kpi.t-mut .kpi-v{color:var(--biru-900)}
-  .kpi.t-muh{background:var(--cyan-100);border-color:transparent;box-shadow:none}
-  .kpi.t-muh .kpi-k,.kpi.t-muh .kpi-s{color:var(--cyan-800)}.kpi.t-muh .kpi-v{color:var(--dakwat-900)}
-  .kpi.t-may{background:var(--emas-100);border-color:transparent;box-shadow:none}
-  .kpi.t-may .kpi-k,.kpi.t-may .kpi-s{color:var(--emas-700)}.kpi.t-may .kpi-v{color:var(--dakwat-800)}
-  .kpi.t-elig{background:var(--blue);border-color:transparent;box-shadow:var(--shadow-md)}
-  .kpi.t-elig .kpi-k,.kpi.t-elig .kpi-s{color:var(--biru-200)}.kpi.t-elig .kpi-v{color:var(--putih)}
+  /* The three stages stay white and carry their colour as a top bar, matching
+     the trend chart (Muhib cyan, Muayyid gold); the two decision numbers are
+     the only filled tiles, so they are where the eye lands. */
+  .kpi{position:relative;overflow:hidden}
+  .kpi.t-mut,.kpi.t-muh,.kpi.t-may{--acc:var(--hijau-500);--acc-t:var(--hijau-600)}
+  .kpi.t-muh{--acc:var(--cyan-600);--acc-t:var(--cyan-800)}
+  .kpi.t-may{--acc:var(--emas-500);--acc-t:var(--emas-700)}
+  .kpi.t-mut::before,.kpi.t-muh::before,.kpi.t-may::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--acc)}
+  .kpi.t-mut .kpi-k,.kpi.t-muh .kpi-k,.kpi.t-may .kpi-k{color:var(--acc-t)}
+  .kpi.t-mut .kpi-i,.kpi.t-muh .kpi-i,.kpi.t-may .kpi-i{color:var(--acc)}
+  .kpi.t-elig{background:var(--emas-500);border-color:transparent;box-shadow:var(--shadow-md)}
+  .kpi.t-elig .kpi-k,.kpi.t-elig .kpi-s,.kpi.t-elig .kpi-v{color:var(--biru-900)}
+  .kpi.t-ahli{background:var(--blue);border-color:transparent;box-shadow:var(--shadow-md)}
+  .kpi.t-ahli .kpi-k,.kpi.t-ahli .kpi-s{color:var(--biru-200)}.kpi.t-ahli .kpi-v{color:var(--putih)}
   /* INTEC sits outside the KPI, so its tile is dashed rather than filled — it
      reads as a note beside the targets, not as another number inside them. */
   .kpi.t-asing{background:var(--surface-sunken);border-style:dashed;border-color:var(--border-strong);box-shadow:none}
   .kpi.t-asing .kpi-k,.kpi.t-asing .kpi-s{color:var(--muted)}.kpi.t-asing .kpi-v{color:var(--ink)}
+  /* It spans the whole row as a slim strip, so the six KPI tiles above keep an
+     even grid at every width instead of leaving one orphan tile. */
+  .kpi.t-asing{grid-column:1/-1;flex-direction:row;align-items:center;gap:16px;padding:12px 18px}
+  .kpi.t-asing .kpi-k{order:2;flex:0 0 auto;min-height:0}
+  .kpi.t-asing .kpi-v{order:1;margin:0;padding-top:0;font-size:24px}
+  .kpi.t-asing .kpi-s{order:3;margin-left:auto}
+  .kpi.t-asing .kpi-i{display:none}
   /* Trend + activity sit side by side: the chart is the wide, scanning half and
      the feed is the narrow, reading half. */
-  .pp-3{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;align-items:start}
+  .pp-bento{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;align-items:stretch}
+  .pp-bento>.pp-wide{grid-column:1/-1}
   .tc-head{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
   .tc-ti{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
   .tc-sub{font-size:12px;color:var(--muted)}
@@ -811,26 +837,17 @@
   .tcs-g{font-family:var(--font-mono);font-size:10.5px;color:var(--muted)}
   .tcs-d{font-size:11.5px;font-weight:600;color:var(--muted)}
   .tcs-d.up{color:var(--hijau-600)}.tcs-d.dn{color:var(--merah-600)}
+  .pp-feed>.tc-ti{flex:0 0 auto}
   .pp-feed .alog-feed{display:flex;flex-direction:column}
   .pp-feed .alog-r{padding:11px 2px}
-  .tc-all{align-self:flex-start;border:none;background:none;padding:2px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--blue);cursor:pointer}
+  .tc-all{align-self:flex-start;margin-top:auto;border:none;background:none;padding:2px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--blue);cursor:pointer}
   .tc-all:hover{text-decoration:underline}
-  @media(max-width:1180px){.pp-3{grid-template-columns:1fr}}
+  @media(max-width:1180px){.pp-bento{grid-template-columns:1fr}}
   @media(max-width:560px){.tcs-row{grid-template-columns:1fr}.tc-rgs{width:100%}.tc-rg{flex:1}}
-  .pp-2{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;align-items:start}
-  .pp-card{display:flex;flex-direction:column;gap:14px;padding:var(--pad-card-lg);border:1px solid var(--border-subtle);border-radius:var(--radius-card);background:#fff;box-shadow:var(--shadow-xs)}
+  .pp-card{display:flex;flex-direction:column;gap:14px;min-width:0;padding:var(--pad-card-lg);border:1px solid var(--border-subtle);border-radius:var(--radius-card);background:#fff;box-shadow:var(--shadow-card)}
   .pp-h{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:700;letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted)}
   .pp-h::before{content:"";width:16px;height:2px;flex:0 0 auto;border-radius:2px;background:var(--cyan-500)}
   .pp-h .c{margin-left:auto;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--radius-pill);background:var(--surface-brand-soft);color:var(--biru-700)}
-  .fnl{display:flex;flex-direction:column;gap:13px}
-  .fnl-r{display:flex;flex-direction:column;gap:7px}
-  .fnl-t{display:flex;align-items:center;gap:9px}
-  .fnl-d{width:11px;height:11px;flex:0 0 auto;border-radius:3px}
-  .fnl-l{font-size:13.5px;font-weight:600;color:var(--ink)}
-  .fnl-n{margin-left:auto;font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--ink)}
-  .fnl-p{width:44px;text-align:right;font-family:var(--font-mono);font-size:11.5px;color:var(--muted)}
-  .fnl-bar{height:9px;border-radius:var(--radius-pill);background:var(--kabus-200);overflow:hidden}
-  .fnl-bar i{display:block;height:100%;border-radius:var(--radius-pill)}
   .pp-list{display:flex;flex-direction:column;gap:7px}
   .pp-row{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:none;border-radius:var(--radius-md);background:var(--surface-sunken);text-align:left;transition:background var(--dur-fast) var(--ease-standard)}
   button.pp-row{cursor:pointer}
@@ -849,20 +866,34 @@
   .pp-date{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--radius-md);background:var(--surface-brand-soft)}
   .pp-dd{font-family:var(--font-display);font-size:16px;font-weight:800;line-height:1;color:var(--biru-700)}
   .pp-dm{font-family:var(--font-mono);font-size:var(--text-label);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--biru-600);margin-top:3px}
+  /* Upcoming card: birthdays as a row of avatars, dated events as rows. */
+  .up-sec{display:flex;flex-direction:column;gap:9px}
+  .up-sec+.up-sec{padding-top:14px;border-top:1px solid var(--border-subtle)}
+  .up-t{font-size:13px;font-weight:700;color:var(--ink)}
+  .up-line{font-size:12.5px;line-height:1.5;color:var(--muted)}
+  .up-line b{color:#c2367a}
+  .up-bd{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+  .up-bdi{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;padding:8px 2px 6px;border:none;border-radius:var(--radius-md);background:none;cursor:pointer;transition:background var(--dur-fast) var(--ease-standard)}
+  .up-bdi:hover{background:var(--paper)}
+  .up-av{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--surface-sunken);color:var(--kabus-600);font-family:var(--font-display);font-size:13px;font-weight:700}
+  .up-bdi.now .up-av{background:#fde8f1;color:#c2367a;box-shadow:0 0 0 2px #fff,0 0 0 4px #f5b8d3}
+  .up-cake{position:absolute;top:-9px;right:-7px;font-size:15px;line-height:1}
+  .up-nm{max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:center;line-height:1.3;font-size:12px;font-weight:600;color:var(--ink)}
+  .up-when{font-family:var(--font-mono);font-size:var(--text-label);color:var(--muted)}
+  .up-bdi.now .up-when{color:#c2367a;font-weight:600}
+  .pp-date.up-d-pc{background:#e3f5f1}.pp-date.up-d-pc .pp-dd,.pp-date.up-d-pc .pp-dm{color:#1f7a6e}
+  .pp-date.up-d-ph{background:var(--amber-100)}.pp-date.up-d-ph .pp-dd,.pp-date.up-d-ph .pp-dm{color:var(--amber-700)}
   .pp-empty{padding:22px 12px;text-align:center;font-size:12.5px;color:var(--muted);background:var(--surface-sunken);border-radius:var(--radius-md)}
-  @media(max-width:1180px){.pp-kpis{grid-template-columns:repeat(3,1fr)}}
-  @media(max-width:980px){.pp-kpis{grid-template-columns:1fr 1fr}.pp-2{grid-template-columns:1fr}}
-  /* Two up even on a phone: five stacked full-width tiles would fill the screen
-     before a single row of the board appears. The action tier keeps the full
-     width so the row still ends on the number that needs a decision. */
+  @media(max-width:1180px){.pp-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:560px){.pp-kpis{grid-template-columns:1fr 1fr}.kpi.t-asing{flex-wrap:wrap;gap:6px 12px}.kpi.t-asing .kpi-s{margin-left:0;flex-basis:100%}}
+  /* Two up even on a phone: six stacked full-width tiles would fill the screen
+     before a single row of the board appears. Six tiles pair off evenly. */
   @media(max-width:460px){
-    .pp-kpis{gap:10px}
     .kpi{padding:14px 15px 16px;border-radius:var(--radius-card)}
     .kpi-k{font-size:var(--text-label);letter-spacing:.08em}
     .kpi-i{width:17px;height:17px}
-    .kpi-v{margin:11px 0 6px;font-size:30px}
+    .kpi-v{padding-top:11px;font-size:30px}
     .kpi-s{font-size:11.5px}
-    .pp-kpis .kpi:last-child{grid-column:1/-1}
   }
 
   /* ---------- Pencalonan board (read-only; links into the Direktori editor) ---------- */
@@ -1023,10 +1054,16 @@
   body.dens-padat .gm-b{padding-bottom:11px}
   body.dens-padat .navtab{height:37px}
 
+  /* ---------- White cards lift off the lilac page ----------
+     One soft shadow for every white surface, declared once here so the tables,
+     rows and panels across all tabs float the same way as the dashboard cards. */
+  .row,.kc,.kb-card,.pdcard,.urow,.rj,.kkc,.pcard,.rjbox,.muwc,.sild,.ktbl,.stats,.cand,.dayd,.iptside,.sil{box-shadow:var(--shadow-card)}
+  .row:hover,.kc:hover,.kb-card:hover{box-shadow:var(--shadow-card-hover)}
+
   /* ---------- Sidebar folds back to a horizontal strip on small screens ---------- */
   @media(max-width:860px){
     .shell{display:block}
-    .sidenav{position:sticky;top:70px;width:auto;flex:none;min-height:0;flex-direction:row;align-items:center;gap:4px;padding:8px 10px;overflow-x:auto;scrollbar-width:none}
+    .sidenav{position:sticky;top:70px;width:auto;flex:none;min-height:0;flex-direction:row;align-items:center;gap:4px;padding:8px 10px;overflow-x:auto;scrollbar-width:none;border-right:none;border-bottom:1px solid var(--border-subtle);box-shadow:0 4px 14px -8px rgba(72,52,130,.14)}
     .sidenav::-webkit-scrollbar{display:none}
     .navtab{width:auto;flex:0 0 auto;height:36px;border-radius:var(--radius-pill);padding:0 13px}
     .nvl{overflow:visible}
@@ -1043,7 +1080,7 @@
   @media (pointer: coarse){
     .hbtn,.navtab,.bellb,.arsiplink,.snxl,.uchip,.nchip,.ipt-pill,.snyt button{min-height:44px}
     .hbtn,.bellb,#gEye{min-width:44px;min-height:44px}
-    .dirfilt-c{height:44px}
+    .dirfilt-c,.dirfilt-ipt .dirfilt-c{height:44px}
     .pddel,.pp-dis{width:44px;height:44px}
     /* Thumb-reach: more room between adjacent targets once they are finger-sized. */
     .dirfilt-s{gap:8px}
@@ -1158,7 +1195,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=13;
+const APP_VERSION=14;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -2065,7 +2102,7 @@ const KPI_TARGET={ahli:293,muhib:88,muayyid:18};
    flat head on the line rather than a fake climb. */
 const TREND_SERIES=[
   {id:"ahli",   label:"Ahli berdaftar", colour:"#3D5AB8"},
-  {id:"muhib",  label:"Muhib & ke atas",colour:"#189CCC"},
+  {id:"muhib",  label:"Muhib",colour:"#189CCC"},
   {id:"muayyid",label:"Muayyid",        colour:"#AC8836"}
 ];
 const TREND_RANGES=[{d:7,l:"7h"},{d:30,l:"30h"},{d:90,l:"90h"}];
@@ -2154,7 +2191,6 @@ function viewPapan(){
   const perluAll=ppl.filter(p=>perluTindakan(p)).sort((a,b)=>(tiadaPd(b)?1:0)-(tiadaPd(a)?1:0));
   const perlu=perluAll.filter(p=>!actDismissed(p));
   const hiddenN=perluAll.length-perlu.length;
-  const STAGE_DOT={mutabaah:"var(--kabus-400)",muhib:"var(--biru-600)",muayyid:"var(--emas-500)"};
 
   const kpis=[
     {k:"Jumlah mad'u",v:total,s:"Aktif dalam bimbingan",t:"",i:"users"},
@@ -2165,18 +2201,9 @@ function viewPapan(){
     /* Keahlian is its own question, separate from the tarsyih ladder: a muayyid
        may still not have registered, and a mutabaah may already be an ahli.
        Counts only statusAhli === "Ya" — an interest in joining is not membership. */
-    {k:"Ahli berdaftar",v:ppl.filter(p=>p.statusAhli==="Ya").length,s:"Sudah jadi ahli ISMA",t:"t-ahli",i:"award"}
+    {k:"Ahli berdaftar",v:ppl.filter(p=>p.statusAhli==="Ya").length,s:"Sudah jadi ahli PEMBINA",t:"t-ahli",i:"award"}
   ].concat(asingN?[{k:"Mad'u INTEC",v:asingN,s:"Kiraan berasingan · di luar KPI",t:"t-asing",i:"users"}]:[])
-   .map(x=>`<div class="kpi ${x.t}"><div class="kpi-k"><span>${esc(x.k)}</span><span class="kpi-i" aria-hidden="true">${ICO[x.i]}</span></div><div class="kpi-v">${x.v}</div><div class="kpi-s">${esc(x.s)}</div></div>`).join("");
-
-  const fnlRow=(label,n,colour,title)=>{const pct=total?Math.round(n/total*100):0;
-    return `<div class="fnl-r"${title?` title="${esc(title)}"`:""}><div class="fnl-t"><span class="fnl-d" style="background:${colour}"></span><span class="fnl-l">${esc(label)}</span><span class="fnl-n">${n}</span><span class="fnl-p">${pct}%</span></div><div class="fnl-bar"><i style="width:${pct}%;background:${colour}"></i></div></div>`;};
-  /* Anyone whose stage is not one of the three would otherwise vanish from the
-     funnel while still counting in "Jumlah mad'u". Surface them instead. */
-  const tiered=STAGES.reduce((a,st)=>a+nStage(st.id),0);
-  const other=total-tiered;
-  const funnel=STAGES.map(st=>fnlRow(st.label,nStage(st.id),STAGE_DOT[st.id])).join("")
-    +(other>0?fnlRow("Tiada peringkat",other,"var(--merah-500)","Rekod tanpa peringkat sah — buka Direktori dan tetapkan peringkat."):"");
+   .map(x=>`<div class="kpi ${x.t}"><div class="kpi-k"><span>${esc(x.k)}</span><span class="kpi-i" aria-hidden="true">${ICO[x.i]}</span></div><div class="kpi-v">${x.v}</div>${x.t==="t-asing"?`<div class="kpi-s">${esc(x.s)}</div>`:""}</div>`).join("");
 
   const actRows=perlu.map(p=>{
     const st=statusOf(p);
@@ -2247,6 +2274,47 @@ function viewPapan(){
     <button type="button" class="tc-all" data-logopen="1">Lihat log penuh <span aria-hidden="true">&rsaquo;</span></button>
   </div>`;
 
+  /* ---- Upcoming card: the same birthdays and Wasilah dates the calendar
+     shows, turned into "what is coming next" so nothing needs the Wasilah tab
+     open to be remembered. Birthdays follow the PSPB pill like the rest of the
+     board; INTEC mad'u are included because a birthday is not a KPI. ---- */
+  const bdPool=ppl.concat(papanPSPB?asing.filter(p=>String(p.tahunPSPB||"")===papanPSPB):asing);
+  const t0=new Date(td+"T00:00:00");
+  const daysTo=d=>Math.round((d-t0)/864e5);
+  const bdUp=bdPool.map(p=>{const b=bdayOf(p);if(!b)return null;
+      let d=new Date(t0.getFullYear(),b.mm-1,b.dd);if(d<t0)d=new Date(t0.getFullYear()+1,b.mm-1,b.dd);
+      return {p,d,n:daysTo(d)};}).filter(x=>x&&x.n<=60).sort((a,b)=>a.n-b.n);
+  /* Malay names read "NUR AISYAH BINTI AHMAD": the part before bin/binti is
+     what the person is called, so that is what the avatar row shows. */
+  const givenName=n=>{n=(n||"").trim();const m=n.split(/\s+(?:binti|bte|bt\.?|bin|b\.)\s+/i)[0];return m||n||"?";};
+  const bdToday=bdUp.filter(x=>x.n===0).length;
+  const bdShown=bdUp.slice(0,5);
+  const whenLbl=n=>n===0?"Hari ini":(n===1?"Esok":dayShort(isoDate(new Date(t0.getTime()+n*864e5))));
+  const bdLine=bdToday?`<b>${bdToday}</b> mad'u menyambut hari lahir hari ini. Jangan lupa ucapkan!`
+    :(bdUp.length?`${bdUp.length} hari lahir dalam 60 hari akan datang.`:"");
+  const bdRow=bdShown.length?`<div class="up-bd">${bdShown.map(x=>`<button type="button" class="up-bdi${x.n===0?" now":""}" data-goto="${esc(x.p.id)}" title="${esc(x.p.nama||"")}" aria-label="Buka ${esc(x.p.nama||"mad'u")}, hari lahir ${esc(whenLbl(x.n))}">
+      <span class="up-av">${esc(initials(x.p.nama))}${x.n===0?`<span class="up-cake" aria-hidden="true">\uD83C\uDF82</span>`:""}</span>
+      <span class="up-nm">${esc(givenName(x.p.nama))}</span>
+      <span class="up-when">${esc(whenLbl(x.n))}</span></button>`).join("")}</div>`:"";
+  const evs=[];
+  (S.wasilah||[]).forEach(w=>{if(w.tarikh&&(w.tarikhTamat||w.tarikh)>=td)evs.push({k:"w",id:w.id,d:w.tarikh,nm:w.nama||"(program)",sub:"Program · "+(w.peserta||"Akhawat")+(w.status?" · "+w.status:""),c:(w.peserta==="Campur")?"pc":"pa"});});
+  (S.holidays||[]).forEach(h=>{if(h.start&&(h.end||h.start)>=td)evs.push({k:"h",id:h.id,d:h.start,nm:h.nama||"(tarikh penting)",sub:h.jenis||"Tarikh penting",c:"ph"});});
+  evs.sort((a,b)=>a.d.localeCompare(b.d));
+  const evRows=evs.slice(0,4).map(e=>`<button type="button" class="pp-row" data-evgo="${e.k}|${esc(e.id)}" aria-label="Buka ${esc(e.nm)}"><span class="pp-date up-d-${e.c}"><span class="pp-dd">${esc(e.d.slice(8,10))}</span><span class="pp-dm">${esc(monShort(e.d))}</span></span><span class="pp-rm"><span class="pp-rn">${esc(e.nm)}</span><span class="pp-rs">${esc(e.sub)}${e.d<td?" · sedang berlangsung":""}</span></span><span class="chev">›</span></button>`).join("");
+  const upCard=`<div class="pp-card">
+    <div class="pp-h">Hari lahir &amp; acara</div>
+    <div class="up-sec">
+      <div class="up-t">Hari lahir akan datang</div>
+      ${bdLine?`<div class="up-line">${bdLine}</div>`:""}
+      ${bdRow||`<div class="pp-empty">Tiada hari lahir dalam 60 hari akan datang. Tarikh lahir diisi di Direktori.</div>`}
+    </div>
+    <div class="up-sec">
+      <div class="up-t">Acara akan datang</div>
+      <div class="pp-list">${evRows||`<div class="pp-empty">Tiada program atau tarikh penting akan datang. Tambah di tab <b>Wasilah</b>.</div>`}</div>
+    </div>
+    <button type="button" class="tc-all" data-view-go="wasilah">Lihat kalendar <span aria-hidden="true">&rsaquo;</span></button>
+  </div>`;
+
   return `<div class="pp">
     <div class="pp-hi">
       <span class="pp-eyebrow">${esc(WEEK_LABEL)}</span>
@@ -2255,20 +2323,17 @@ function viewPapan(){
     </div>
     ${pills}
     <div class="pp-kpis">${kpis}</div>
-    <div class="pp-3">${trendCard}${logCard}</div>
-    <div class="pp-2">
+    <div class="pp-bento">
+      ${trendCard}${logCard}
       <div class="pp-card">
         <div class="pp-h">Perlu tindakan${perlu.length?`<span class="c">${perlu.length}</span>`:""}</div>
         <div class="pp-list">${actRows||`<div class="pp-empty">Semua mad'u ada PD, dan tiada siapa yang cukup syarat tarsyih buat masa ini.</div>`}</div>
       </div>
-      <div class="pp-card">
-        <div class="pp-h">Corong pencalonan</div>
-        <div class="fnl">${funnel}</div>
-      </div>
-    </div>
-    <div class="pp-card">
+      ${upCard}
+    <div class="pp-card pp-wide">
       <div class="pp-h">${ahead?"Usrah akan datang":"Usrah terkini"}</div>
       <div class="pp-list">${sesRows||`<div class="pp-empty">Belum ada usrah bertarikh direkod. Log usrah pertama di tab <b>Log</b>.</div>`}</div>
+    </div>
     </div>
   </div>`;
 }
@@ -2483,7 +2548,7 @@ function viewKeahlian(){
   const filters=`<div class="dirfilt">
     <div class="dirfilt-p">${isKb?asingPill:pills}<span class="dirfilt-sp"></span>${modeTgl}</div>
     <div class="dirfilt-s">
-      <span class="dirfilt-w"><select class="dirfilt-c" data-flt="ipt" aria-label="Tapis ikut IPT">${iptOpt}</select><i aria-hidden="true">${ICO.chev}</i></span>
+      <span class="dirfilt-w dirfilt-ipt"><b aria-hidden="true">${ICO.ipt}</b><select class="dirfilt-c" data-flt="ipt" aria-label="Tapis ikut IPT">${iptOpt}</select><i aria-hidden="true">${ICO.chev}</i></span>
       <span class="dirfilt-w"><select class="dirfilt-c" data-flt="pd" aria-label="Tapis ikut PD">${pdOpt}</select><i aria-hidden="true">${ICO.chev}</i></span>
       <span class="dirfilt-w"><select class="dirfilt-c" data-flt="ajk" aria-label="Tapis ikut AJK"><option value="">AJK: semua</option><option${F.ajk==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.ajk==="Tidak"?" selected":""}>Tidak</option></select><i aria-hidden="true">${ICO.chev}</i></span>
       ${showMut?`<span class="dirfilt-w"><select class="dirfilt-c" data-flt="minat" aria-label="Tapis ikut minat usrah"><option value="">Minat usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.minat==="Tidak"?" selected":""}>Tidak</option></select><i aria-hidden="true">${ICO.chev}</i></span>`:""}
@@ -3059,6 +3124,8 @@ document.addEventListener("click",e=>{
     if(p){const a=nextAction(p);if(a){S._actHide=S._actHide||{};S._actHide[p.id]=a.label;
       logAct("Buang dari Perlu tindakan",(p.nama||"(tanpa nama)")+" · "+a.label);save();render();}}return;}
   const ashw=e.target.closest("[data-actshow]");if(ashw){S._actHide={};logAct("Papar semula Perlu tindakan","");save();render();return;}
+  const evg=e.target.closest("[data-evgo]");if(evg){const [k,id]=evg.dataset.evgo.split("|");wasMode="list";wasDrawerOpen(k,id,false);setView("wasilah");focusDrawer();return;}
+  const vgo=e.target.closest("[data-view-go]");if(vgo){if(vgo.dataset.viewGo==="wasilah")wasMode="cal";setView(vgo.dataset.viewGo);return;}
   const gto=e.target.closest("[data-goto]");if(gto){const id=gto.dataset.goto;const _gp=get(id);selId=id;if(_gp&&_gp.stage)stage=_gp.stage;setView("keahlian");return;}
   /* The INTEC pill and the IPT filter would otherwise fight each other: leaving
      the pill with F.ipt still on INTEC keeps the list INTEC-only, and entering it
