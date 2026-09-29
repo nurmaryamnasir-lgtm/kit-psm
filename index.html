@@ -286,7 +286,7 @@
      readable, and stays dimmed for a non-ahli so the pair remain tellable apart. */
   .uchip .ahli{width:15px;height:15px}
   .uchip.on .ahli{color:rgba(255,255,255,.5)}
-  .uchip.on .ahli-y{color:#fff}
+  .uchip.on .ahli-y,.uchip.on .ahli-m{color:#fff}
   .uleg{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:8px 0 7px;font-size:12px;color:var(--muted)}
   .uleg-i{display:inline-flex;align-items:center;gap:6px}
   .uleg-sw{flex:0 0 auto;width:14px;height:14px;border-radius:var(--radius-pill);background:var(--hijau-600);border:1px solid var(--hijau-600)}
@@ -507,6 +507,7 @@
   .ahli{flex:0 0 auto;display:inline-grid;place-items:center;width:18px;height:18px;color:var(--kabus-400);vertical-align:middle}
   .ahli svg{width:100%;height:100%}
   .ahli-y{color:var(--hijau-600)}
+  .ahli-m{color:var(--emas-500)}
   /* Column sizing: let the name and next-action columns breathe, pin the rest. */
   /* Keyed to the cell's own class, not its position. These were nth-child rules
      and silently sized the wrong columns the moment Ahli and Usrah were inserted
@@ -571,7 +572,7 @@
   .ipt-pill .lbl{flex:1;text-align:left;line-height:1.25}
   .drawer-back{position:fixed;inset:0;background:rgba(16,28,66,.42);backdrop-filter:blur(3px);z-index:50;}
   @keyframes fadein{from{opacity:0}to{opacity:1}}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:480px;max-width:100%;background:var(--paper);z-index:51;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:480px;max-width:100%;background:#fff;z-index:51;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;}
   @keyframes slidein{from{transform:translateX(28px);opacity:.5}to{transform:none;opacity:1}}
   .drawer-head{display:flex;align-items:center;gap:10px;padding:15px 16px;background:#fff;border-bottom:1px solid var(--border-subtle)}
   .drawer-head .dname{font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:var(--tracking-heading);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1195,7 +1196,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=14;
+const APP_VERSION=15;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -1344,7 +1345,7 @@ const BPMY_MAX=720; const SUMMARY_ORDER=["c1","c2","c4","c3","c5"];
 
 let S={people:[],meetings:[],wasilah:[],claims:[],universities:[],pds:[],kolej:[],roster:[],holidays:[],_holSeeded:false};
 let view="papan", stage="mutabaah", q="", openExp=true, calDate=new Date();
-let F={pd:"",ipt:"",minat:"",ajk:"",tahun:""}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let papanRange=30; let santFilt=""; let santSel=null; let santQ="";
+let F={pd:"",ipt:"",minat:"",ajk:"",tahun:"",ahli:""}; let onlyElig=false; let sesOpen=""; let memCalOpen=false; let kMode="senarai"; let selId=null; let selDate=""; let holOpen=false; let showArsip=false; let uForm={tarikh:today(),jenis:"Usrah",pd:"",pd2:"",butiran:"",catatan:"",att:{}}; let uLogOpen=""; let memCalDate=new Date(); let sortKey="nama"; let sortDir="asc"; let rujMain="krit"; let rujTab="muw"; let rujUsr=0; let rujMuw=-1; let rujKd=0; let previousFocus=null; let noteEdit=""; let pdFilt=""; let logOpen=false; let papanPSPB=PSPB_SEMASA; let papanRange=30; let santFilt=""; let santSel=null; let santQ="";
 /* Which editor tab is open. This lives here, not on the person, because
    syncNow() and pullMerge() replace the whole of S with the server's copy every
    25 seconds — anything parked on a person record is overwritten by whatever
@@ -1907,6 +1908,7 @@ function eligibleMadu(){return S.people.filter(p=>!p.arsip&&(p.stage==="mutabaah
    very marks being explained so the legend cannot drift from the chips. */
 function usrahLegend(){return `<div class="uleg">
   <span class="uleg-i">${ahliMark({statusAhli:"Ya"})}Ahli berdaftar</span>
+  <span class="uleg-i">${ahliMark({statusAhli:"Belum",minatAhli:"Ya"})}Belum ahli · berminat</span>
   <span class="uleg-i">${ahliMark({statusAhli:"Belum"})}Belum ahli</span>
   <span class="uleg-i"><i class="uleg-sw" aria-hidden="true"></i>Ditanda hadir</span>
 </div>`;}
@@ -2464,6 +2466,11 @@ function filteredPeople(allStages){let list=S.people.slice();
   if(F.pd){if(F.pd==="__none__")list=list.filter(p=>!p.pd1&&!p.pd2);else list=list.filter(p=>p.pd1===F.pd||p.pd2===F.pd);}
   if(F.minat)list=list.filter(p=>(p.minatUsrah||"Tidak")===F.minat);
   if(F.ajk)list=list.filter(p=>(p.minatAJK||"Tidak")===F.ajk);
+  /* "Belum" narrows to non-ahli; the two "Belum|…" values split them further
+     by whether they want to join, which is the list PD follow up on. */
+  if(F.ahli){const [st,mn]=F.ahli.split("|");
+    list=list.filter(p=>(st==="Ya")===(p.statusAhli==="Ya"));
+    if(mn)list=list.filter(p=>(p.minatAhli||"Tidak")===mn);}
   if(F.ipt){if(F.ipt==="__blank__")list=list.filter(p=>!(p.universiti||"").trim());else list=list.filter(p=>(p.universiti||"")===F.ipt);}
   if(F.tahun)list=list.filter(p=>(p.tahunPSPB||"")===F.tahun);
   list.sort((a,b)=>(a.nama||"~").localeCompare(b.nama||"~"));
@@ -2550,6 +2557,7 @@ function viewKeahlian(){
     <div class="dirfilt-s">
       <span class="dirfilt-w dirfilt-ipt"><b aria-hidden="true">${ICO.ipt}</b><select class="dirfilt-c" data-flt="ipt" aria-label="Tapis ikut IPT">${iptOpt}</select><i aria-hidden="true">${ICO.chev}</i></span>
       <span class="dirfilt-w"><select class="dirfilt-c" data-flt="pd" aria-label="Tapis ikut PD">${pdOpt}</select><i aria-hidden="true">${ICO.chev}</i></span>
+      <span class="dirfilt-w"><select class="dirfilt-c" data-flt="ahli" aria-label="Tapis ikut status ahli"><option value="">Status ahli: semua</option><option value="Ya"${F.ahli==="Ya"?" selected":""}>Ahli berdaftar</option><option value="Belum"${F.ahli==="Belum"?" selected":""}>Belum ahli</option><option value="Belum|Ya"${F.ahli==="Belum|Ya"?" selected":""}>Belum ahli · berminat</option><option value="Belum|Tidak"${F.ahli==="Belum|Tidak"?" selected":""}>Belum ahli · tidak berminat</option></select><i aria-hidden="true">${ICO.chev}</i></span>
       <span class="dirfilt-w"><select class="dirfilt-c" data-flt="ajk" aria-label="Tapis ikut AJK"><option value="">AJK: semua</option><option${F.ajk==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.ajk==="Tidak"?" selected":""}>Tidak</option></select><i aria-hidden="true">${ICO.chev}</i></span>
       ${showMut?`<span class="dirfilt-w"><select class="dirfilt-c" data-flt="minat" aria-label="Tapis ikut minat usrah"><option value="">Minat usrah: semua</option><option${F.minat==="Ya"?" selected":""}>Ya</option><option value="Tidak"${F.minat==="Tidak"?" selected":""}>Tidak</option></select><i aria-hidden="true">${ICO.chev}</i></span>`:""}
       ${(arsipN>0||showArsip)?`<button class="arsiplink" data-arsip="1">${showArsip?"← Senarai aktif":("Arkib ("+arsipN+")")}</button>`:""}
@@ -2604,9 +2612,9 @@ function actCell(p){const a=nextAction(p);
 function usrahMark(p){const ya=(p&&p.minatUsrah)==="Ya";
   const t=ya?"Berminat sertai usrah":"Belum berminat sertai usrah";
   return `<span class="usm${ya?" usm-y":""}" title="${t}" role="img" aria-label="${t}">${ICO.plant}</span>`;}
-function ahliMark(p){const ya=p.statusAhli==="Ya";
-  const t=ya?"Ahli berdaftar ISMA":"Belum ahli berdaftar";
-  return `<span class="ahli${ya?" ahli-y":""}" title="${t}" role="img" aria-label="${t}">${ya
+function ahliMark(p){const ya=p.statusAhli==="Ya",mn=!ya&&p.minatAhli==="Ya";
+  const t=ya?"Ahli berdaftar ISMA":(mn?"Belum ahli · berminat jadi ahli":"Belum ahli berdaftar");
+  return `<span class="ahli${ya?" ahli-y":(mn?" ahli-m":"")}" title="${t}" role="img" aria-label="${t}">${ya
     ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.4 12.3 2.5 2.5 4.7-5.1"/></svg>`
     :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12h7"/></svg>`}</span>`;}
 
