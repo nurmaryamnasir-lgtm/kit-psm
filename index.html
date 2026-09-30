@@ -1196,7 +1196,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=15;
+const APP_VERSION=16;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -2747,7 +2747,9 @@ function addedByHint(p){
 }
 function secMaklumat(p){return `<div class="grp"><h3>Maklumat asas</h3>
     ${fld("Nama penuh",T(p.id,"nama",p.nama,"Nama"))}${addedByHint(p)}
-    <div class="g2">${fld("Tarikh lahir",T(p.id,"tarikhLahir",p.tarikhLahir,"","date"))}${fld("Email",T(p.id,"email",p.email,"nama@email.com","email"))}</div>
+    <div class="g2">${fld("No. IC (isi tarikh lahir)",`<input id="${fieldId("ic",p.id,"ic")}" data-icdob="${p.id}" inputmode="numeric" autocomplete="off" placeholder="000000-00-0000">`)}${fld("Tarikh lahir",T(p.id,"tarikhLahir",p.tarikhLahir,"","date"))}</div>
+    <div class="hint" style="margin:-6px 0 8px">Taip no. IC dan tarikh lahir dikira sendiri. No. IC tidak disimpan.</div>
+    ${fld("Email",T(p.id,"email",p.email,"nama@email.com","email"))}
     <div class="g2">${fld("No. telefon",T(p.id,"telefon",p.telefon,"01_-___ ____","tel"))}${fld("Status ahli",`<div class="toggle g"><button data-tgl="${p.id}|statusAhli|Ya" class="${p.statusAhli==="Ya"?"on":""}">Ya</button><button data-tgl="${p.id}|statusAhli|Belum" class="${p.statusAhli!=="Ya"?"on":""}">Belum</button></div>`)}</div>
     ${/* Only worth asking of someone who is not one yet; on an ahli the question
           has already been answered and the toggle would just be noise. */
@@ -2784,14 +2786,19 @@ function timelineSection(p){
   const add=(sort,dateLabel,label,sub,tone,icon)=>ev.push({sort,dateLabel,label,sub,tone,icon});
   const ses=(p.sessions||[]).filter(s=>s&&s.tarikh).slice().sort((a,b)=>a.tarikh.localeCompare(b.tarikh));
 
-  /* Entry: earliest of mulaP / tahunMasuk / first session. A bare year stays a
-     year — no day or month is invented for it. */
-  const cands=[];
-  if(/^\d{4}-\d{2}-\d{2}/.test(p.mulaP||""))cands.push({sort:String(p.mulaP).slice(0,10),label:dmy(p.mulaP)});
-  if(/^\d{4}$/.test(String(p.tahunMasuk||"").trim()))cands.push({sort:String(p.tahunMasuk).trim()+"-00-00",label:String(p.tahunMasuk).trim()});
-  if(ses.length)cands.push({sort:ses[0].tarikh,label:dmy(ses[0].tarikh)});
-  cands.sort((a,b)=>a.sort.localeCompare(b.sort));
-  if(cands.length)add(cands[0].sort,cands[0].label,"Mula direkod sebagai mad'u","","muted","●");
+  /* Entry: the day the record went into Kit PD (ditambahPada, set once by
+     newPerson()). Mad'u from before that stamp existed fall back to the
+     earliest of mulaP / tahunMasuk / first session; a bare year stays a year —
+     no day or month is invented for it. */
+  const added=String(p.ditambahPada||"").slice(0,10);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(added)){const who=String(p.ditambahOleh||"").trim();
+    add(added,dmy(added),"Dimasukkan ke Kit PD",(who&&who!=="—")?"Oleh "+who:"","muted","●");}
+  else{const cands=[];
+    if(/^\d{4}-\d{2}-\d{2}/.test(p.mulaP||""))cands.push({sort:String(p.mulaP).slice(0,10),label:dmy(p.mulaP)});
+    if(/^\d{4}$/.test(String(p.tahunMasuk||"").trim()))cands.push({sort:String(p.tahunMasuk).trim()+"-00-00",label:String(p.tahunMasuk).trim()});
+    if(ses.length)cands.push({sort:ses[0].tarikh,label:dmy(ses[0].tarikh)});
+    cands.sort((a,b)=>a.sort.localeCompare(b.sort));
+    if(cands.length)add(cands[0].sort,cands[0].label,"Mula direkod sebagai mad'u","","muted","●");}
 
   const last=ses.length?ses[ses.length-1]:null;
   ses.forEach(s=>{
@@ -3056,6 +3063,12 @@ function wtgl(id,f,v,opts){return `<div class="toggle${opts.length>2?" g":""}">`
 function holClass(j){return j==="Cuti Umum"?"hol-umum":j==="Cuti Semester"?"hol-sem":j==="Study Week"?"hol-study":"hol-lain";}
 function bdayOf(p){if(p&&p.tarikhLahir){const m=+p.tarikhLahir.slice(5,7),d=+p.tarikhLahir.slice(8,10);if(m>=1&&m<=12&&d>=1&&d<=31)return{mm:m,dd:d};}return null;}
 function icBirthday(ic){const d=(ic||"").replace(/\D/g,"");if(d.length<6)return null;const mm=+d.slice(2,4),dd=+d.slice(4,6);if(mm<1||mm>12||dd<1||dd>31)return null;return{mm:mm,dd:dd};}
+/* Full ISO birthdate from the YYMMDD head of a MyKad number. A two-digit year
+   that would land in the future belongs to the 1900s. Returns "" for anything
+   that is not a real calendar date (31 Feb, 00 month). */
+function icDob(ic){const b=icBirthday(ic);if(!b)return "";const yy=+String(ic).replace(/\D/g,"").slice(0,2);
+  const yr=(new Date(2000+yy,b.mm-1,b.dd)<=new Date())?2000+yy:1900+yy;const dt=new Date(yr,b.mm-1,b.dd);
+  if(dt.getMonth()!==b.mm-1)return "";return yr+"-"+String(b.mm).padStart(2,"0")+"-"+String(b.dd).padStart(2,"0");}
 function calendarHTML(){
   const y=calDate.getFullYear(),mo=calDate.getMonth();
   const first=new Date(y,mo,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
@@ -3359,6 +3372,10 @@ document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};
         const av=row.querySelector(".pdav");if(av)av.textContent=initials(sn.nama);}}}
     return;}
   if(!(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+  /* The IC box is a calculator, not a field: it writes tarikhLahir and keeps
+     nothing itself, so the date input is updated in place and the caret stays. */
+  if(d.icdob){const p=get(d.icdob),iso=icDob(t.value);if(p&&iso&&iso!==p.tarikhLahir){p.tarikhLahir=iso;save();
+    const di=document.getElementById(fieldId("ed",p.id,"tarikhLahir"));if(di)di.value=iso;}return;}
   if(d.ed&&d.f){const p=get(d.ed);if(p){let v=t.value;if(d.f==="telefon"){v=fmtPhone(v);t.value=v;}else if(d.f==="poskod"){v=v.replace(/\D/g,"").slice(0,5);t.value=v;}if(d.f.indexOf("rmk_")===0){p.remarks=p.remarks||{};p.remarks[d.f.slice(4)]=v;}else p[d.f]=v;save();}return;}
   if(d.ses&&d.f){const[pid,sid]=d.ses.split("|");const p=get(pid);const s=p&&p.sessions.find(x=>x.id===sid);if(s){s[d.f]=t.value;save();}return;}
   if(d.med&&d.f){const m=getM(d.med);if(m){m[d.f]=t.value;save();}return;}
