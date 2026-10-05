@@ -1201,7 +1201,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=17;
+const APP_VERSION=18;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -3347,7 +3347,7 @@ document.addEventListener("keydown",e=>{
     if(noteEdit){noteEdit="";render();return;}
     closeDrawer();return;}if(e.key==="Tab"&&dw){const focusable=[...dw.querySelectorAll("button,[href],input,select,textarea,[tabindex]:not([tabindex=\"-1\"])")].filter(x=>!x.disabled);if(focusable.length){const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}}if((e.key==="Enter"||e.key===" ")){const a=document.activeElement;if(a&&a.matches&&a.matches("[data-sel]")){e.preventDefault();a.click();}}});
 document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};
-  if(d.hrv&&hadirRev){hadirRev[d.hrv]=t.value;return;}
+  if(d.hrv&&hadirRev){hadirRev[d.hrv]=t.value;if(hadirRev.mode==="names"&&d.hrv==="prog"){const c=t.selectionStart;render();const n2=document.querySelector('[data-hrv="prog"]');if(n2){n2.focus();try{n2.setSelectionRange(c,c);}catch(err){}}}return;}
   if(t.id==="snSearch"){santQ=t.value;const c=t.selectionStart;render();const n2=$("#snSearch");if(n2){n2.focus();try{n2.setSelectionRange(c,c);}catch(err){}}return;}
   if(d.uf){uForm[d.uf]=t.value;if(t.tagName==="SELECT"||t.type==="date")render();return;}if(d.pded){const pd=getPd(d.pded);if(pd){pd[d.f]=t.value;pd._upd=Date.now();save();
     /* Name keeps its caret: repaint just the avatar. IPT re-tints the avatar and
@@ -3555,33 +3555,18 @@ function importNames(file){
       p.minatUsrah=/^ya/i.test(String(o["berminat untuk menyertai usrah?"]||o["minat usrah"]||o.minatusrah||""))?"Ya":"Tidak";
       cands.push(p);});
     if(!cands.length){toast("Tiada nama sah dijumpai dalam fail");return;}
-    const nrm=s=>(s||"").trim().toLowerCase();
-    const existing=new Set(S.people.filter(x=>!x.arsip).map(x=>nrm(x.nama)));const seen=new Set();const fresh=[],dups=[];
-    cands.forEach(p=>{const key=nrm(p.nama);if(existing.has(key)||seen.has(key))dups.push(p);else{fresh.push(p);seen.add(key);}});
-    const nIpt=fresh.filter(p=>p.universiti).length, nTel=fresh.filter(p=>p.telefon).length;
-    /* An uploaded list almost always comes off a program, and keying that
-       attendance in again by hand afterwards was the step people skipped. Asked
-       for here so one upload does both. Leaving either prompt blank imports the
-       names only, which is what a plain roster upload wants. */
-    const prog=(prompt("Nama program / acara untuk kehadiran ini:\n(Kosongkan jika ini senarai nama sahaja, tanpa kehadiran)","")||"").trim();
-    let dt="";
-    if(prog){
-      dt=isoDate(prompt("Tarikh program (YYYY-MM-DD):",today())||"");
-      if(!dt){toast("Tarikh tidak sah \u2014 guna format YYYY-MM-DD");return;}
-    }
-    /* A duplicate name is a mad'u who is already in the Direktori. They are still
-       skipped as an intake, but they were at the program, so they get kehadiran. */
-    const dir={};S.people.forEach(x=>{if(x.arsip)return;const k=nrm(x.nama);if(k&&!dir[k])dir[k]=x;});
-    const onExisting=prog?dups.map(p=>dir[nrm(p.nama)]).filter(x=>x&&!(x.sessions||[]).some(s=>s.tarikh===dt&&nrm(s.nota)===nrm(prog))):[];
-    const kehLine=prog?("\n\u2022 Kehadiran \""+prog+"\" pada "+dt+" \u2014 "+(fresh.length+onExisting.length)+" nama"):"";
-    if(!confirm("Import "+cands.length+" baris:\n\u2022 "+fresh.length+" nama baharu \u2014 semua masuk peringkat Mutabaah\n\u2022 "+dups.length+" kemungkinan duplikat (nama sama) \u2014 akan dilangkau"+kehLine+"\n\nDikesan automatik: "+nIpt+" IPT \u00b7 "+nTel+" no. telefon\n\nTeruskan tambah "+fresh.length+" nama baharu?"))return;
-    const gid="u_"+Date.now();
-    const mkSes=()=>({id:uid("s_"),_usrahId:gid,jenis:"Program",tarikh:dt,oleh:"",oleh2:"",nota:prog,catatan:""});
-    fresh.forEach(p=>{if(p.pd1&&!S.pds.includes(p.pd1))S.pds.push(p.pd1);if(p.pd2&&!S.pds.includes(p.pd2))S.pds.push(p.pd2);if(p.universiti&&!S.universities.includes(p.universiti))S.universities.push(p.universiti);if(prog)p.sessions=[mkSes()];S.people.push(p);});
-    onExisting.forEach(x=>{x.sessions=x.sessions||[];x.sessions.push(mkSes());stamp(x);});
-    S.pds.sort();S.universities.sort();logAct("Import "+fresh.length+" nama (Mutabaah) dari fail",file.name);
-    if(prog)logAct("Muat naik kehadiran "+prog,dt+" \u00b7 "+(fresh.length+onExisting.length)+" hadir");
-    save();stage="mutabaah";render();toast(fresh.length+" nama ditambah ke Mutabaah"+(prog?" \u00b7 "+(fresh.length+onExisting.length)+" kehadiran":"")+(dups.length?" \u00b7 "+dups.length+" duplikat dilangkau":""));
+    /* Duplicates are found by the same matcher as the kehadiran upload, so a
+       "binti" or a "Mohd" no longer slips a second copy of someone into the
+       Direktori. The review drawer also takes the optional program: an uploaded
+       list almost always comes off one, and keying that attendance in again by
+       hand afterwards was the step people skipped. Leaving it blank imports the
+       names only. */
+    const dir=S.people.filter(p=>!p.arsip).map(p=>({p:p,k:hKey(p)}));
+    const seen=new Set(),out=[];
+    cands.forEach(p=>{const x=hKey(p).x;if(!x||seen.has(x))return;seen.add(x);out.push(Object.assign({c:p},hClassify(p,dir)));});
+    hadirRev={mode:"names",file:file.name,prog:"",dt:today(),rows:out};
+    previousFocus=document.activeElement;render();
+    setTimeout(()=>{const dw=document.querySelector("#hadirdrawer .drawer");if(dw)dw.focus();},0);
   };
   readSheet(file,addRows);
 }
@@ -3764,36 +3749,50 @@ function hadirDrawer(){const R=hadirRev;if(!R)return "";
   const sec=(kind,ttl,hint)=>{const idx=R.rows.map((r,i)=>r.kind===kind?i:-1).filter(i=>i>=0);
     return idx.length?`<div class="grp"><h3>${ttl} (${idx.length})</h3>${hint?`<div class="hint">${hint}</div>`:""}${idx.map(i=>row(R.rows[i],i)).join("")}</div>`:"";};
   const open=R.rows.filter(r=>!r.pick).length,nK=R.rows.filter(r=>r.pick&&r.pick!=="new"&&r.pick!=="skip").length,nN=R.rows.filter(r=>r.pick==="new").length;
-  const ok=!open&&(nK+nN)>0;
-  return `<div class="drawer-back" data-hclose="1"></div><div class="drawer" role="dialog" aria-modal="true" aria-label="Semak kehadiran program" tabindex="-1">
-    <div class="drawer-head"><div class="dname">Semak kehadiran · ${esc(R.file)}</div><button class="drawer-close" data-hclose="1" aria-label="Tutup">✕</button></div>
+  const nm=R.mode==="names",hasProg=!!String(R.prog||"").trim();
+  const ok=!open&&(nm&&!hasProg?nN:nK+nN)>0;
+  const nIpt=R.rows.filter(r=>r.pick==="new"&&r.c.universiti).length,nTel=R.rows.filter(r=>r.pick==="new"&&r.c.telefon).length;
+  return `<div class="drawer-back" data-hclose="1"></div><div class="drawer" role="dialog" aria-modal="true" aria-label="${nm?"Semak senarai nama":"Semak kehadiran program"}" tabindex="-1">
+    <div class="drawer-head"><div class="dname">${nm?"Semak senarai nama":"Semak kehadiran"} · ${esc(R.file)}</div><button class="drawer-close" data-hclose="1" aria-label="Tutup">✕</button></div>
     <div class="drawer-body">
-      <div class="grp"><div class="g2">${fld("Nama program",`<input data-hrv="prog" value="${esc(R.prog)}" placeholder="cth. Ceramah Maulidur Rasul">`)}${fld("Tarikh program",`<input data-hrv="dt" type="date" value="${esc(R.dt)}">`)}</div></div>
+      <div class="grp"><div class="g2">${fld("Nama program",`<input data-hrv="prog" value="${esc(R.prog)}" placeholder="${nm?"Kosongkan jika senarai nama sahaja":"cth. Ceramah Maulidur Rasul"}">`)}${fld("Tarikh program",`<input data-hrv="dt" type="date" value="${esc(R.dt)}">`)}</div>
+        ${nm?`<div class="hint">Isi nama program jika senarai ini dari kehadiran program — setiap nama akan dapat rekod kehadiran. Dikesan automatik dalam nama baharu: ${nIpt} IPT · ${nTel} no. telefon.</div>`:""}</div>
       ${sec("near","Perlu semak","Nama ini mirip seseorang dalam Direktori. Pilih orang yang betul, atau tanda sebagai nama baharu.")}
       ${sec("new","Nama baharu","Tiada padanan dalam Direktori — akan masuk senarai <b>Mutabaah</b> bersama kehadiran.")}
-      ${sec("auto","Sudah ada dalam Direktori","Dipadankan automatik. Tukar jika ada yang salah.")}
+      ${sec("auto","Sudah ada dalam Direktori",nm?"Dipadankan automatik — tidak ditambah semula, tetapi dapat kehadiran jika program diisi. Tukar jika ada yang salah.":"Dipadankan automatik. Tukar jika ada yang salah.")}
       <div class="actions"><button class="arch" data-hclose="1" style="flex:1">Batal</button>
-        <button class="add" id="hadirSave" style="flex:2"${ok?"":" disabled"}>${open?open+" nama perlu disemak":"Simpan kehadiran · "+(nK+nN)}</button></div>
+        <button class="add" id="hadirSave" style="flex:2"${ok?"":" disabled"}>${open?open+" nama perlu disemak":(nm?"Tambah "+nN+" nama baharu"+(hasProg?" · "+(nK+nN)+" kehadiran":""):"Simpan kehadiran · "+(nK+nN))}</button></div>
     </div></div>`;}
 function hadirCommit(){const R=hadirRev;if(!R)return;
-  const prog=String(R.prog||"").trim();if(!prog){toast("Kehadiran perlu nama program");return;}
-  const dt=isoDate(R.dt);if(!dt){toast("Tarikh tidak sah");return;}
+  const nm=R.mode==="names";
+  const prog=String(R.prog||"").trim();if(!prog&&!nm){toast("Kehadiran perlu nama program");return;}
+  const dt=prog?isoDate(R.dt):"";if(prog&&!dt){toast("Tarikh tidak sah");return;}
   const nrm=s=>(s||"").trim().toLowerCase().replace(/\s+/g," ");
   const gid="u_"+Date.now();
   const mkSes=()=>({id:uid("s_"),_usrahId:gid,jenis:"Program",tarikh:dt,oleh:"",oleh2:"",nota:prog,catatan:""});
   const done=new Set();let nK=0,nN=0,nD=0;
   R.rows.forEach(r=>{const c=r.c;
+    if(r.pick==="new"&&nm){const p=c;
+      if(p.pd1&&!S.pds.includes(p.pd1))S.pds.push(p.pd1);if(p.pd2&&!S.pds.includes(p.pd2))S.pds.push(p.pd2);
+      if(p.universiti&&!S.universities.includes(p.universiti))S.universities.push(p.universiti);
+      if(prog)p.sessions=[mkSes()];S.people.push(p);nN++;return;}
     if(r.pick==="new"){const p=newPerson("mutabaah");
       p.nama=c.nama;p.universiti=c.universiti;p.telefon=fmtPhone(c.telefon);p.ic=c.ic;
       p.email=c.email.toLowerCase();p.bidang=titleCase(c.bidang);p.tahap=titleCase(c.tahap);p.pd1=c.pd;
       if(c.pd&&!S.pds.includes(c.pd))S.pds.push(c.pd);
       if(p.universiti&&!S.universities.includes(p.universiti))S.universities.push(p.universiti);
       p.sessions=[mkSes()];S.people.push(p);nN++;return;}
-    if(!r.pick||r.pick==="skip"||done.has(r.pick))return;
+    if(!prog||!r.pick||r.pick==="skip"||done.has(r.pick))return;
     const p=get(r.pick);if(!p)return;done.add(p.id);
     if((p.sessions||[]).some(s=>s.tarikh===dt&&nrm(s.nota)===nrm(prog))){nD++;return;}
     p.sessions=p.sessions||[];p.sessions.push(mkSes());stamp(p);nK++;});
   const n=nK+nN;hadirRev=null;
+  if(nm){S.pds.sort();S.universities.sort();
+    if(nN)logAct("Import "+nN+" nama (Mutabaah) dari fail",R.file);
+    if(prog&&n)logAct("Muat naik kehadiran "+prog,dt+" \u00b7 "+n+" hadir");
+    const nSkip=R.rows.filter(r=>r.pick!=="new").length;
+    if(nN||n)save();stage="mutabaah";render();
+    toast(nN+" nama ditambah ke Mutabaah"+(prog?" \u00b7 "+n+" kehadiran":"")+(nSkip?" \u00b7 "+nSkip+" sedia ada dilangkau":""));return;}
   if(!n){render();toast("Semua nama sudah ada kehadiran untuk program ini");return;}
   S.pds.sort();S.universities.sort();
   logAct("Muat naik kehadiran "+prog,dt+" · "+n+" hadir"+(nN?" · "+nN+" mad'u baharu":""));
