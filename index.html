@@ -88,6 +88,10 @@
   .nchip{border:1px solid var(--border-subtle);background:#fff;border-radius:var(--radius-pill);padding:7px 13px;font-weight:600;font-size:12.5px;color:var(--muted)}
   .nchip.on{background:var(--hijau-600);border-color:var(--hijau-600);color:#fff}
   .nchip.add{border-style:dashed;color:var(--blue)}
+  .nchip small{display:block;font-weight:500;font-size:11px;opacity:.8;margin-top:1px}
+  .hrow{padding:11px 0;border-bottom:1px solid var(--border-subtle)} .hrow:last-child{border-bottom:none}
+  .hrow-n{font-weight:700} .hrow-s{font-size:12px;color:var(--muted);margin-top:2px}
+  .hchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px} .hchips .nchip{text-align:left} .hchips .nchip:has(small){border-radius:var(--radius-md)}
   .tag.red{background:var(--red-s);color:var(--merah-600)}
   .iptbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
   /* Base for every filter pill. The .active and .c variants below (and the
@@ -1141,6 +1145,7 @@
 <main class="app" id="app"></main>
 </div>
 <div id="logdrawer"></div>
+<div id="hadirdrawer"></div>
 <div id="gate" class="gate">
   <div class="gatebox">
     <aside class="gaside">
@@ -1196,7 +1201,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=16;
+const APP_VERSION=17;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -2377,6 +2382,7 @@ function render(){const _dsb=document.querySelector(".drawer-body");const _sc=_d
   const _lb=$("#logBtn");if(_lb&&!_lb.firstChild)_lb.innerHTML=ICO.clock;
   if(_lb)_lb.setAttribute("aria-expanded",String(logOpen));
   const _ld=$("#logdrawer");if(_ld)_ld.innerHTML=logOpen?activityDrawer():"";
+  const _hd=$("#hadirdrawer");if(_hd)_hd.innerHTML=hadirRev?hadirDrawer():"";
   const _nb=document.querySelector(".drawer-body");if(_nb&&_sc)_nb.scrollTop=_sc;
 }
 
@@ -3179,6 +3185,9 @@ document.addEventListener("click",e=>{
   if(e.target.closest&&e.target.closest("#addSnBtn")){const sn=newSantunan();S.santunan=(S.santunan||[]);S.santunan.unshift(sn);santSel=sn.id;santFilt="";logAct("Tambah nama santunan","");save();render();return;}
   if(e.target.closest&&e.target.closest("#snXlBtn")){$("#fileSant").click();return;}
   if(e.target.closest&&e.target.closest("#hadirXlBtn")){$("#fileHadir").click();return;}
+  const hpk=e.target.closest("[data-hpick]");if(hpk&&hadirRev){const[i,v]=hpk.dataset.hpick.split("|");const r=hadirRev.rows[+i];if(r){r.pick=v;render();}return;}
+  if(e.target.closest&&e.target.closest("[data-hclose]")){hadirRev=null;render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
+  if(e.target.closest&&e.target.closest("#hadirSave")){hadirCommit();return;}
   if(e.target.closest&&e.target.closest("#dirXlBtn")){$("#fileXl").click();return;}
   const snd=e.target.closest("[data-sndel]");if(snd){const sn=getSn(snd.dataset.sndel);
     if(sn&&confirm(`Buang "${sn.nama||"nama ini"}" dari santunan?`)){S._del[sn.id]=Date.now();S.santunan=S.santunan.filter(x=>x.id!==sn.id);if(santSel===sn.id)santSel=null;logAct("Buang nama santunan",sn.nama);save();render();toast("Dibuang");}return;}
@@ -3328,6 +3337,7 @@ function closeDrawer(){if(!selId)return;selId=null;noteEdit="";render();setTimeo
 document.addEventListener("keydown",e=>{
   /* The log drawer sits above everything and is not tied to a selected mad'u, so
      it gets its own Escape before the drawer logic below. */
+  if(e.key==="Escape"&&hadirRev){e.preventDefault();hadirRev=null;render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
   if(e.key==="Escape"&&logOpen){e.preventDefault();logOpen=false;render();const b=$("#logBtn");if(b)b.focus();return;}
   if(e.key==="Escape"&&wasDrawer){e.preventDefault();wasDrawerClose();render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
   if(e.key==="Escape"&&santSel){e.preventDefault();santSel=null;render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
@@ -3337,6 +3347,7 @@ document.addEventListener("keydown",e=>{
     if(noteEdit){noteEdit="";render();return;}
     closeDrawer();return;}if(e.key==="Tab"&&dw){const focusable=[...dw.querySelectorAll("button,[href],input,select,textarea,[tabindex]:not([tabindex=\"-1\"])")].filter(x=>!x.disabled);if(focusable.length){const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}}if((e.key==="Enter"||e.key===" ")){const a=document.activeElement;if(a&&a.matches&&a.matches("[data-sel]")){e.preventDefault();a.click();}}});
 document.addEventListener("input",e=>{const t=e.target,d=t.dataset||{};
+  if(d.hrv&&hadirRev){hadirRev[d.hrv]=t.value;return;}
   if(t.id==="snSearch"){santQ=t.value;const c=t.selectionStart;render();const n2=$("#snSearch");if(n2){n2.focus();try{n2.setSelectionRange(c,c);}catch(err){}}return;}
   if(d.uf){uForm[d.uf]=t.value;if(t.tagName==="SELECT"||t.type==="date")render();return;}if(d.pded){const pd=getPd(d.pded);if(pd){pd[d.f]=t.value;pd._upd=Date.now();save();
     /* Name keeps its caret: repaint just the avatar. IPT re-tints the avatar and
@@ -3674,9 +3685,50 @@ function isoDate(v){
    gains a session; a name that is not becomes a new mad'u at Mutabaah, because
    turning up to a program is how someone enters the funnel in the first place.
    The whole upload shares one _usrahId, so it reads as a single program under
-   "Usrah direkod" and can be edited \u2014 or deleted \u2014 as one record. The PD is
+   "Usrah direkod" and can be edited — or deleted — as one record. The PD is
    left blank on purpose: the sheet rarely knows it, and it is one dropdown
-   away in that record. */
+   away in that record.
+
+   Sign-in sheets are typed by the attendee, so the same person arrives as "Nur
+   Aisyah binti Ahmad", "Nur Aisyah Ahmad" or "Mohd" for "Muhammad". Matching is
+   therefore two-tier. A sure match — same IC, same phone or email with a
+   similar name, or the same name once bin/binti, spacing and punctuation are
+   ignored — is taken automatically. Anything only similar (spelling variant,
+   dropped surname, typo) is put in front of the user in the review drawer and
+   nothing is written until each of those is decided. */
+const H_STOP=new Set(["bin","binti","bt","bte","binte","bnt","bn","b"]);
+const H_VAR={mohd:"muhammad",mohamad:"muhammad",mohammad:"muhammad",muhamad:"muhammad",mohamed:"muhammad",mohammed:"muhammad",muhammed:"muhammad",muhd:"muhammad",mhd:"muhammad",md:"muhammad",nor:"nur",noor:"nur",abd:"abdul",ab:"abdul"};
+function hTokens(s){return String(s||"").toLowerCase().replace(/\ba\s*\/\s*[lp]\b/g," ").replace(/[^a-zÀ-ɏ]+/g," ").split(" ").filter(t=>t&&!H_STOP.has(t));}
+function hGrams(k){const g=new Set();for(let i=0;i<k.length-1;i++)g.add(k.slice(i,i+2));return g;}
+function hKey(o){const t=hTokens(o.nama),f=t.map(x=>H_VAR[x]||x),fk=f.join("");
+  const ic=String(o.ic||"").replace(/\D/g,""),tel=normPhone(o.telefon).replace(/\D/g,"");
+  return{x:t.join(""),fk:fk,fs:new Set(f),g:hGrams(fk),ic:ic.length===12?ic:"",tel:tel,em:String(o.email||"").trim().toLowerCase()};}
+function hSim(a,b){
+  if(!a.fk||!b.fk)return 0;if(a.fk===b.fk)return .97;
+  const[sm,bg]=a.fs.size<=b.fs.size?[a.fs,b.fs]:[b.fs,a.fs];
+  if(sm.size>=2&&[...sm].every(t=>bg.has(t)))return .9;
+  let n=0;a.g.forEach(x=>{if(b.g.has(x))n++;});
+  return Math.min(.89,(a.g.size+b.g.size)?2*n/(a.g.size+b.g.size):0);}
+/* One row of the sheet against the Direktori. Returns the row's kind — auto,
+   near or new — its candidates best first, and the pick pre-chosen for it. */
+function hClassify(c,dir){
+  const k=hKey(c),cand={};
+  const add=(d,sc,why)=>{const o=cand[d.p.id];if(!o||o.sc<sc)cand[d.p.id]={p:d.p,sc:sc,why:why};};
+  const auto=(d,why)=>({kind:"auto",cands:[{p:d.p,sc:1,why:why}],pick:d.p.id});
+  if(k.ic){const h=dir.filter(d=>d.k.ic===k.ic);if(h.length===1)return auto(h[0],"IC sama");}
+  for(const[f,why]of[["tel","Telefon sama"],["em","Emel sama"]]){if(!k[f])continue;
+    const h=dir.filter(d=>d.k[f]===k[f]);
+    h.forEach(d=>{const sm=hSim(k,d.k);if(h.length===1&&sm>=.5&&!Object.keys(cand).length)cand._a=d;add(d,Math.max(sm,.8),why);});}
+  const a=cand._a;delete cand._a;
+  if(a&&Object.keys(cand).length===1)return auto(a,cand[a.p.id].why);
+  if(k.x){const h=dir.filter(d=>d.k.x===k.x);
+    if(h.length===1&&!Object.keys(cand).length)return auto(h[0],h[0].p.nama.toLowerCase().replace(/\s+/g," ").trim()===c.nama.toLowerCase().replace(/\s+/g," ").trim()?"Nama sama":"Nama sama (abai bin/binti, jarak)");
+    h.forEach(d=>add(d,.99,"Nama sama — lebih dari seorang"));}
+  dir.forEach(d=>{const sm=hSim(k,d.k);if(sm>=.75)add(d,sm,sm>=.97?"Ejaan nama berbeza (Mohd/Muhammad, Nor/Nur…)":(sm>=.9?"Sebahagian nama sama":"Ejaan hampir sama"));});
+  const list=Object.values(cand).sort((a,b)=>b.sc-a.sc).slice(0,3);
+  return list.length?{kind:"near",cands:list,pick:""}:{kind:"new",cands:[],pick:"new"};}
+
+let hadirRev=null;
 function importKehadiran(file){
   readSheet(file,rows=>{
     const pick=(o,keys)=>{for(const k of keys){if(o[k]!=null&&String(o[k]).trim())return String(o[k]).trim();}return "";};
@@ -3687,45 +3739,66 @@ function importKehadiran(file){
         program:pick(o,["program","nama program","acara","program/acara","event","aktiviti"]),
         tarikh:pick(o,["tarikh","tarikh program","tarikh kehadiran","date"]),
         universiti:pick(o,["universiti","institut pengajian tinggi (ipt)","ipt","kampus"]),
-        telefon:pick(o,["telefon","no. telefon","no telefon","phone","whatsapp"]),
+        telefon:pick(o,["telefon","no. telefon","no telefon","phone","whatsapp","no wa"]),
         email:pick(o,["email","emel"]),
+        ic:pick(o,["ic","no ic","no. ic","no kad pengenalan","no. kad pengenalan","kp"]),
         bidang:pick(o,["bidang","kursus","bidang pengajian","course"]),
         tahap:pick(o,["tahap","tahap pengajian","peringkat pengajian"]),
         pd:pick(o,["pd","pd1","murobbi","nama murobbi"])});});
     if(!cands.length){toast("Tiada nama sah dijumpai dalam fail");return;}
-
-    const prog=(prompt("Nama program / acara untuk kehadiran ini:",(cands.find(c=>c.program)||{}).program||uForm.butiran||"")||"").trim();
-    if(!prog){toast("Kehadiran perlu nama program");return;}
-    const dSheet=cands.map(c=>isoDate(c.tarikh)).find(Boolean);
-    const dt=isoDate(prompt("Tarikh program (YYYY-MM-DD):",dSheet||uForm.tarikh||today())||"");
-    if(!dt){toast("Tarikh tidak sah \u2014 guna format YYYY-MM-DD");return;}
-
-    const nrm=s=>(s||"").trim().toLowerCase().replace(/\s+/g," ");
-    const dir={};S.people.forEach(p=>{if(p.arsip)return;const k=nrm(p.nama);if(k&&!dir[k])dir[k]=p;});
-    const seen=new Set();const fresh=[],known=[],dups=[];
-    cands.forEach(c=>{const k=nrm(c.nama);if(!k||seen.has(k))return;seen.add(k);
-      const p=dir[k];
-      if(!p)fresh.push(c);
-      else if((p.sessions||[]).some(s=>s.tarikh===dt&&nrm(s.nota)===nrm(prog)))dups.push(c);
-      else known.push({c:c,p:p});});
-    const n=fresh.length+known.length;
-    if(!n){toast("Semua nama sudah ada kehadiran untuk program ini");return;}
-    if(!confirm("Program: "+prog+"\nTarikh: "+dt+"\n\n\u2022 "+known.length+" nama sedia ada \u2014 tambah kehadiran\n\u2022 "+fresh.length+" nama baharu \u2014 masuk senarai Mutabaah + kehadiran\n\u2022 "+dups.length+" sudah ada kehadiran program ini \u2014 akan dilangkau\n\nTeruskan?"))return;
-
-    const gid="u_"+Date.now();
-    const mkSes=()=>({id:uid("s_"),_usrahId:gid,jenis:"Program",tarikh:dt,oleh:"",oleh2:"",nota:prog,catatan:""});
-    fresh.forEach(c=>{const p=newPerson("mutabaah");
-      p.nama=c.nama;p.universiti=c.universiti;p.telefon=fmtPhone(c.telefon);
+    const dir=S.people.filter(p=>!p.arsip).map(p=>({p:p,k:hKey(p)}));
+    const seen=new Set(),out=[];
+    cands.forEach(c=>{const x=hKey(c).x;if(!x||seen.has(x))return;seen.add(x);out.push(Object.assign({c:c},hClassify(c,dir)));});
+    hadirRev={file:file.name,prog:(cands.find(c=>c.program)||{}).program||uForm.butiran||"",
+      dt:cands.map(c=>isoDate(c.tarikh)).find(Boolean)||uForm.tarikh||today(),rows:out};
+    previousFocus=document.activeElement;render();
+    setTimeout(()=>{const dw=document.querySelector("#hadirdrawer .drawer");if(dw)dw.focus();},0);
+  });
+}
+function hadirDrawer(){const R=hadirRev;if(!R)return "";
+  const chip=(i,v,on,lbl,sub)=>`<button class="nchip${on?" on":""}" data-hpick="${i}|${v}" aria-pressed="${on}">${esc(lbl)}${sub?`<small>${esc(sub)}</small>`:""}</button>`;
+  const row=(r,i)=>{const c=r.c,meta=[c.universiti,c.telefon,c.ic].filter(Boolean).join(" · ");
+    return `<div class="hrow"><div class="hrow-n">${esc(c.nama)}</div>${meta?`<div class="hrow-s">${esc(meta)}</div>`:""}
+      <div class="hchips">${r.cands.map(x=>chip(i,x.p.id,r.pick===x.p.id,x.p.nama,stageLabel(x.p.stage)+(x.p.universiti?" · "+x.p.universiti:"")+" — "+x.why)).join("")}
+      ${chip(i,"new",r.pick==="new","＋ Nama baharu","masuk Mutabaah")}${chip(i,"skip",r.pick==="skip","Langkau","")}</div></div>`;};
+  const sec=(kind,ttl,hint)=>{const idx=R.rows.map((r,i)=>r.kind===kind?i:-1).filter(i=>i>=0);
+    return idx.length?`<div class="grp"><h3>${ttl} (${idx.length})</h3>${hint?`<div class="hint">${hint}</div>`:""}${idx.map(i=>row(R.rows[i],i)).join("")}</div>`:"";};
+  const open=R.rows.filter(r=>!r.pick).length,nK=R.rows.filter(r=>r.pick&&r.pick!=="new"&&r.pick!=="skip").length,nN=R.rows.filter(r=>r.pick==="new").length;
+  const ok=!open&&(nK+nN)>0;
+  return `<div class="drawer-back" data-hclose="1"></div><div class="drawer" role="dialog" aria-modal="true" aria-label="Semak kehadiran program" tabindex="-1">
+    <div class="drawer-head"><div class="dname">Semak kehadiran · ${esc(R.file)}</div><button class="drawer-close" data-hclose="1" aria-label="Tutup">✕</button></div>
+    <div class="drawer-body">
+      <div class="grp"><div class="g2">${fld("Nama program",`<input data-hrv="prog" value="${esc(R.prog)}" placeholder="cth. Ceramah Maulidur Rasul">`)}${fld("Tarikh program",`<input data-hrv="dt" type="date" value="${esc(R.dt)}">`)}</div></div>
+      ${sec("near","Perlu semak","Nama ini mirip seseorang dalam Direktori. Pilih orang yang betul, atau tanda sebagai nama baharu.")}
+      ${sec("new","Nama baharu","Tiada padanan dalam Direktori — akan masuk senarai <b>Mutabaah</b> bersama kehadiran.")}
+      ${sec("auto","Sudah ada dalam Direktori","Dipadankan automatik. Tukar jika ada yang salah.")}
+      <div class="actions"><button class="arch" data-hclose="1" style="flex:1">Batal</button>
+        <button class="add" id="hadirSave" style="flex:2"${ok?"":" disabled"}>${open?open+" nama perlu disemak":"Simpan kehadiran · "+(nK+nN)}</button></div>
+    </div></div>`;}
+function hadirCommit(){const R=hadirRev;if(!R)return;
+  const prog=String(R.prog||"").trim();if(!prog){toast("Kehadiran perlu nama program");return;}
+  const dt=isoDate(R.dt);if(!dt){toast("Tarikh tidak sah");return;}
+  const nrm=s=>(s||"").trim().toLowerCase().replace(/\s+/g," ");
+  const gid="u_"+Date.now();
+  const mkSes=()=>({id:uid("s_"),_usrahId:gid,jenis:"Program",tarikh:dt,oleh:"",oleh2:"",nota:prog,catatan:""});
+  const done=new Set();let nK=0,nN=0,nD=0;
+  R.rows.forEach(r=>{const c=r.c;
+    if(r.pick==="new"){const p=newPerson("mutabaah");
+      p.nama=c.nama;p.universiti=c.universiti;p.telefon=fmtPhone(c.telefon);p.ic=c.ic;
       p.email=c.email.toLowerCase();p.bidang=titleCase(c.bidang);p.tahap=titleCase(c.tahap);p.pd1=c.pd;
       if(c.pd&&!S.pds.includes(c.pd))S.pds.push(c.pd);
       if(p.universiti&&!S.universities.includes(p.universiti))S.universities.push(p.universiti);
-      p.sessions=[mkSes()];S.people.push(p);});
-    known.forEach(r=>{r.p.sessions=r.p.sessions||[];r.p.sessions.push(mkSes());stamp(r.p);});
-    S.pds.sort();S.universities.sort();
-    logAct("Muat naik kehadiran "+prog,dt+" \u00b7 "+n+" hadir"+(fresh.length?" \u00b7 "+fresh.length+" mad'u baharu":""));
-    save();render();
-    toast(n+" kehadiran direkod"+(fresh.length?" \u00b7 "+fresh.length+" nama baharu ke Mutabaah":""));
-  });
+      p.sessions=[mkSes()];S.people.push(p);nN++;return;}
+    if(!r.pick||r.pick==="skip"||done.has(r.pick))return;
+    const p=get(r.pick);if(!p)return;done.add(p.id);
+    if((p.sessions||[]).some(s=>s.tarikh===dt&&nrm(s.nota)===nrm(prog))){nD++;return;}
+    p.sessions=p.sessions||[];p.sessions.push(mkSes());stamp(p);nK++;});
+  const n=nK+nN;hadirRev=null;
+  if(!n){render();toast("Semua nama sudah ada kehadiran untuk program ini");return;}
+  S.pds.sort();S.universities.sort();
+  logAct("Muat naik kehadiran "+prog,dt+" · "+n+" hadir"+(nN?" · "+nN+" mad'u baharu":""));
+  save();render();
+  toast(n+" kehadiran direkod"+(nN?" · "+nN+" nama baharu":"")+(nD?" · "+nD+" sudah ada":""));
 }
 
 function parseCSV(txt){txt=txt.replace(/^\ufeff/,"");const lines=txt.split(/\r?\n/).filter(l=>l.trim());if(!lines.length)return[];
