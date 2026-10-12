@@ -1201,7 +1201,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=18;
+const APP_VERSION=19;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -3133,8 +3133,35 @@ function claimCard(c){const sb={"Draf":"b-n","Dihantar":"b-b","Lulus":"b-g","Tol
         ${fld("Status",CS(c.id,"status",c.status,CLAIM_STATUS))}
       </div>
       ${muay}
-      <div class="hint" style="margin:8px 0 4px">Namakan fail lampiran: <b>[Nama Pemohon]-[Tarikh transaksi]</b> (cth. Maryam-2026-08-16).</div>${attList("claim",c.id,c.files)}<div class="actions"><button class="del" data-delclaim="${c.id}" style="flex:1">Buang</button></div>
+      <div class="hint" style="margin:8px 0 4px">Namakan fail lampiran: <b>[Nama Pemohon]-[Tarikh transaksi]</b> (cth. Maryam-2026-08-16).</div>${attList("claim",c.id,c.files)}<div class="actions"><button class="btn2" data-copyclaim="${c.id}" style="flex:1">Salin untuk WhatsApp</button><button class="del" data-delclaim="${c.id}" style="flex:1">Buang</button></div>
     </div></div>`;
+}
+/* Plain-text version of a claim in the format the bajet muayyasyah request is
+   sent in over WhatsApp / Telegram / Signal. Empty fields stay as blank labels
+   so the message still reads as the full form. */
+function claimText(c){
+  const mms=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+  const d=c.tarikhAktiviti?new Date(c.tarikhAktiviti+"T00:00:00"):null;
+  const tarikh=d&&!isNaN(d)?`${d.getDate()} ${mms[d.getMonth()]} ${d.getFullYear()}`:(c.tarikhAktiviti||"");
+  const v=x=>String(x==null?"":x).trim();
+  const amt=v(c.jumlahDipohon);
+  return ["Permohonan kewangan dibawah bajet muayashah","",
+    "Nama pemohon : "+v(c.namaPemohon),
+    "Nama agensi : "+v(c.namaAgensi),
+    "Tarikh aktiviti muayashah : "+tarikh,
+    "Perincian aktiviti : "+v(c.perincianAktiviti),
+    "Jumlah mad’u dan mas’ul yg terlibat : "+v(c.jumlahMadu),
+    "Perincian perbelanjaan : "+v(c.perincianBelanja),
+    "Lampirkan gambar bersama mad’u","",
+    "Jumlah bantuan kewangan yg dipohon : "+(amt?(/^rm/i.test(amt)?amt:"RM "+amt):""),"",
+    "Penama akaun: "+v(c.penama),
+    "Nama bank: "+v(c.bank),
+    "No akaun: "+v(c.akaun)].join("\n");
+}
+function copyText(t){
+  if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(t);
+  return new Promise((res,rej)=>{const ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy")?res():rej();}catch(err){rej(err);}finally{ta.remove();}});
 }
 function CT(id,f,v,type,ph){return `<input data-ced="${id}" data-f="${f}" type="${type||"text"}" value="${esc(v)}" placeholder="${ph||""}">`;}
 function CTA(id,f,v){return `<textarea data-ced="${id}" data-f="${f}">${esc(v)}</textarea>`;}
@@ -3276,6 +3303,7 @@ document.addEventListener("click",e=>{
   // claims
   const ctog=e.target.closest("[data-ctog]");if(ctog){const c=getC(ctog.dataset.ctog);if(c){toggleOpen(c.id);render();}return;}
   if($("#addClaimBtn")&&e.target.closest("#addClaimBtn")){S.claims.unshift(addOpen(newClaim()));logAct("Tambah tuntutan","");save();render();return;}
+  const cc=e.target.closest("[data-copyclaim]");if(cc){const c=getC(cc.dataset.copyclaim);if(c)copyText(claimText(c)).then(()=>toast("Disalin — tampal di WhatsApp"),()=>toast("Gagal menyalin"));return;}
   const dc=e.target.closest("[data-delclaim]");if(dc){const c=getC(dc.dataset.delclaim);if(c&&confirm("Buang tuntutan?")){logAct("Buang tuntutan",c.reportName);S._del[c.id]=Date.now();S.claims=S.claims.filter(x=>x.id!==c.id);save();render();}return;}
   const ub=e.target.closest("[data-uplbtn]");if(ub){const [kind,id]=ub.dataset.uplbtn.split("|");pickAndUpload(kind,id);return;}
   /* Removing an attachment drops the link from this record only — the file
