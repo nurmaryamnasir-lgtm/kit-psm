@@ -1201,7 +1201,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=19;
+const APP_VERSION=20;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -1450,7 +1450,14 @@ function iptOwner(p){return IPT_OWNER[String((p&&p.universiti)||"").trim()]||"";
 function pdOwner(p){return [p&&p.pd1,p&&p.pd2].map(x=>String(x||"").trim()).filter(Boolean).join(", ");}
 /* Before taklif the coordinator owns it; after, the PD does. The coordinator is
    the fallback so a mad'u whose PD fields were cleared still has a name on it. */
-function actionOwner(p){return tiadaPd(p)?iptOwner(p):(pdOwner(p)||iptOwner(p));}
+/* Kenaikan ke Muhib / Muayyid is decided at cawangan level, so a tarsyih
+   action is Arifah's, not the PD's. */
+const TARSYIH_OWNER="Arifah";
+function actionOwner(p){
+  const a=p&&nextActionRaw(p);
+  if(a&&/^Tarsyih ke /.test(a.label))return TARSYIH_OWNER;
+  return tiadaPd(p)?iptOwner(p):(pdOwner(p)||iptOwner(p));
+}
 
 /* ---- Dismissing a Perlu tindakan row ----
    Some rows are known and already in hand, and a card that cannot be cleared
