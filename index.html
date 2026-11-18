@@ -1238,7 +1238,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=23;
+const APP_VERSION=24;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -4044,9 +4044,30 @@ function cc(v){v=(v==null?"":String(v));return /[",\n]/.test(v)?'"'+v.replace(/"
    wipe them on restore. Better no file than a file that looks complete. */
 function exportJSON(){if(!SYNC.pulled){toast("Log masuk dahulu — backup luar talian tidak lengkap");return;}
   dl(`KitPD-${today()}.json`,JSON.stringify(S,null,2),"application/json");toast("Backup dimuat turun");}
-function exportCSV(){const head=["Nama","Peringkat","Tahun PSPB","Status ahli","Tarikh lahir","Email","Status","IPT","Kolej","Bidang","Tahap","Tahun masuk IPT","Telefon","PD1","PD2","Poskod","Negeri","Tajmik","Sesi","Minat usrah","Minat AJK","BPMy %","Keadaan"];
-  const rows=S.people.map(p=>[p.nama,stageLabel(p.stage),p.tahunPSPB,p.statusAhli,p.tarikhLahir,p.email,p.kerja,p.universiti,p.kolej,p.bidang,p.tahap,p.tahunMasuk,p.telefon,p.pd1,p.pd2,p.poskod,p.negeri,p.tajmik,sesCount(p),p.minatUsrah,p.minatAJK,p.stage==="muhib"?Math.round(bpmy(p).pct*100):"",statusOf(p).t].map(cc).join(","));
-  dl(`KitPD-Direktori-${today()}.csv`,"\ufeff"+[head.join(","),...rows].join("\n"),"text/csv");toast("CSV dimuat turun");}
+/* Full directory export: profile, kehadiran (count + every sesi) and syarat
+   tarsyih (MUT\u2192MHB checks, BPMy per category, next step). Contact fields are
+   redacted from the local cache, so they are only complete once synced. */
+function exportCSV(){const yn=b=>b?"Ya":"Tidak";
+  const head=["Nama","No. IC","Peringkat","Arkib","Tahun PSPB","Status ahli","Tarikh lahir","Email","Telefon","Status","IPT","Kolej","Bidang","Tahap","Tahun masuk IPT","Mula pengajian","Tamat pengajian","Alamat cawangan","Alamat kampung 1","Alamat kampung 2","Poskod","Negeri","PD1","PD2","Tajmik","Minat usrah","Minat ahli","Minat AJK","Program AJK","Bukan musuh Islam",
+    "Jumlah kehadiran (sesi)","Sesi terakhir","Senarai kehadiran",
+    "Syarat: Hadir 3\u00d7","Syarat: Minat usrah","Syarat: Bukan musuh","Layak tarsyih","Tahap kelayakan","Kekurangan syarat",
+    "BPMy %","BPMy lulus (\u226550%)",...BPMY.map(c=>"BPMy "+c.name+" %"),"Item WAJIB belum skor","Remarks BPMy",
+    "Tindakan seterusnya","Sasaran tarikh","Pemilik tindakan","Keadaan",
+    "Tarikh naik Muhib","Disahkan Muhib oleh","Tarikh naik Muayyid","Disahkan Muayyid oleh","Tarikh ahli","Sejarah tarsyih",
+    "Passing","Passing cawangan","Passing pautan","Catatan","Ditambah oleh","Ditambah pada"];
+  const rows=S.people.map(p=>{const ses=(p.sessions||[]).slice().sort((a,b)=>(a.tarikh||"").localeCompare(b.tarikh||""));
+    const mc=mutCrit(p),isMut=p.stage==="mutabaah",isMuh=p.stage==="muhib",b=bpmy(p),dk=dekat(p),na=nextAction(p)||{};
+    const tl=(TAHAP.find(x=>x.id===dk.k)||{}).l||"";
+    return[p.nama,p.ic,stageLabel(p.stage),yn(p.arsip),p.tahunPSPB,p.statusAhli,p.tarikhLahir,p.email,p.telefon,p.kerja,p.universiti,p.kolej,p.bidang,p.tahap,p.tahunMasuk,p.mulaP,p.tamatP,p.alamatCaw,p.alamatKg1,p.alamatKg2,p.poskod,p.negeri,p.pd1,p.pd2,p.tajmik,p.minatUsrah,p.minatAhli,p.minatAJK,p.programAJK,p.bukanMusuh,
+      ses.length,lastSessionDate(p),ses.map(s=>[s.tarikh||"?",s.jenis||"Sesi",[s.oleh,s.oleh2].filter(Boolean).join("/"),s.nota].filter(Boolean).join(" \u00b7 ")).join("\n"),
+      isMut?yn(mc[0].ok):"",isMut?yn(mc[1].ok):"",isMut?yn(mc[2].ok):"",(isMut||isMuh)?yn(eligible(p)):"",tl,(isMut||isMuh)?dk.t:"",
+      isMuh?Math.round(b.pct*100):"",isMuh?yn(b.pass):"",...b.cats.map(c=>isMuh?Math.round(c.score/(c.max||1)*100):""),isMuh?wajibZero(p).join("; "):"",
+      Object.keys(p.remarks||{}).filter(k=>p.remarks[k]).map(k=>{const c=BPMY.find(x=>x.id===k);return (c?c.name:k)+": "+p.remarks[k];}).join("\n"),
+      na.label||"",na.due||"",na.owner||"",statusOf(p).t,
+      p.tarikhMuhib,p.tarsyihMuhibOleh,p.tarikhMuayyid,p.tarsyihMayOleh,p.tarikhAhli,(p.tarsyih||[]).map(t=>(t.tarikh||"")+" \u2192 "+stageLabel(t.ke)+(t.oleh?" ("+t.oleh+")":"")).join("\n"),
+      yn(p.passing),p.passCaw,p.passLink,p.catatan,p.ditambahOleh,p.ditambahPada].map(cc).join(",");});
+  dl(`KitPD-Direktori-${today()}.csv`,"\ufeff"+[head.map(cc).join(","),...rows].join("\n"),"text/csv");
+  toast(SYNC.pulled?"CSV dimuat turun":"CSV dimuat turun \u2014 log masuk untuk maklumat hubungan penuh");}
 
 async function exportBPMy(p){if(!p)return;await loadXLSX();const b=bpmy(p);
   const aoa=[["BORANG PENCALONAN MUAYYID"],["Nama :",p.nama||""],["Tarikh akhir kemaskini :",today()],[],
