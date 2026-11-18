@@ -1238,7 +1238,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=26;
+const APP_VERSION=27;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -1459,7 +1459,7 @@ function getC(id){return S.claims.find(c=>c.id===id);}
 function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Tidak",minatAhli:"Tidak",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",syurut1:"Tidak",syurut2:"Tidak",syurut3:"Tidak",syurut4:"Tidak",tarikhMuhib:"",tarikhMuayyid:"",tarikhAhli:"",arsip:false,ditambahOleh:coordName(),ditambahPada:today(),_upd:Date.now()};}
 function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_upd:Date.now()};}
 function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"To do"};}
-function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_upd:Date.now()};}
+function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",jumlahPeserta:"",outAhli:"",outMtb:"",outMhb:"",outCalonMay:"",catatan:"",_upd:Date.now()};}
 function newClaim(){return{id:uid("cl_"),reportName:"",jenis:"Bajet Muayyasyah",tarikh:today(),desc:"",amount:"",cukai:"0.00",resit:"",lampiran:"",files:[],status:"Draf",namaPemohon:"",namaAgensi:"PEMBINA",tarikhAktiviti:"",perincianAktiviti:"",jumlahMadu:"",perincianBelanja:"",gambarLink:"",jumlahDipohon:"",penama:"",bank:"",akaun:"",_upd:Date.now()};}
 
 /* ---- MUT status ---- */
@@ -3249,12 +3249,23 @@ function wasFields(w){
       ${w.kolab?fld("Nama pihak kolaborasi",`<input data-wed="${w.id}" data-f="kolabNama" value="${esc(w.kolabNama||"")}" placeholder="cth. Sekretariat X">`):""}
       <div class="g3">${fld("Target peserta",`<input data-wed="${w.id}" data-f="target" type="number" min="0" value="${esc(w.target)}" placeholder="cth. 30">`)}${fld("Venue",`<input data-wed="${w.id}" data-f="venue" value="${esc(w.venue)}">`)}${fld("Anggaran budget (RM)",`<input data-wed="${w.id}" data-f="budget" type="number" min="0" step="0.01" value="${esc(w.budget)}" placeholder="0.00">`)}</div>
       ${fld("PIC",`<input data-wed="${w.id}" data-f="pic" value="${esc(w.pic)}">`)}
+      <div class="g2">${fld("Jumlah peserta",`<input data-wed="${w.id}" data-f="jumlahPeserta" type="number" min="0" inputmode="numeric" value="${esc(w.jumlahPeserta??"")}" placeholder="bil.">`)}<div class="fld"><label>Senarai peserta</label><button class="btn2" data-wimport="${w.id}" style="width:100%;min-height:42px">⭱&nbsp; Import Excel/CSV</button></div></div>
+      <div class="hint" style="margin:-4px 0 10px">Jumlah peserta dikira automatik bila senarai nama diimport (lajur <b>Nama</b> wajib). Setiap nama juga dapat rekod kehadiran program ini.</div>
       <div class="g2">${fld("Dapatan — MUH hadir",`<input data-wed="${w.id}" data-f="dapMUH" type="number" min="0" value="${esc(w.dapMUH)}" placeholder="bil.">`)}${fld("Dapatan — MUT hadir",`<input data-wed="${w.id}" data-f="dapMUT" type="number" min="0" value="${esc(w.dapMUT)}" placeholder="bil.">`)}</div>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin:12px 0 2px">Pelaporan — output program</div>
+      <div class="hint" style="margin-bottom:8px">Kemas kini selepas program.${wasBelumLapor(w)?` <b style="color:var(--merah-600)">Belum dilapor.</b>`:""}</div>
+      <div class="g2">${WAS_OUT.slice(0,2).map(([f,l])=>wasOutFld(w,f,l)).join("")}</div>
+      <div class="g2">${WAS_OUT.slice(2).map(([f,l])=>wasOutFld(w,f,l)).join("")}</div>
       ${fld("Catatan / dapatan lain",`<textarea data-wed="${w.id}" data-f="catatan">${esc(w.catatan)}</textarea>`)}`;
 }
+/* Post-program report counts. Entered by hand once the program is done, so a
+   program marked Sudah with none of them filled is flagged as Belum lapor. */
+const WAS_OUT=[["outAhli","Bil. ahli"],["outMtb","Bil. mutabaah"],["outMhb","Bil. muhib"],["outCalonMay","Bil. calon muayyid"]];
+function wasOutFld(w,f,l){return fld(l,`<input data-wed="${w.id}" data-f="${f}" type="number" min="0" inputmode="numeric" value="${esc(w[f]??"")}" placeholder="bil.">`);}
+function wasBelumLapor(w){return w.status==="Sudah"&&WAS_OUT.every(([f])=>w[f]===""||w[f]==null);}
 function wasCard(w){
   return `<div class="row${isOpen(w.id)?" open":""}"><div class="rhead" data-wtog="${w.id}"><div class="wdate ${(w.peserta==="Campur")?"pc":"pa"}"><div class="wdd">${(w.tarikh||"").slice(8,10)||"—"}</div><div class="wdm">${monShort(w.tarikh)}</div></div>
-    <div class="rname">${esc(w.nama||"(nama program)")}<div class="hsub">${esc(w.peserta||"Akhawat")} · ${esc(w.status)}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · s/d "+esc(w.tarikhTamat):""}</div></div><span class="chev">▾</span></div>
+    <div class="rname">${esc(w.nama||"(nama program)")}<div class="hsub">${esc(w.peserta||"Akhawat")} · ${esc(w.status)}${w.tarikhTamat&&w.tarikhTamat!==w.tarikh?" · s/d "+esc(w.tarikhTamat):""}${wasBelumLapor(w)?` · <b style="color:var(--merah-600)">Belum lapor</b>`:""}</div></div><span class="chev">▾</span></div>
     <div class="rbody">${wasFields(w)}
       <div class="actions"><button class="del" data-delwas="${w.id}" style="flex:1">Buang</button></div>
     </div></div>`;
@@ -3418,7 +3429,8 @@ document.addEventListener("click",e=>{
   if(e.target.closest&&e.target.closest("[data-snclose]")){santSel=null;render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
   if(e.target.closest&&e.target.closest("#addSnBtn")){const sn=newSantunan();S.santunan=(S.santunan||[]);S.santunan.unshift(sn);santSel=sn.id;santFilt="";logAct("Tambah nama santunan","");save();render();return;}
   if(e.target.closest&&e.target.closest("#snXlBtn")){$("#fileSant").click();return;}
-  if(e.target.closest&&e.target.closest("#hadirXlBtn")){$("#fileHadir").click();return;}
+  if(e.target.closest&&e.target.closest("#hadirXlBtn")){hadirWasId=null;$("#fileHadir").click();return;}
+  const wim=e.target.closest&&e.target.closest("[data-wimport]");if(wim){hadirWasId=wim.dataset.wimport;$("#fileHadir").click();return;}
   const hpk=e.target.closest("[data-hpick]");if(hpk&&hadirRev){const[i,v]=hpk.dataset.hpick.split("|");const r=hadirRev.rows[+i];if(r){r.pick=v;render();}return;}
   if(e.target.closest&&e.target.closest("[data-hclose]")){hadirRev=null;render();setTimeout(()=>{if(previousFocus&&document.contains(previousFocus))previousFocus.focus();previousFocus=null;},0);return;}
   if(e.target.closest&&e.target.closest("#hadirSave")){hadirCommit();return;}
@@ -3707,7 +3719,7 @@ function renderListOnly(){
 
 $("#menuBtn").addEventListener("click",e=>{e.stopPropagation();const pop=$("#menuPop"),open=pop.classList.toggle("show");$("#menuBtn").setAttribute("aria-expanded",String(open));});
 $("#menuPop").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;$("#menuPop").classList.remove("show");
-  if(a==="csv")exportCSV();if(a==="importxl")$("#fileXl").click();if(a==="importhadir")$("#fileHadir").click();
+  if(a==="csv")exportCSV();if(a==="importxl")$("#fileXl").click();if(a==="importhadir"){hadirWasId=null;$("#fileHadir").click();}
   if(a==="json")exportJSON();if(a==="restore")$("#fileImport").click();
   if(a==="pull")pullNow();
   if(a==="logout")logout();});
@@ -3967,7 +3979,11 @@ function hClassify(c,dir){
   return list.length?{kind:"near",cands:list,pick:""}:{kind:"new",cands:[],pick:"new"};}
 
 let hadirRev=null;
+/* Set when the import is started from a wasilah program, so the review drawer is
+   pre-filled with that program and its Jumlah peserta is written on save. */
+let hadirWasId=null;
 function importKehadiran(file){
+  const wasW=hadirWasId?getW(hadirWasId):null;hadirWasId=null;
   readSheet(file,rows=>{
     const pick=(o,keys)=>{for(const k of keys){if(o[k]!=null&&String(o[k]).trim())return String(o[k]).trim();}return "";};
     const cands=[];
@@ -3987,8 +4003,9 @@ function importKehadiran(file){
     const dir=S.people.filter(p=>!p.arsip).map(p=>({p:p,k:hKey(p)}));
     const seen=new Set(),out=[];
     cands.forEach(c=>{const x=hKey(c).x;if(!x||seen.has(x))return;seen.add(x);out.push(Object.assign({c:c},hClassify(c,dir)));});
-    hadirRev={file:file.name,prog:(cands.find(c=>c.program)||{}).program||uForm.butiran||"",
-      dt:cands.map(c=>isoDate(c.tarikh)).find(Boolean)||uForm.tarikh||today(),rows:out};
+    hadirRev={file:file.name,prog:(wasW&&(wasW.nama||"").trim())||(cands.find(c=>c.program)||{}).program||uForm.butiran||"",
+      dt:(wasW&&wasW.tarikh)||cands.map(c=>isoDate(c.tarikh)).find(Boolean)||uForm.tarikh||today(),rows:out,wasId:wasW?wasW.id:""};
+    if(wasW)wasDrawer=null;
     previousFocus=document.activeElement;render();
     setTimeout(()=>{const dw=document.querySelector("#hadirdrawer .drawer");if(dw)dw.focus();},0);
   });
@@ -4039,18 +4056,24 @@ function hadirCommit(){const R=hadirRev;if(!R)return;
     const p=get(r.pick);if(!p)return;done.add(p.id);
     if((p.sessions||[]).some(s=>s.tarikh===dt&&nrm(s.nota)===nrm(prog))){nD++;return;}
     p.sessions=p.sessions||[];p.sessions.push(mkSes());stamp(p);nK++;});
+  /* Jumlah peserta = every name kept from the list (not Langkau), whether new,
+     matched or already marked. Goes to the program the import was started from,
+     or else the one whose name and date match. */
+  const wasT=prog?(R.wasId?getW(R.wasId):(S.wasilah||[]).find(w=>nrm(w.nama)===nrm(prog)&&w.tarikh===dt)):null;
+  let nP=0;if(wasT){nP=R.rows.filter(r=>r.pick&&r.pick!=="skip").length;wasT.jumlahPeserta=nP;stamp(wasT);logAct("Jumlah peserta "+(wasT.nama||prog),nP+" orang");
+    if(R.wasId)wasDrawer={kind:"w",id:wasT.id,fresh:false};}
   const n=nK+nN;hadirRev=null;
   if(nm){S.pds.sort();S.universities.sort();
     if(nN)logAct("Import "+nN+" nama (Mutabaah) dari fail",R.file);
     if(prog&&n)logAct("Muat naik kehadiran "+prog,dt+" \u00b7 "+n+" hadir");
     const nSkip=R.rows.filter(r=>r.pick!=="new").length;
-    if(nN||n)save();stage="mutabaah";render();
+    if(nN||n||wasT)save();stage="mutabaah";render();
     toast(nN+" nama ditambah ke Mutabaah"+(prog?" \u00b7 "+n+" kehadiran":"")+(nSkip?" \u00b7 "+nSkip+" sedia ada dilangkau":""));return;}
-  if(!n){render();toast("Semua nama sudah ada kehadiran untuk program ini");return;}
+  if(!n){if(wasT)save();render();toast("Semua nama sudah ada kehadiran untuk program ini"+(wasT?" · jumlah peserta "+nP:""));return;}
   S.pds.sort();S.universities.sort();
   logAct("Muat naik kehadiran "+prog,dt+" · "+n+" hadir"+(nN?" · "+nN+" mad'u baharu":""));
   save();render();
-  toast(n+" kehadiran direkod"+(nN?" · "+nN+" nama baharu":"")+(nD?" · "+nD+" sudah ada":""));
+  toast(n+" kehadiran direkod"+(nN?" · "+nN+" nama baharu":"")+(nD?" · "+nD+" sudah ada":"")+(wasT?" · jumlah peserta "+nP:""));
 }
 
 function parseCSV(txt){txt=txt.replace(/^\ufeff/,"");const lines=txt.split(/\r?\n/).filter(l=>l.trim());if(!lines.length)return[];
