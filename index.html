@@ -1238,7 +1238,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=25;
+const APP_VERSION=26;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -3170,13 +3170,19 @@ function rosterNames(m){const set=new Set(pdOptions());
   return [...set].filter(Boolean).sort();}
 function rosterChecklist(m){const hadir=m.hadir||[];const names=rosterNames(m);
   return `<div class="att">`+names.map(n=>`<button class="nchip${hadir.includes(n)?" on":""}" data-hadir="${m.id}|${encodeURIComponent(n)}">${esc(n)}</button>`).join("")+`</div>${names.length?`<div class="hint" style="margin-top:7px">Senarai ini diambil dari halaman <b>PD</b>. Tambah atau buang nama di sana.</div>`:`<div class="hint">Belum ada PD didaftarkan. Buka halaman <b>PD</b> untuk tambah nama.</div>`}`;}
-function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").length;
+/* Snapshot counts for a meeting's minit. Same pool as the dashboard (no arkib,
+   no INTEC); calon muayyid = muhib who are layak now (BPMy ≥ 50% + 4 syurut). */
+function meetCounts(){const pool=maduPool();const mhb=pool.filter(p=>p.stage==="muhib");
+  return{mtb:pool.filter(p=>p.stage==="mutabaah").length,mhb:mhb.length,may:mhb.filter(eligible).length};}
+function meetCard(m){const openN=m.items.filter(it=>it.status!=="Selesai").length;const mcN=meetCounts();
   return `<div class="row${isOpen(m.id)?" open":""}"><div class="rhead" data-mtog="${m.id}"><div class="rav">${initials(m.tajuk)||"M"}</div>
     <div class="rname">${esc(m.tajuk||"(tajuk mesyuarat)")}</div>
     <div class="rtags"><span class="tag st">${esc(m.tarikh||"—")}</span><span class="badge ${openN?"b-a":"b-g"}">${openN?openN+" terbuka":"selesai"}</span></div><span class="chev">▾</span></div>
     <div class="rbody">
       <div class="g2">${fld("Tajuk mesyuarat",`<input data-med="${m.id}" data-f="tajuk" value="${esc(m.tajuk)}" placeholder="cth. LMM Ogos / Progress Review">`)}${fld("Tarikh",`<input data-med="${m.id}" data-f="tarikh" type="date" value="${esc(m.tarikh)}">`)}</div>
       ${fld("Kehadiran ("+((m.hadir||[]).length)+")",rosterChecklist(m))}
+      <div class="g3">${[["bilMtb","Bil. Mutabaah"],["bilMhb","Bil. Muhib"],["bilCalonMay","Bil. calon Muayyid"]].map(([f,l])=>fld(l,`<input data-med="${m.id}" data-f="${f}" type="number" min="0" inputmode="numeric" value="${esc(m[f]??"")}" placeholder="0">`)).join("")}</div>
+      <div class="hint" style="margin:-4px 0 10px">Direktori sekarang: ${mcN.mtb} mutabaah · ${mcN.mhb} muhib · ${mcN.may} calon muayyid (layak). <button class="btn2" data-mcount="${m.id}">Isi dari Direktori</button></div>
       ${fld("Agenda",`<textarea data-med="${m.id}" data-f="agenda" placeholder="Agenda mesyuarat…">${esc(m.agenda)}</textarea>`)}
       ${fld("Minit / nota",`<textarea data-med="${m.id}" data-f="minit" placeholder="Perkara dibincang, keputusan…" style="min-height:220px;resize:vertical;line-height:1.55;font-size:14px">${esc(m.minit)}</textarea>`)}
       <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin:12px 0 8px">Tindakan (${m.items.length})</div>
@@ -3479,6 +3485,7 @@ document.addEventListener("click",e=>{
     if(m){const it=(m.items||[]).find(x=>x.id===iid);const t=it?(it.tugasan||"").trim():"";
       if(t&&!confirm(`Buang tindakan "${t}"?`))return;
       m.items=m.items.filter(x=>x.id!==iid);save();render();}return;}
+  const mc=e.target.closest("[data-mcount]");if(mc){const m=getM(mc.dataset.mcount);if(m){const c=meetCounts();m.bilMtb=c.mtb;m.bilMhb=c.mhb;m.bilCalonMay=c.may;m._upd=Date.now();logAct("Isi bilangan mesyuarat",m.tajuk);save();render();}return;}
   const dm=e.target.closest("[data-delmeet]");if(dm){const m=getM(dm.dataset.delmeet);if(m&&confirm("Buang mesyuarat?")){logAct("Buang mesyuarat",m.tajuk);S._del[m.id]=Date.now();S.meetings=S.meetings.filter(x=>x.id!==m.id);save();render();}return;}
   const dn=e.target.closest("[data-done]");if(dn){const[mid,iid]=dn.dataset.done.split("|");const m=getM(mid);const it=m&&m.items.find(x=>x.id===iid);if(it){it.status="Selesai";save();render();toast("Selesai");}return;}
   const hd=e.target.closest("[data-hadir]");if(hd){const[mid,en]=hd.dataset.hadir.split("|");const nm=decodeURIComponent(en);const m=getM(mid);if(m){m.hadir=m.hadir||[];const i=m.hadir.indexOf(nm);if(i>=0)m.hadir.splice(i,1);else m.hadir.push(nm);save();render();}return;}
