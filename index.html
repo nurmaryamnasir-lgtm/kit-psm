@@ -1238,7 +1238,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=24;
+const APP_VERSION=25;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -1290,7 +1290,8 @@ const FIELD_LABEL={nama:"nama",tarikhLahir:"tarikh lahir",email:"email",telefon:
   tahunPSPB:"tahun PSPB",kolej:"kolej",negeri:"negeri",poskod:"poskod",stage:"peringkat",
   pd1:"PD 1",pd2:"PD 2",catatan:"catatan",tajmik:"tajmik",bukanMusuh:"bukan musuh Islam",
   kerja:"status",alamatCaw:"alamat cawangan",alamatKg1:"alamat kampung 1",alamatKg2:"alamat kampung 2",
-  tarikhMuhib:"tarikh naik Muhib",tarikhMuayyid:"tarikh naik Muayyid",programAJK:"program AJK"};
+  tarikhMuhib:"tarikh naik Muhib",tarikhMuayyid:"tarikh naik Muayyid",programAJK:"program AJK",
+  syurut1:"syurut 1 (komitmen kehadiran)",syurut2:"syurut 2 (kerja berpasukan)",syurut3:"syurut 3 (ciri kesolehan)",syurut4:"syurut 4 (minat tarbiah khusus)"};
 const FIELD_PRIVATE={email:1,telefon:1,tarikhLahir:1,alamatCaw:1,alamatKg1:1,alamatKg2:1,poskod:1};
 function logField(p,f,v){
   if(!p||!f)return;
@@ -1455,7 +1456,7 @@ function getM(id){return S.meetings.find(m=>m.id===id);}
 function getW(id){return S.wasilah.find(w=>w.id===id);}
 function getC(id){return S.claims.find(c=>c.id===id);}
 
-function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Tidak",minatAhli:"Tidak",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",tarikhMuhib:"",tarikhMuayyid:"",tarikhAhli:"",arsip:false,ditambahOleh:coordName(),ditambahPada:today(),_upd:Date.now()};}
+function newPerson(st){return{id:uid("p_"),nama:"",ic:"",statusAhli:"Belum",email:"",kerja:"Belajar",telefon:"",universiti:"",bidang:"",tahap:"",tahunMasuk:"",mulaP:"",tamatP:"",tahunPSPB:"2026",alamatCaw:"",kolej:"",alamatKg1:"",alamatKg2:"",poskod:"",negeri:"",pd1:"",pd2:"",tarsyih:[],tarikhMuhib:"",tarsyihMuhibOleh:"",tarsyihMayOleh:"",tajmik:"",catatan:"",lampiran:[],stage:st||"mutabaah",active:true,passing:false,passCaw:"",passLink:"",sessions:[],bukanMusuh:"Ya",minatUsrah:"Tidak",minatAhli:"Tidak",minatAJK:"Tidak",bpmy:{},remarks:{},programAJK:"",syurut1:"Tidak",syurut2:"Tidak",syurut3:"Tidak",syurut4:"Tidak",tarikhMuhib:"",tarikhMuayyid:"",tarikhAhli:"",arsip:false,ditambahOleh:coordName(),ditambahPada:today(),_upd:Date.now()};}
 function newMeeting(){return{id:uid("m_"),tajuk:"",tarikh:today(),kehadiran:"",hadir:[],agenda:"",minit:"",items:[],_upd:Date.now()};}
 function newItem(){return{id:uid("a_"),tugasan:"",pic:"",due:"",status:"To do"};}
 function newWasilah(){return{id:uid("w_"),nama:"",bahan:"",tarikh:today(),tarikhTamat:"",target:"",venue:"",budget:"",medium:"Fizikal",pic:"",status:"Belum",multi:false,peserta:"Akhawat",kolab:false,kolabNama:"",dapMUH:"",dapMUT:"",catatan:"",_upd:Date.now()};}
@@ -1467,9 +1468,17 @@ function mutStatus(p){const n=sesCount(p);if(p.bukanMusuh==="Tidak")return{k:"a"
 /* ---- BPMy ---- */
 function bpmy(p){const sc=p.bpmy||{};let total=0;const cats=BPMY.map(c=>{let s=0,max=0;c.items.forEach(it=>{s+=(sc[it.id]||0)*it.w;max+=5*it.w;});total+=s;return{id:c.id,name:c.name,score:s,max:max};});
   return{cats,total,pct:total/BPMY_MAX,pass:(total/BPMY_MAX)>=0.5};}
-function muhStatus(p){const b=bpmy(p);const pc=Math.round(b.pct*100);if(b.pass)return{k:"g",t:"Layak MAY · "+pc+"%"};if(b.total>0)return{k:"b",t:"BPMy "+pc+"%"};return{k:"n",t:"Baru muhib"};}
+/* Checklist Muhib → Muayyid (4 syurut). Each is a Ya/Tidak call by the PD, and
+   all four must be Ya on top of BPMy ≥ 50% before a muhib is layak MAY. */
+const SYURUT=[
+  {f:"syurut1",s:"Komitmen kehadiran",t:"Komitmen kehadiran dalam program ISMA/Biro dan wasilah tarbiah MUHIB (50% kehadiran)"},
+  {f:"syurut2",s:"Kerja berpasukan",t:"Boleh bekerja dalam satu pasukan (AJK PEMBINA/KRIM & Biro ISMA)"},
+  {f:"syurut3",s:"Ciri kesolehan",t:"Terserlah ciri-ciri kesolehan (akhlak, komunikasi, pergaulan, pemakaian)"},
+  {f:"syurut4",s:"Minat tarbiah khusus",t:"Berminat dengan usrah dan sistem tarbiah ISMA yang lebih khusus (ditanya terus dan telus)"}];
+function syurutKurang(p){return SYURUT.filter(x=>p[x.f]!=="Ya");}
+function muhStatus(p){const b=bpmy(p);const pc=Math.round(b.pct*100);const sk=syurutKurang(p).length;if(b.pass&&sk)return{k:"b",t:"BPMy lulus · "+sk+" syurut belum"};if(b.pass)return{k:"g",t:"Layak MAY · "+pc+"%"};if(b.total>0)return{k:"b",t:"BPMy "+pc+"%"};return{k:"n",t:"Baru muhib"};}
 function statusOf(p){if(p.stage==="mutabaah")return mutStatus(p);if(p.stage==="muhib")return muhStatus(p);if(p.stage==="muayyid")return{k:"g",t:"Muayyid"};return{k:"n",t:"Baru"};}
-function eligible(p){if(p.stage==="mutabaah")return sesCount(p)>=3&&p.minatUsrah==="Ya"&&p.bukanMusuh!=="Tidak";if(p.stage==="muhib")return bpmy(p).pass;return false;}
+function eligible(p){if(p.stage==="mutabaah")return sesCount(p)>=3&&p.minatUsrah==="Ya"&&p.bukanMusuh!=="Tidak";if(p.stage==="muhib")return bpmy(p).pass&&!syurutKurang(p).length;return false;}
 
 /* A mad'u with nobody assigned is stalled, not merely incomplete: no PD means no
    usrah, so no sesi, so no tarsyih. A muayyid is past the PD relationship. */
@@ -1575,7 +1584,9 @@ function nextActionRaw(p){
   /* Muhib: point at the weakest BPMy category so the action names the actual gap.
      Each label keeps the category name so the card still says which one. */
   const b=bpmy(p);
-  if(b.pass)return{label:"Tarsyih ke Muayyid",due:TARSYIH_DUE.muhib,tone:"green"};
+  if(b.pass){const sk=syurutKurang(p).length;
+    if(sk)return{label:`Sahkan ${sk} syurut`,due:TARSYIH_DUE.muhib,tone:"amber"};
+    return{label:"Tarsyih ke Muayyid",due:TARSYIH_DUE.muhib,tone:"green"};}
   const FOCUS={
     c1:"Muayyasyah: jaulah",
     c2:"Komitmen: kehadiran",
@@ -2162,7 +2173,9 @@ function dekat(p){
     const kurang=Math.max(0,3-sesCount(p)),minat=p.minatUsrah==="Ya",gap=kurang+(minat?0:1);
     const need=[kurang?kurang+" sesi lagi":"",minat?"":"minat usrah"].filter(Boolean).join(" + ");
     return{k:gap===0?"layak":gap===1?"hampir":gap===2?"separuh":"awal",gap,t:gap?"Perlu "+need:"Cukup syarat"};}
-  if(p.stage==="muhib"){const b=bpmy(p),pc=Math.round(b.pct*100),gap=b.pass?0:Math.max(1,50-pc);
+  if(p.stage==="muhib"){const b=bpmy(p),pc=Math.round(b.pct*100);
+    if(b.pass){const sk=syurutKurang(p);return{k:sk.length?"hampir":"layak",gap:sk.length,t:sk.length?"Perlu syurut: "+sk.map(x=>x.s).join(", "):"Cukup syarat"};}
+    const gap=Math.max(1,50-pc);
     return{k:b.pass?"layak":pc>=40?"hampir":pc>=25?"separuh":"awal",gap,t:gap?"Kurang "+gap+"% ke 50%":"Cukup syarat"};}
   return{k:"",gap:99,t:""};}
 function hadirMatch(p){if(!pcF.hadir)return true;const n=sesCount(p);return pcF.hadir==="3"?n>=3:n===+pcF.hadir;}
@@ -2235,7 +2248,7 @@ function viewPencalonan(){
     return `<div class="cand${ok?" is-elig":""}">
       <button type="button" class="cand-main" data-sel="${p.id}" aria-label="Buka ${esc(p.nama||"ahli")}">${stageBadge(p.stage)}<span class="cand-id"><span class="cand-n">${esc(p.nama||"(nama)")}</span><span class="cand-m">${esc(iptLabel(p.universiti)||"Tiada IPT")} · ${esc([p.pd1,p.pd2].filter(Boolean).join(", ")||"Tiada PD")}</span></span></button>
       <div class="cand-x"><span class="catg">${cats}</span></div>
-      <div class="cand-a">${wz.length?`<span class="wflag" title="WAJIB masih 0: ${esc(wz.join("; "))}" aria-label="Amaran: item WAJIB masih 0">⚠</span>`:""}<span class="pct">${pc}%</span>${b.pass?`<span class="passpill ok">LULUS ≥50%</span>`:tag(d)}${ok?`<button class="promote ready mini" data-promote="${p.id}">Naik ke Muayyid →</button>`:""}</div>
+      <div class="cand-a">${wz.length?`<span class="wflag" title="WAJIB masih 0: ${esc(wz.join("; "))}" aria-label="Amaran: item WAJIB masih 0">⚠</span>`:""}<span class="pct">${pc}%</span>${b.pass?`<span class="passpill ok">LULUS ≥50%</span>`:""}${ok?"":tag(d)}${ok?`<button class="promote ready mini" data-promote="${p.id}">Naik ke Muayyid →</button>`:""}</div>
     </div>`;}).join("");
 
   const empty=t=>`<div class="pp-empty">${esc(t)}</div>`;
@@ -3130,7 +3143,10 @@ function muhSection(p){
         <div class="scale">${[0,1,2,3,4,5].map(v=>`<button class="scb ${(p.bpmy&&p.bpmy[it.id]||0)===v?"sel":""}" data-score="${p.id}|${it.id}|${v}">${v}</button>`).join("")}</div></div>`).join("")}
       ${fld("Remarks — "+c.name,TA(p.id,"rmk_"+c.id,(p.remarks||{})[c.id]||"","Catatan ciri ini…"))}
     </div>`;}).join("");
-  const extra=`<div class="grp"><h3>Butiran tambahan (kenaikan MAY)</h3>${fld("Program jadi AJK",TA(p.id,"programAJK",p.programAJK,"Senarai program di mana beliau jadi AJK…"))}${fld("Tarikh jadi muhib",T(p.id,"tarikhMuhib",p.tarikhMuhib,"","date"))}</div>`;
+  const sk=syurutKurang(p).length;
+  const syurut=`<div class="grp"><h3>Checklist Muhib ke Muayyid (4 syurut)</h3><div class="hint">Keempat-empat syurut mesti <b>Ya</b>, selain BPMy ≥ 50%, untuk layak kenaikan Muayyid.${sk?` · <b>${sk} belum</b>`:" · <b>Lengkap</b>"}</div>
+    ${SYURUT.map((x,i)=>fld(`(${i+1}) ${esc(x.t)}`,SELf(p.id,x.f,p[x.f]==="Ya"?"Ya":"Tidak",["Tidak","Ya"]))).join("")}</div>`;
+  const extra=syurut+`<div class="grp"><h3>Butiran tambahan (kenaikan MAY)</h3>${fld("Program jadi AJK",TA(p.id,"programAJK",p.programAJK,"Senarai program di mana beliau jadi AJK…"))}${fld("Tarikh jadi muhib",T(p.id,"tarikhMuhib",p.tarikhMuhib,"","date"))}</div>`;
   return `<div class="grp"><h3>Borang Pencalonan Muayyid (BPMy)</h3><div class="hint">Skor setiap item 0–5 (× pemberat). Lulus jika jumlah ≥ 50%. <button class="btn2" data-bpmyxl="${p.id}" style="margin-top:6px">⭳ Export BPMy (Excel)</button></div>${sum}${cats}</div>${extra}`;
 }
 
@@ -4051,7 +4067,7 @@ function exportCSV(){const yn=b=>b?"Ya":"Tidak";
   const head=["Nama","No. IC","Peringkat","Arkib","Tahun PSPB","Status ahli","Tarikh lahir","Email","Telefon","Status","IPT","Kolej","Bidang","Tahap","Tahun masuk IPT","Mula pengajian","Tamat pengajian","Alamat cawangan","Alamat kampung 1","Alamat kampung 2","Poskod","Negeri","PD1","PD2","Tajmik","Minat usrah","Minat ahli","Minat AJK","Program AJK","Bukan musuh Islam",
     "Jumlah kehadiran (sesi)","Sesi terakhir","Senarai kehadiran",
     "Syarat: Hadir 3\u00d7","Syarat: Minat usrah","Syarat: Bukan musuh","Layak tarsyih","Tahap kelayakan","Kekurangan syarat",
-    "BPMy %","BPMy lulus (\u226550%)",...BPMY.map(c=>"BPMy "+c.name+" %"),"Item WAJIB belum skor","Remarks BPMy",
+    "BPMy %","BPMy lulus (\u226550%)",...BPMY.map(c=>"BPMy "+c.name+" %"),"Item WAJIB belum skor","Remarks BPMy",...SYURUT.map((x,i)=>"Syurut "+(i+1)+": "+x.s),
     "Tindakan seterusnya","Sasaran tarikh","Pemilik tindakan","Keadaan",
     "Tarikh naik Muhib","Disahkan Muhib oleh","Tarikh naik Muayyid","Disahkan Muayyid oleh","Tarikh ahli","Sejarah tarsyih",
     "Passing","Passing cawangan","Passing pautan","Catatan","Ditambah oleh","Ditambah pada"];
@@ -4062,7 +4078,7 @@ function exportCSV(){const yn=b=>b?"Ya":"Tidak";
       ses.length,lastSessionDate(p),ses.map(s=>[s.tarikh||"?",s.jenis||"Sesi",[s.oleh,s.oleh2].filter(Boolean).join("/"),s.nota].filter(Boolean).join(" \u00b7 ")).join("\n"),
       isMut?yn(mc[0].ok):"",isMut?yn(mc[1].ok):"",isMut?yn(mc[2].ok):"",(isMut||isMuh)?yn(eligible(p)):"",tl,(isMut||isMuh)?dk.t:"",
       isMuh?Math.round(b.pct*100):"",isMuh?yn(b.pass):"",...b.cats.map(c=>isMuh?Math.round(c.score/(c.max||1)*100):""),isMuh?wajibZero(p).join("; "):"",
-      Object.keys(p.remarks||{}).filter(k=>p.remarks[k]).map(k=>{const c=BPMY.find(x=>x.id===k);return (c?c.name:k)+": "+p.remarks[k];}).join("\n"),
+      Object.keys(p.remarks||{}).filter(k=>p.remarks[k]).map(k=>{const c=BPMY.find(x=>x.id===k);return (c?c.name:k)+": "+p.remarks[k];}).join("\n"),...SYURUT.map(x=>isMuh?(p[x.f]==="Ya"?"Ya":"Tidak"):""),
       na.label||"",na.due||"",na.owner||"",statusOf(p).t,
       p.tarikhMuhib,p.tarsyihMuhibOleh,p.tarikhMuayyid,p.tarsyihMayOleh,p.tarikhAhli,(p.tarsyih||[]).map(t=>(t.tarikh||"")+" \u2192 "+stageLabel(t.ke)+(t.oleh?" ("+t.oleh+")":"")).join("\n"),
       yn(p.passing),p.passCaw,p.passLink,p.catatan,p.ditambahOleh,p.ditambahPada].map(cc).join(",");});
@@ -4074,6 +4090,9 @@ async function exportBPMy(p){if(!p)return;await loadXLSX();const b=bpmy(p);
     ["GAMBARAN FOKUS TARBIAH MHB","% CAPAI","% PENUH"]];
   SUMMARY_ORDER.forEach(cid=>{const c=b.cats.find(x=>x.id===cid);aoa.push([c.name,(c.score/BPMY_MAX),(c.max/BPMY_MAX)]);});
   aoa.push(["TOTAL",b.pct,1]);aoa.push(["LULUS (≥50%)?",b.pass?"YA":"BELUM"]);aoa.push([]);
+  aoa.push(["CHECKLIST MUHIB UNTUK KE MUAYYID (4 SYURUT)"]);
+  SYURUT.forEach((x,i)=>aoa.push(["("+(i+1)+") "+x.t,p[x.f]==="Ya"?"Ya":"Tidak"]));
+  aoa.push(["LAYAK MUAYYID?",eligible(p)?"YA":"BELUM"]);aoa.push([]);
   aoa.push(["NO","PERKARA","PENCAPAIAN (0-5)","PEMBERAT","SKOR"]);
   BPMY.forEach(c=>{aoa.push([c.id.toUpperCase(),c.name.toUpperCase(),"","",""]);
     c.items.forEach(it=>{const pen=(p.bpmy&&p.bpmy[it.id])||0;aoa.push([it.id,it.t+(it.wajib?" (WAJIB)":""),pen,it.w,pen*it.w]);});});
