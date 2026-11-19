@@ -1238,7 +1238,7 @@ const KEY="kitpd_psm_sa";
    out. APP_VERSION must never be below the backend's floor for a fresh deploy.
    Fail direction: a reply with no `requiredVersion` (backend not yet updated)
    leaves writes ENABLED, so rolling the guard out cannot lock the team out. */
-const APP_VERSION=28;
+const APP_VERSION=29;
 let STALE=false;
 /* Called on every backend reply. Only a numeric, strictly-higher floor trips
    the switch; anything else (absent, null, junk) is treated as "no floor". */
@@ -3151,11 +3151,15 @@ function muhSection(p){
 }
 
 /* ---------- MINIT ---------- */
+/* Newest tarikh first; meetings with no date go last. Sorts a copy for display
+   only, so S.meetings order (and sync) is untouched. */
+function meetingsByDate(){return (S.meetings||[]).slice().sort((a,b)=>(b.tarikh||"").localeCompare(a.tarikh||""));}
 function viewMinit(){
-  const open=[];S.meetings.forEach(m=>m.items.forEach(it=>{if(it.status!=="Selesai")open.push({m,it});}));
+  const ms=meetingsByDate();
+  const open=[];ms.forEach(m=>m.items.forEach(it=>{if(it.status!=="Selesai")open.push({m,it});}));
   const ob=`<details class="stats" ${openExp?"open":""}><summary style="cursor:pointer;font-weight:800;color:var(--blue)">Tindakan (${open.length})</summary><div style="margin-top:8px">`+
     (open.length?open.map(({m,it})=>`<div class="tind"><div class="tind-l"><div class="tind-pic">${esc(it.pic||"(PIC)")}</div><div class="tind-task">${esc(it.tugasan||"(tugasan)")}</div><div class="tind-from">dari: ${esc(m.tajuk||"(mesyuarat)")}</div></div><div class="tind-r"><div class="tind-due">${esc(it.due||"—")}</div><select data-sumstat="${m.id}|${it.id}" class="tind-sel">${["To do","In progress","Selesai"].map(s=>`<option${s===(it.status||"To do")?" selected":""}>${s}</option>`).join("")}</select></div></div>`).join(""):`<div class="hint">Tiada tindakan.</div>`)+`</div></details>`;
-  const list=S.meetings.length?S.meetings.map(meetCard).join(""):`<div class="empty"><b>Belum ada mesyuarat</b></div>`;
+  const list=ms.length?ms.map(meetCard).join(""):`<div class="empty"><b>Belum ada mesyuarat</b></div>`;
   return `<div class="bar"><button class="add" id="addMeetBtn" style="flex:1">＋ Mesyuarat baharu</button></div>${ob}<div class="rows">${list}</div>`;
 }
 /* The meeting attendance checklist is the PD page's list. It used to be a mix of
